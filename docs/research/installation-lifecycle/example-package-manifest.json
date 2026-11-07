@@ -1,11 +1,16 @@
 {
-  "_comment": "SYNTHETIC illustration for R06 (#7). Placeholder hashes; field names are proposals for D01/D05, not an adopted schema.",
+  "_comment": "SYNTHETIC, NON-EXECUTABLE illustration for R06 (#7) revision 2. All hashes are placeholders; no receipt or validation result shown here occurred. Field names are proposals for D01/D05, not an adopted schema. Scope is deliberately INCOMPLETE (see scope_note).",
+  "scope_note": "Illustrative subset: one design revision, one unbound bundle, one synthetic receipt, two declared procurement packages and an unexecuted binding placeholder. Not an S5-design package and not installable.",
   "project_id": "00000000-0000-4000-8000-000000000000",
   "design_revision": 7,
   "supersedes": 6,
-  "readiness_state": "S5-design",
-  "design_hash": "sha256:<placeholder: hash over the unbound design artifacts below>",
-  "bound_package_hash": null,
+  "hash_rules": {
+    "instance": "sha256(file bytes)",
+    "design_hash": "sha256(concat over instances where in_design_hash=true, sorted by path, of '<path>\\0<sha256>\\n')",
+    "bound_hash": "same rule over bound_manifest instances plus binding_input sha256",
+    "excluded_from_digests": ["approvals", "receipts", "packages[].approver", "signatures"]
+  },
+  "design_hash": "sha256:<placeholder>",
   "upstream": {
     "release": "26.05",
     "fabric": "v0.144.1@4bde50829fd7cfebac69332982abd1dee504a8a3",
@@ -13,25 +18,46 @@
     "docs": "1be68948e177dcc031e91659ab5293ba19893ccf"
   },
   "generator": {"name": "hh-aid", "version": "<tbd>", "rules": "<tbd>", "catalog": "<tbd>", "support_policy": "<tbd>"},
-  "artifacts": [
-    {"id": "A1", "path": "design/baseline.json", "sha256": "<placeholder>", "in_design_hash": true},
-    {"id": "A2", "path": "wiring/include/00-fabric.yaml", "sha256": "<placeholder>", "in_design_hash": true},
-    {"id": "A2", "path": "wiring/include/10-switches.yaml", "sha256": "<placeholder>", "in_design_hash": true},
-    {"id": "A2", "path": "wiring/include/20-servers-connections.yaml", "sha256": "<placeholder>", "in_design_hash": true},
-    {"id": "A3", "path": "validation/hhaid-receipt.json", "sha256": "<placeholder>", "in_design_hash": false, "covers": ["A2"], "config": "synthetic", "config_sha256": "<placeholder>"},
-    {"id": "A5", "path": "bom/bom.csv", "sha256": "<placeholder>", "in_design_hash": true},
-    {"id": "A6", "path": "site/placement.csv", "sha256": "<placeholder>", "in_design_hash": true},
-    {"id": "A7", "path": "install/cable-schedule.csv", "sha256": "<placeholder>", "in_design_hash": true},
-    {"id": "A8", "path": "install/labels.csv", "sha256": "<placeholder>", "in_design_hash": true},
-    {"id": "A10", "path": "install/site-prerequisites.json", "sha256": "<placeholder>", "in_design_hash": false},
-    {"id": "A11", "path": "site/binding-template.csv", "sha256": "<placeholder>", "in_design_hash": false}
+  "instances": [
+    {"instance_id": "A1.baseline", "type": "A1", "path": "design/baseline.json", "sha256": "<placeholder>", "in_design_hash": true},
+    {"instance_id": "A2.fabric", "type": "A2", "path": "wiring/include/00-fabric.yaml", "sha256": "<placeholder>", "in_design_hash": true},
+    {"instance_id": "A2.switches", "type": "A2", "path": "wiring/include/10-switches.yaml", "sha256": "<placeholder>", "in_design_hash": true},
+    {"instance_id": "A2.servers-connections", "type": "A2", "path": "wiring/include/20-servers-connections.yaml", "sha256": "<placeholder>", "in_design_hash": true},
+    {"instance_id": "A4.synthetic-config", "type": "A4", "path": "validation/synthetic-fab.yaml", "sha256": "<placeholder>", "in_design_hash": false, "label": "VALIDATION-ONLY - NOT AN INSTALLATION CONFIG; public placeholder credential values; release-binary acceptance untested"},
+    {"instance_id": "A5.budgetary", "type": "A5", "path": "bom/budgetary.csv", "sha256": "<placeholder>", "in_design_hash": true},
+    {"instance_id": "A6.placement", "type": "A6", "path": "site/placement-routes.csv", "sha256": "<placeholder>", "in_design_hash": true},
+    {"instance_id": "A7.schedule", "type": "A7", "path": "install/cable-schedule.csv", "sha256": "<placeholder>", "in_design_hash": true},
+    {"instance_id": "A8.labels", "type": "A8", "path": "install/labels.csv", "sha256": "<placeholder>", "in_design_hash": true},
+    {"instance_id": "A9.portmaps", "type": "A9", "path": "install/port-maps.csv", "sha256": "<placeholder>", "in_design_hash": true},
+    {"instance_id": "A10.prereqs", "type": "A10", "path": "install/site-prerequisites.json", "sha256": "<placeholder>", "in_design_hash": false},
+    {"instance_id": "A11.template", "type": "A11", "path": "site/binding-template.csv", "sha256": "<placeholder>", "in_design_hash": false}
   ],
+  "bundles": {
+    "A2.unbound": ["A2.fabric", "A2.switches", "A2.servers-connections"]
+  },
+  "packages": [
+    {"package_id": "PKG-OPTICS-1", "scope": "fabric-link optics for leaf-spine links", "readiness": "procurement-candidate", "included": ["module class for L-f01 ends (C-0001, C-0002)"], "excluded": ["fiber jumpers (cabling plant/route unresolved)"], "dependency_risks": ["module connector depends on cabling plant type"], "line_state": "planned", "approver": "<named role, pending>"},
+    {"package_id": "PKG-CABLES-1", "scope": "server integrated assemblies X-0002..X-0004", "readiness": "blocked", "blocked_by": ["exact orderable lengths/branch geometry", "qualified SKU per R05"], "line_state": "planned"},
+    {"package_id": "PKG-INSTALL-1", "scope": "installation design package", "readiness": "not-ready", "blocked_by": ["PKG-CABLES-1", "A6 routes for RT-012"]}
+  ],
+  "receipts": [
+    {"receipt_id": "R-A3-1", "kind": "synthetic-snapshot", "covers": [
+        {"instance_id": "A2.fabric", "sha256": "<placeholder>"},
+        {"instance_id": "A2.switches", "sha256": "<placeholder>"},
+        {"instance_id": "A2.servers-connections", "sha256": "<placeholder>"},
+        {"instance_id": "A4.synthetic-config", "sha256": "<placeholder>"}],
+     "result": "<not executed - placeholder>", "scope": "checks the pinned CLI executes under synthetic config; R03 G1-G7 open"}
+  ],
+  "binding": {
+    "_comment": "Operator-produced; shown as an empty placeholder. No binding or A12 receipt has occurred.",
+    "binding_version": null,
+    "binding_input": {"instance_id": "A11.inputs", "sha256": null},
+    "transformation": {"tool": null, "version": null, "permitted_fields": ["Switch.spec.boot.serial", "Switch.spec.boot.mac", "Server.spec.inspect.expectedSysName", "server-side Connection port strings via link map"], "changes": []},
+    "bound_manifest_hash": null,
+    "operator_receipt": {"receipt_id": null, "kind": "bound-snapshot", "covers": "imported bytes of bound manifest", "real_config_digest": null}
+  },
   "approvals": [
-    {"role": "designer", "name": "<named person>", "design_hash": "sha256:<placeholder>", "at": "<timestamp>"},
-    {"role": "support-authority", "name": "<pending>", "scope": "support claims for capabilities used", "design_hash": null}
-  ],
-  "labels": {
-    "upstream_gate": "accepted by checks the pinned CLI executes, with synthetic config only; not admission, not support, not deployable",
-    "installation": "operator validation receipt (A12) and site binding (A11) required before build"
-  }
+    {"role": "designer (P2)", "name": "<named person>", "approval_class": "full", "design_hash": "sha256:<placeholder>", "at": "<timestamp>"},
+    {"role": "support authority (AUTH)", "name": "<pending>", "scope": "support claims for capabilities used", "design_hash": null}
+  ]
 }
