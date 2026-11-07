@@ -38,3 +38,19 @@ run unbundled-40       gen --unbundled-servers 40
 run unbundled-60       gen --unbundled-servers 60            # exceeds VS leaf ports
 run unbundled-300      gen --unbundled-servers 300           # uint8 truncation: 300 -> 44
 run real-profile       gen --sp celestica-ds5000             # only virtual profiles accepted
+
+# Revision 2 parity probe (G1): offline validation vs CRD schema. Remove the second link of the first ESLAG
+# connection in the default wiring; the pinned CRD declares eslag.links minItems: 2, so a real API server is
+# expected to reject it (NOT executed here: no cluster). Offline `hhfab validate` result is recorded.
+d="$W/runs/parity-eslag-1link"; mkdir -p "$d"; cd "$d"
+"$H" init --dev >/dev/null 2>&1; "$H" vlab gen >/dev/null 2>&1
+awk '
+  /name: server-01--eslag--leaf-01--leaf-02$/ {inconn=1}
+  inconn && /^    - server:$/ {nlink++}
+  inconn && nlink==2 && /^    - server:$/ {skip=4}
+  skip>0 {skip--; next}
+  /^---$/ {inconn=0; nlink=0}
+  {print}' include/vlab.generated.yaml > include/tmp && mv include/tmp include/vlab.generated.yaml
+echo "=== parity-eslag-1link: ESLAG connection with 1 link (CRD minItems: 2)"
+echo "  links in server-01 eslag: $(awk '/name: server-01--eslag/{f=1} f&&/^---$/{exit} f&&/- server:/{n++} END{print n+0}' include/vlab.generated.yaml)"
+if "$H" validate > validate.log 2>&1; then echo "  validate: OK (offline accepts; CRD schema would reject — not executed)"; else echo "  validate: FAIL: $(grep ERR validate.log)"; fi
