@@ -12,7 +12,7 @@ The same agent may fill different roles sequentially, but an artifact's independ
 
 ## Lasting role nicknames
 
-Names belong to roles; an ephemeral replacement resumes the same nickname. Session aliases t1–t4 remain valid. Other roles have not yet been instantiated. A role's review assignment may begin before its downstream design ticket is Ready; that does not unlock dependent design work.
+Names belong to roles; an ephemeral replacement resumes the same nickname. Seven sessions are established: t1–t7 below. Roles with a dash have not been instantiated; do not send the sponsor instructions as though they already exist. Always address dispatch messages to `tN / nickname` and state explicitly if a new agent session is needed. A role's review assignment may begin before its downstream design ticket is Ready; that does not unlock dependent design work.
 
 | Nickname | Session alias | Purpose | Assignments |
 | --- | --- | --- | --- |
@@ -20,14 +20,14 @@ Names belong to roles; an ephemeral replacement resumes the same nickname. Sessi
 | scout | t2 | Product discovery and user needs | R01 |
 | compat | t3 | Hedgehog support and compatibility | R02 |
 | bridge | t4 | Upstream reuse and integration research | R03 |
-| topo | — | Network topology and rail/domain constraints | R04 |
+| topo | t6 | Network topology and rail/domain constraints | Review R02 (#3); R04 (#5) |
 | parts | — | Hardware profiles, physical links and BOM | R05 |
 | ops | — | Installation and lifecycle handoff | R06 |
 | model | — | Domain model and progressive input contracts | D01 |
-| ux | — | User research and interaction design | D02 |
+| ux | t5 | User research and interaction design | Review R01 (#2); D02 (#9) |
 | solver | — | Allocation and constraint algorithms | D03 |
 | check | — | Independent correctness verification | D04, S02 |
-| arch | — | Application architecture, deployment and security | D05 |
+| arch | t7 | Application architecture, deployment and security | Review R03 (#4); D05 (#12) |
 | spike | — | Bounded executable feasibility work | S01 |
 
 ## Issue comment protocol

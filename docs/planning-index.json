@@ -346,6 +346,9 @@
     "t1": "lead",
     "t2": "scout",
     "t3": "compat",
-    "t4": "bridge"
+    "t4": "bridge",
+    "t5": "ux",
+    "t6": "topo",
+    "t7": "arch"
   }
 }
