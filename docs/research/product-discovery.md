@@ -4,8 +4,8 @@
 | --- | --- |
 | Issue | [#2 R01](https://github.com/afewell-hh/hh-aid/issues/2) (coordination [#1](https://github.com/afewell-hh/hh-aid/issues/1)) |
 | Role / author | **scout**, Product discovery lead (AI agent, Claude Opus 5.5, session of 2026-11-07) |
-| Independent reviewers | UX researcher (`ux`, D02 owner) and sponsor. ux disposition on revision 3: [changes requested](https://github.com/afewell-hh/hh-aid/issues/2#issuecomment-6712419637). Revision 4 responds. |
-| Status | Revision 4: public-source-only draft. One correction round for ux findings M1–M4, m1 and m2 ([lead 6712493749](https://github.com/afewell-hh/hh-aid/issues/2#issuecomment-6712493749)). Not self-approved. Every user, target, readiness state, release policy and slice recommendation here is a **proposal**. |
+| Independent reviewers | UX researcher (`ux`, D02 owner) and sponsor. ux [accepted revision 4 subject to W1–W3](https://github.com/afewell-hh/hh-aid/issues/2#issuecomment-6712984970); lead applied those specified corrections in revision 5. Sponsor review remains pending. |
+| Status | Revision 5: public-source-only draft. Lead applied ux-prescribed W1–W3 wording corrections after independent review; no new UX review cycle required. Not self-approved. Every user, target, readiness state, release policy and slice recommendation here is a **proposal**. |
 | Evidence date | 2026-11-07 |
 
 ## 1. Question and scope
@@ -132,7 +132,7 @@ Users meet several output states, and each permits different actions. This ladde
 | **S0 Intent captured** | Request recorded with its source | Internal discussion | Any quantity shared as an answer | `INTENT – no design` |
 | **S1 Provisional estimate** | Every number traces to an input, a named default or an assumption; unknowns ranked | Share as a *range-style estimate* with its assumptions listed | Ordering, quoting as committed, cabling | `PROVISIONAL ESTIMATE – assumptions listed – not a design` |
 | **S2 Candidate design** | Profiles chosen; no hard-constraint violation in hh-aid's own checks; remaining unknowns listed | Design review; comparing scenarios | Ordering, cabling, claiming Hedgehog support | `CANDIDATE – not validated` |
-| **S3 Validated design package** | S2, plus: R02 support rows for every capability used; pinned upstream gate passes with warnings captured, plus the §13.1 extra checks; D04 independent checks pass; component BOM *estimated* by part class | Approval; customer design review; budgetary BOM | Ordering length-specific cable assemblies or optics; starting cabling | `VALIDATED DESIGN – lengths/reach unspecified – not orderable` |
+| **S3 Validated design package** | S2, plus: R02 support rows for every capability used; pinned CLI gate passes (it does not surface object warnings); hh-aid's versioned support policy blocks unsupported and warning-only families; any warnings from a separate direct-validation or webhook integration are labelled with their source; the §13.1 extra checks pass; D04 independent checks pass; component BOM *estimated* by part class | Approval; customer design review; budgetary BOM | Ordering length-specific cable assemblies or optics; starting cabling | `VALIDATED DESIGN – lengths/reach unspecified – not orderable` |
 | **S4 Procurement-ready** | S3 approved, plus: per-link length or reach class (user-supplied or derived from placement); media compatibility evidence (R05); no open critical unknowns that affect parts | Hand the BOM to procurement | Cabling before S5 | `PROCUREMENT-READY – rev N` |
 | **S5 Installation-ready** | S4, plus: placement and labels; cable schedule; installation inputs that R06 defines (for example serials or MACs if required); every critical unknown closed by its resolver | Start installation | — | `INSTALLATION-READY – rev N` |
 
@@ -177,7 +177,7 @@ These are proposed measures for the sponsor to accept or adjust (**H**). Baselin
 | --- | --- | --- | --- |
 | SM1 Same-scenario time and correctness | One scripted sparse scenario (≤3 answers) done with the incumbent path and with hh-aid. Record time to a first estimate, and whether the estimate falls within the pre-written expected ranges and names the expected top unknowns. A fast but wrong estimate fails. Field turnaround (Q-S2) is context, not the comparison. | Set after the LG1 baseline. Hypothesis to test: ≤15 min and correct (A-16) | TBD: incumbent path on the same scenario (H-W1) |
 | SM2 Assumption visibility | Per participant: the share of a fixed, pre-selected set of displayed quantities whose source (input, default, assumption or derived) they classify correctly. Critical misunderstandings are counted separately. | Signal to proceed: no critical misunderstanding. The item share is reported per participant (≥90% is a heuristic, not a pass mark). | n/a |
-| SM3 Pinned upstream validation | Share of installation-gate exports that pass `hhfab validate` at the pinned version, with warnings captured | 100% (any failure blocks release). Necessary, not sufficient: support, hardware and requirement checks are separate (SM4, R02). | n/a |
+| SM3 Pinned upstream validation | Share of S3-and-above exports whose pinned CLI gate passes (the CLI does not surface object warnings); hh-aid's versioned support policy blocks unsupported and warning-only families; any warnings from a separate direct-validation or webhook integration are labelled with their source | 100% (any failure blocks release). Necessary, not sufficient: support, hardware and requirement checks are separate (SM4, R02). | n/a |
 | SM4 Independent agreement | Agreement between generator and independent oracle (D04) on ports, endpoints, rails, capacity and BOM, across golden and mutation fixtures | 100% on golden fixtures; every seeded mutation detected | n/a |
 | SM5 Determinism | Identical inputs give byte-identical canonical output. A one-field change gives a diff limited to its explained impact set. | 100% | n/a |
 | SM6 Installation-task correctness (applies once S5 artifacts exist) | For a pre-selected sample of links per pattern (server–rail leaf, leaf–spine, breakout lane, plus management if in scope), the installer states endpoint A/B, port, lane, assembly type and label. Reported per pattern. Clarification questions are recorded separately and categorised. A confident misread is a critical finding. | Every sampled link correct in every pattern; any miss is analysed | If available, the same sample from an incumbent-style schedule (Q-I1). Q-I2 informs the categories only. |
@@ -217,7 +217,7 @@ This is a proposal for **sponsor review**, which the acceptance criterion requir
 **Session format (H).** 45 minutes. Open with a recent-story prompt ("walk me through the last cluster you sized") rather than hypotheticals. Ask about past behaviour, not opinions about a future tool. Collect any sanitised artifact the participant can share.
 
 **Ranking exercise (last 10 minutes; P1–P4).**
-1. Rank the journey stages J0–J7 (§5) twice: by how painful the stage was in the participant's last two designs, and by how often they do it.
+1. Rank the journey stages J0–J7 (§5) twice: by how painful the stage was in the participant's last two designs, and by how often they do it. Offer “not my stage” for stages they do not perform; exclude those from their rankings and report results by role.
 2. Rank cards FM1–FM12 (§6, in plain wording) by cost the participant has actually *experienced*. Mark "never seen" separately.
 3. A blank card is always offered: "a pain not on these cards".
 
@@ -291,7 +291,7 @@ Each goal is timeboxed. "Exit evidence" must be an artifact, not an opinion.
 | ID | We believe… | We will learn by… | Exit evidence / threshold | Timebox (planning, not a promise) | Owner |
 | --- | --- | --- | --- | --- | --- |
 | LG1 | SEs and designers are the primary users and the incumbent workflow is too slow or error-prone (A-01, A-02) | Interviews Q-S1 to Q-S11 with 4 SE/designer participants (minimum 3) per the §9 screening; the incumbent path timed on the SM1 scripted scenario | Recorded interviews; per-participant SM1 baseline; ranking exercise results; the §11.1 evidence log updated, with any P0 disconfirmation stated | 1–2 weeks of calendar time, depending on sponsor introductions | R01, sponsor |
-| LG2 | A sparse request can produce a *useful* provisional output without false precision (A-03, A-05) | D02 paper prototype of J1 for "512 B300 HGX" and "8 NVL72 racks", tested with 3–4 SEs | Per participant: SM2 item accuracy, SM9 comprehension, and whether they pick the pre-defined "right next question" (written in advance by R04/ux from the scenario). Zero critical misunderstandings, or each one analysed. Qualitative evidence only. | One D02 iteration | D02 |
+| LG2 | A sparse request can produce a *useful* provisional output without false precision (A-03, A-05) | D02 paper prototype of J1 for "512 B300 HGX" and "8 NVL72 racks", tested with 3–4 SEs | Per participant: SM2 item accuracy, SM9 comprehension, and whether they pick the pre-defined "right next question" (written in advance by topo/R04 or check, independently of the facilitator, from the scenario). Zero critical misunderstandings, or each one analysed. Qualitative evidence only. | One D02 iteration | D02 |
 | LG3 | The rail-aware allocation for 32/64 nodes can be expressed within the 26.05 support contract and exported to wiring that `hhfab validate` accepts (A-06, A-07) | R02 matrix rows plus R04 worked cases, then S01 spike | `hhfab validate` passes at v0.51.4; independent oracle agrees; a negative case is rejected with an explanation | M3 spike | R02/R04 → S01 |
 | LG4 | Regeneration can be deterministic with stable identities (FM6) | S01 regeneration after a one-field change | SM5 met; the diff names its impacted connections | Same spike | S01/S02 |
 | LG5 | The incumbent workflow's handoff, if one exists (H-W1), can be a compatibility target instead of a competitor (A-08) | Reproduce one already reviewed design in the slice and compare outputs. Use a public OCP composition until D5 permits a sanitised real one. | Equivalence report with explained differences, or a documented reason it cannot be reproduced | After S01 | Sponsor decision D1, then a spike |
@@ -355,7 +355,7 @@ Each P0 assumption gets a running count, **by participant**, of interviews that 
 
 | ID | Supports | Contradicts | No evidence | Disconfirmed if (pre-stated) |
 | --- | --- | --- | --- | --- |
-| A-01 | 0 | 0 | 0 | Most SE/designer participants rank installation or lifecycle stages (J4–J7) above J0–J2 for pain, or rank estimation pain as rare |
+| A-01 | 0 | 0 | 0 | Across participating roles, including installers and operators, most participants with applicable experience rank installation or lifecycle stages (J4–J7) above J0–J2 for pain, or rank estimation pain as rare. Exclude “not my stage”; report denominators and findings by role, including disagreement rather than letting SE rankings stand for all roles |
 | A-02 | 0 | 0 | 0 | In Q-S11, most last designs passed through separate people for estimate and design with distinct tools |
 | A-03 | 0 | 0 | 0 | In LG2, most participants reject provisional outputs as unusable, or make critical misunderstandings despite labels |
 | A-08 | 0 | 0 | 0 | No participant uses a repeatable handoff format, or participants say a clean break is preferable |
@@ -399,7 +399,7 @@ Both are **peer research reports under review**, not accepted hh-aid facts. Neit
 - performance;
 - support for warning-only deprecated features.
 
-bridge defines this as the **U-gate**. Revision 3 reads a pass as "accepted by the checks the pinned CLI executes at pin P", meaning upstream semantic acceptance minus G1–G7, and lists those gaps ([§3.1](https://github.com/afewell-hh/hh-aid/blob/7459463688a35f1fb8c1d4b0093c241a1f23c149/docs/research/upstream-reuse.md#L101)).
+bridge defines this as the **U-gate**. Revision 4 reads a pass as "accepted by the checks the pinned CLI executes at pin P", meaning upstream semantic acceptance minus G1–G7, and lists those gaps ([§3.1](https://github.com/afewell-hh/hh-aid/blob/2b547901413c00fb8d7ce3eeff7d6669f2b78135/docs/research/upstream-reuse.md#L105)).
 
 | Gap | Evidence status |
 | --- | --- |
@@ -460,7 +460,7 @@ These are **not proven equivalent** in availability, physical isolation, address
 | Measurable learning goals and candidate vertical slices that preserve full coverage | §10.1, §10.2, §10.3 | LG1/LG2/LG6 thresholds made per participant; VS-B terminal state S3 (D8) |
 | Ownership boundaries for procurement, live deployment and lifecycle, with sponsor review | §8.2 | **Awaiting sponsor review** |
 | Facts, hypotheses, inferred maintainer intent and open questions separated; source versions and reproducible evidence | Labels throughout; §1 baseline; §15 commands; public sources only (§1, §3.3) | Accepted for this pass by ux; m2 wording updated (§13.1). |
-| Independent reviewer disposition; sponsor/domain decisions recorded | — | **Not started.** Reviewers: ux and sponsor. Decisions D1–D7 pending. ux review assigned by lead. |
+| Independent reviewer disposition; sponsor/domain decisions recorded | — | ux accepted rev 4 with W1–W3; lead applied the prescribed corrections in rev 5. Sponsor review and decisions D1–D8 pending. |
 
 ## 15. Reproducible evidence
 
@@ -509,7 +509,7 @@ Key findings: §2 (overlap with existing public tools; SE/designer proposed prim
 Acceptance criteria with evidence: §14
 Cross-ticket reconciliation: §13 consolidated from compat #4 review 6711820797 and bridge 7459463
 Assumptions and unresolved questions: §11, §9, §13, §16
-Decisions requested (with alternatives): §12 D1–D7
-Independent reviewer and review status: ux changes requested on rev 3 → rev 4 awaiting ux delta review; sponsor pending
+Decisions requested (with alternatives): §12 D1–D8
+Independent reviewer and review status: ux accepted rev 4 subject to W1–W3; lead applied specified fixes in rev 5; sponsor pending
 Recommended next assignment: sponsor decision session (Q-SP1–7), then interviews (LG1); R02/R04/R05 to confirm VS-B feasibility
 ```
