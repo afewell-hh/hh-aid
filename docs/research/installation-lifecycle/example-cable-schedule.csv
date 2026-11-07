@@ -1,0 +1,7 @@
+# SYNTHETIC illustration for R06 (#7). Hypothetical H400 profiles from R04; not a qualified design, SKU or customer data.
+# One row per physical termination pair (assembly leg). Breakout assembly X-0003 has two legs sharing one parent cage.
+row_id,design_rev,link_id,assembly_id,leg,assembly_class,a_rack,a_ru,a_device,a_port,a_cage_mode,a_lane,b_rack,b_ru,b_device,b_port,b_cage_mode,speed_gbps,rail,plane,role,length_m,length_source,label_l1,label_l2,label_l3,status
+1,7,L-1a2b3c,X-0001,a,optic-pair+fiber,R01,40,leaf-r0-p0,E1/33,1x800G,,R02,40,spine-00,E1/1,1x800G,800,,P0,fabric,12,derived:placement-v3+slack-2m,L-1a2b3c X-0001.a,A: R01-40 leaf-r0-p0 E1/33,B: R02-40 spine-00 E1/1,planned
+2,7,L-4d5e6f,X-0002,a,integrated-dac,R01,40,leaf-r0-p0,E1/1/1,2x400G,1,R01,30,srv-0001,nic0-p0,,400,R0,P0,server,2,user-supplied,L-4d5e6f X-0002.a R0 P0,A: R01-40 leaf-r0-p0 E1/1/1,B: R01-30 srv-0001 nic0-p0,planned
+3,7,L-7a8b9c,X-0003,a,breakout-dac-1to2,R01,40,leaf-r0-p0,E1/2/1,2x400G,1,R01,26,srv-0002,nic0-p0,,400,R0,P0,server,3,user-supplied,L-7a8b9c X-0003.a R0 P0,A: R01-40 leaf-r0-p0 E1/2/1,B: R01-26 srv-0002 nic0-p0,planned
+4,7,L-0d1e2f,X-0003,b,breakout-dac-1to2,R01,40,leaf-r0-p0,E1/2/2,2x400G,2,R01,22,srv-0003,nic0-p0,,400,R0,P0,server,3,user-supplied,L-0d1e2f X-0003.b R0 P0,A: R01-40 leaf-r0-p0 E1/2/2,B: R01-22 srv-0003 nic0-p0,planned

@@ -1,0 +1,37 @@
+{
+  "_comment": "SYNTHETIC illustration for R06 (#7). Placeholder hashes; field names are proposals for D01/D05, not an adopted schema.",
+  "project_id": "00000000-0000-4000-8000-000000000000",
+  "design_revision": 7,
+  "supersedes": 6,
+  "readiness_state": "S5-design",
+  "design_hash": "sha256:<placeholder: hash over the unbound design artifacts below>",
+  "bound_package_hash": null,
+  "upstream": {
+    "release": "26.05",
+    "fabric": "v0.144.1@4bde50829fd7cfebac69332982abd1dee504a8a3",
+    "fabricator": "v0.51.4@d2316aca666eb278541276a11a5f8dae372bf629",
+    "docs": "1be68948e177dcc031e91659ab5293ba19893ccf"
+  },
+  "generator": {"name": "hh-aid", "version": "<tbd>", "rules": "<tbd>", "catalog": "<tbd>", "support_policy": "<tbd>"},
+  "artifacts": [
+    {"id": "A1", "path": "design/baseline.json", "sha256": "<placeholder>", "in_design_hash": true},
+    {"id": "A2", "path": "wiring/include/00-fabric.yaml", "sha256": "<placeholder>", "in_design_hash": true},
+    {"id": "A2", "path": "wiring/include/10-switches.yaml", "sha256": "<placeholder>", "in_design_hash": true},
+    {"id": "A2", "path": "wiring/include/20-servers-connections.yaml", "sha256": "<placeholder>", "in_design_hash": true},
+    {"id": "A3", "path": "validation/hhaid-receipt.json", "sha256": "<placeholder>", "in_design_hash": false, "covers": ["A2"], "config": "synthetic", "config_sha256": "<placeholder>"},
+    {"id": "A5", "path": "bom/bom.csv", "sha256": "<placeholder>", "in_design_hash": true},
+    {"id": "A6", "path": "site/placement.csv", "sha256": "<placeholder>", "in_design_hash": true},
+    {"id": "A7", "path": "install/cable-schedule.csv", "sha256": "<placeholder>", "in_design_hash": true},
+    {"id": "A8", "path": "install/labels.csv", "sha256": "<placeholder>", "in_design_hash": true},
+    {"id": "A10", "path": "install/site-prerequisites.json", "sha256": "<placeholder>", "in_design_hash": false},
+    {"id": "A11", "path": "site/binding-template.csv", "sha256": "<placeholder>", "in_design_hash": false}
+  ],
+  "approvals": [
+    {"role": "designer", "name": "<named person>", "design_hash": "sha256:<placeholder>", "at": "<timestamp>"},
+    {"role": "support-authority", "name": "<pending>", "scope": "support claims for capabilities used", "design_hash": null}
+  ],
+  "labels": {
+    "upstream_gate": "accepted by checks the pinned CLI executes, with synthetic config only; not admission, not support, not deployable",
+    "installation": "operator validation receipt (A12) and site binding (A11) required before build"
+  }
+}
