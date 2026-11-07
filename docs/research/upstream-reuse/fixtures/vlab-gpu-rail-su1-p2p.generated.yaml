@@ -1,0 +1,1173 @@
+#
+# FabricList
+#
+apiVersion: wiring.githedgehog.com/v1beta1
+kind: Fabric
+metadata:
+  name: default
+spec:
+  domains:
+    default:
+      gatewayASN: 4200006133
+      spineASN: 4200005633
+  leafASNEnd: 4200015631
+  leafASNStart: 4200006632
+#
+# VLANNamespaceList
+#
+---
+apiVersion: wiring.githedgehog.com/v1beta1
+kind: VLANNamespace
+metadata:
+  name: default
+spec:
+  ranges:
+  - from: 1000
+    to: 2999
+#
+# IPv4NamespaceList
+#
+---
+apiVersion: vpc.githedgehog.com/v1beta1
+kind: IPv4Namespace
+metadata:
+  name: default
+spec:
+  subnets:
+  - 10.0.0.0/8
+  topology: {}
+#
+# SwitchList
+#
+---
+apiVersion: wiring.githedgehog.com/v1beta1
+kind: Switch
+metadata:
+  annotations:
+    fabric.githedgehog.com/route-summ: vpc-0=10.0.0.0/24,vpc-0=10.4.0.0/24,vpc-1=10.8.0.0/24,vpc-1=10.12.0.0/24
+  name: leaf-su00-r0
+spec:
+  boot:
+    mac: 0c:20:12:ff:02:00
+  ecmp: {}
+  profile: vs
+  redundancy: {}
+  role: server-leaf
+  topology: {}
+  vlanNamespaces:
+  - default
+---
+apiVersion: wiring.githedgehog.com/v1beta1
+kind: Switch
+metadata:
+  annotations:
+    fabric.githedgehog.com/route-summ: vpc-0=10.1.0.0/24,vpc-0=10.5.0.0/24,vpc-1=10.9.0.0/24,vpc-1=10.13.0.0/24
+  name: leaf-su00-r1
+spec:
+  boot:
+    mac: 0c:20:12:ff:03:00
+  ecmp: {}
+  profile: vs
+  redundancy: {}
+  role: server-leaf
+  topology: {}
+  vlanNamespaces:
+  - default
+---
+apiVersion: wiring.githedgehog.com/v1beta1
+kind: Switch
+metadata:
+  annotations:
+    fabric.githedgehog.com/route-summ: vpc-0=10.2.0.0/24,vpc-0=10.6.0.0/24,vpc-1=10.10.0.0/24,vpc-1=10.14.0.0/24
+  name: leaf-su00-r2
+spec:
+  boot:
+    mac: 0c:20:12:ff:04:00
+  ecmp: {}
+  profile: vs
+  redundancy: {}
+  role: server-leaf
+  topology: {}
+  vlanNamespaces:
+  - default
+---
+apiVersion: wiring.githedgehog.com/v1beta1
+kind: Switch
+metadata:
+  annotations:
+    fabric.githedgehog.com/route-summ: vpc-0=10.3.0.0/24,vpc-0=10.7.0.0/24,vpc-1=10.11.0.0/24,vpc-1=10.15.0.0/24
+  name: leaf-su00-r3
+spec:
+  boot:
+    mac: 0c:20:12:ff:05:00
+  ecmp: {}
+  profile: vs
+  redundancy: {}
+  role: server-leaf
+  topology: {}
+  vlanNamespaces:
+  - default
+---
+apiVersion: wiring.githedgehog.com/v1beta1
+kind: Switch
+metadata:
+  name: spine-s00
+spec:
+  boot:
+    mac: 0c:20:12:ff:00:00
+  ecmp: {}
+  profile: vs
+  redundancy: {}
+  role: spine
+  topology: {}
+  vlanNamespaces:
+  - default
+---
+apiVersion: wiring.githedgehog.com/v1beta1
+kind: Switch
+metadata:
+  name: spine-s01
+spec:
+  boot:
+    mac: 0c:20:12:ff:01:00
+  ecmp: {}
+  profile: vs
+  redundancy: {}
+  role: spine
+  topology: {}
+  vlanNamespaces:
+  - default
+#
+# ServerList
+#
+---
+apiVersion: wiring.githedgehog.com/v1beta1
+kind: Server
+metadata:
+  name: server-su00-n00
+spec:
+  inspect: {}
+---
+apiVersion: wiring.githedgehog.com/v1beta1
+kind: Server
+metadata:
+  name: server-su00-n01
+spec:
+  inspect: {}
+---
+apiVersion: wiring.githedgehog.com/v1beta1
+kind: Server
+metadata:
+  name: server-su00-n02
+spec:
+  inspect: {}
+---
+apiVersion: wiring.githedgehog.com/v1beta1
+kind: Server
+metadata:
+  name: server-su00-n03
+spec:
+  inspect: {}
+#
+# ConnectionList
+#
+---
+apiVersion: wiring.githedgehog.com/v1beta1
+kind: Connection
+metadata:
+  name: server-su00-n00-r0-leaf-su00-r0
+spec:
+  topology: {}
+  unbundled:
+    link:
+      server:
+        port: server-su00-n00/enp2s1
+      switch:
+        port: leaf-su00-r0/E1/9
+---
+apiVersion: wiring.githedgehog.com/v1beta1
+kind: Connection
+metadata:
+  name: server-su00-n00-r1-leaf-su00-r1
+spec:
+  topology: {}
+  unbundled:
+    link:
+      server:
+        port: server-su00-n00/enp2s2
+      switch:
+        port: leaf-su00-r1/E1/9
+---
+apiVersion: wiring.githedgehog.com/v1beta1
+kind: Connection
+metadata:
+  name: server-su00-n00-r2-leaf-su00-r2
+spec:
+  topology: {}
+  unbundled:
+    link:
+      server:
+        port: server-su00-n00/enp2s3
+      switch:
+        port: leaf-su00-r2/E1/9
+---
+apiVersion: wiring.githedgehog.com/v1beta1
+kind: Connection
+metadata:
+  name: server-su00-n00-r3-leaf-su00-r3
+spec:
+  topology: {}
+  unbundled:
+    link:
+      server:
+        port: server-su00-n00/enp2s4
+      switch:
+        port: leaf-su00-r3/E1/9
+---
+apiVersion: wiring.githedgehog.com/v1beta1
+kind: Connection
+metadata:
+  name: server-su00-n00-r4-leaf-su00-r0
+spec:
+  topology: {}
+  unbundled:
+    link:
+      server:
+        port: server-su00-n00/enp2s5
+      switch:
+        port: leaf-su00-r0/E1/10
+---
+apiVersion: wiring.githedgehog.com/v1beta1
+kind: Connection
+metadata:
+  name: server-su00-n00-r5-leaf-su00-r1
+spec:
+  topology: {}
+  unbundled:
+    link:
+      server:
+        port: server-su00-n00/enp2s6
+      switch:
+        port: leaf-su00-r1/E1/10
+---
+apiVersion: wiring.githedgehog.com/v1beta1
+kind: Connection
+metadata:
+  name: server-su00-n00-r6-leaf-su00-r2
+spec:
+  topology: {}
+  unbundled:
+    link:
+      server:
+        port: server-su00-n00/enp2s7
+      switch:
+        port: leaf-su00-r2/E1/10
+---
+apiVersion: wiring.githedgehog.com/v1beta1
+kind: Connection
+metadata:
+  name: server-su00-n00-r7-leaf-su00-r3
+spec:
+  topology: {}
+  unbundled:
+    link:
+      server:
+        port: server-su00-n00/enp2s8
+      switch:
+        port: leaf-su00-r3/E1/10
+---
+apiVersion: wiring.githedgehog.com/v1beta1
+kind: Connection
+metadata:
+  name: server-su00-n01-r0-leaf-su00-r0
+spec:
+  topology: {}
+  unbundled:
+    link:
+      server:
+        port: server-su00-n01/enp2s1
+      switch:
+        port: leaf-su00-r0/E1/11
+---
+apiVersion: wiring.githedgehog.com/v1beta1
+kind: Connection
+metadata:
+  name: server-su00-n01-r1-leaf-su00-r1
+spec:
+  topology: {}
+  unbundled:
+    link:
+      server:
+        port: server-su00-n01/enp2s2
+      switch:
+        port: leaf-su00-r1/E1/11
+---
+apiVersion: wiring.githedgehog.com/v1beta1
+kind: Connection
+metadata:
+  name: server-su00-n01-r2-leaf-su00-r2
+spec:
+  topology: {}
+  unbundled:
+    link:
+      server:
+        port: server-su00-n01/enp2s3
+      switch:
+        port: leaf-su00-r2/E1/11
+---
+apiVersion: wiring.githedgehog.com/v1beta1
+kind: Connection
+metadata:
+  name: server-su00-n01-r3-leaf-su00-r3
+spec:
+  topology: {}
+  unbundled:
+    link:
+      server:
+        port: server-su00-n01/enp2s4
+      switch:
+        port: leaf-su00-r3/E1/11
+---
+apiVersion: wiring.githedgehog.com/v1beta1
+kind: Connection
+metadata:
+  name: server-su00-n01-r4-leaf-su00-r0
+spec:
+  topology: {}
+  unbundled:
+    link:
+      server:
+        port: server-su00-n01/enp2s5
+      switch:
+        port: leaf-su00-r0/E1/12
+---
+apiVersion: wiring.githedgehog.com/v1beta1
+kind: Connection
+metadata:
+  name: server-su00-n01-r5-leaf-su00-r1
+spec:
+  topology: {}
+  unbundled:
+    link:
+      server:
+        port: server-su00-n01/enp2s6
+      switch:
+        port: leaf-su00-r1/E1/12
+---
+apiVersion: wiring.githedgehog.com/v1beta1
+kind: Connection
+metadata:
+  name: server-su00-n01-r6-leaf-su00-r2
+spec:
+  topology: {}
+  unbundled:
+    link:
+      server:
+        port: server-su00-n01/enp2s7
+      switch:
+        port: leaf-su00-r2/E1/12
+---
+apiVersion: wiring.githedgehog.com/v1beta1
+kind: Connection
+metadata:
+  name: server-su00-n01-r7-leaf-su00-r3
+spec:
+  topology: {}
+  unbundled:
+    link:
+      server:
+        port: server-su00-n01/enp2s8
+      switch:
+        port: leaf-su00-r3/E1/12
+---
+apiVersion: wiring.githedgehog.com/v1beta1
+kind: Connection
+metadata:
+  name: server-su00-n02-r0-leaf-su00-r0
+spec:
+  topology: {}
+  unbundled:
+    link:
+      server:
+        port: server-su00-n02/enp2s1
+      switch:
+        port: leaf-su00-r0/E1/13
+---
+apiVersion: wiring.githedgehog.com/v1beta1
+kind: Connection
+metadata:
+  name: server-su00-n02-r1-leaf-su00-r1
+spec:
+  topology: {}
+  unbundled:
+    link:
+      server:
+        port: server-su00-n02/enp2s2
+      switch:
+        port: leaf-su00-r1/E1/13
+---
+apiVersion: wiring.githedgehog.com/v1beta1
+kind: Connection
+metadata:
+  name: server-su00-n02-r2-leaf-su00-r2
+spec:
+  topology: {}
+  unbundled:
+    link:
+      server:
+        port: server-su00-n02/enp2s3
+      switch:
+        port: leaf-su00-r2/E1/13
+---
+apiVersion: wiring.githedgehog.com/v1beta1
+kind: Connection
+metadata:
+  name: server-su00-n02-r3-leaf-su00-r3
+spec:
+  topology: {}
+  unbundled:
+    link:
+      server:
+        port: server-su00-n02/enp2s4
+      switch:
+        port: leaf-su00-r3/E1/13
+---
+apiVersion: wiring.githedgehog.com/v1beta1
+kind: Connection
+metadata:
+  name: server-su00-n02-r4-leaf-su00-r0
+spec:
+  topology: {}
+  unbundled:
+    link:
+      server:
+        port: server-su00-n02/enp2s5
+      switch:
+        port: leaf-su00-r0/E1/14
+---
+apiVersion: wiring.githedgehog.com/v1beta1
+kind: Connection
+metadata:
+  name: server-su00-n02-r5-leaf-su00-r1
+spec:
+  topology: {}
+  unbundled:
+    link:
+      server:
+        port: server-su00-n02/enp2s6
+      switch:
+        port: leaf-su00-r1/E1/14
+---
+apiVersion: wiring.githedgehog.com/v1beta1
+kind: Connection
+metadata:
+  name: server-su00-n02-r6-leaf-su00-r2
+spec:
+  topology: {}
+  unbundled:
+    link:
+      server:
+        port: server-su00-n02/enp2s7
+      switch:
+        port: leaf-su00-r2/E1/14
+---
+apiVersion: wiring.githedgehog.com/v1beta1
+kind: Connection
+metadata:
+  name: server-su00-n02-r7-leaf-su00-r3
+spec:
+  topology: {}
+  unbundled:
+    link:
+      server:
+        port: server-su00-n02/enp2s8
+      switch:
+        port: leaf-su00-r3/E1/14
+---
+apiVersion: wiring.githedgehog.com/v1beta1
+kind: Connection
+metadata:
+  name: server-su00-n03-r0-leaf-su00-r0
+spec:
+  topology: {}
+  unbundled:
+    link:
+      server:
+        port: server-su00-n03/enp2s1
+      switch:
+        port: leaf-su00-r0/E1/15
+---
+apiVersion: wiring.githedgehog.com/v1beta1
+kind: Connection
+metadata:
+  name: server-su00-n03-r1-leaf-su00-r1
+spec:
+  topology: {}
+  unbundled:
+    link:
+      server:
+        port: server-su00-n03/enp2s2
+      switch:
+        port: leaf-su00-r1/E1/15
+---
+apiVersion: wiring.githedgehog.com/v1beta1
+kind: Connection
+metadata:
+  name: server-su00-n03-r2-leaf-su00-r2
+spec:
+  topology: {}
+  unbundled:
+    link:
+      server:
+        port: server-su00-n03/enp2s3
+      switch:
+        port: leaf-su00-r2/E1/15
+---
+apiVersion: wiring.githedgehog.com/v1beta1
+kind: Connection
+metadata:
+  name: server-su00-n03-r3-leaf-su00-r3
+spec:
+  topology: {}
+  unbundled:
+    link:
+      server:
+        port: server-su00-n03/enp2s4
+      switch:
+        port: leaf-su00-r3/E1/15
+---
+apiVersion: wiring.githedgehog.com/v1beta1
+kind: Connection
+metadata:
+  name: server-su00-n03-r4-leaf-su00-r0
+spec:
+  topology: {}
+  unbundled:
+    link:
+      server:
+        port: server-su00-n03/enp2s5
+      switch:
+        port: leaf-su00-r0/E1/16
+---
+apiVersion: wiring.githedgehog.com/v1beta1
+kind: Connection
+metadata:
+  name: server-su00-n03-r5-leaf-su00-r1
+spec:
+  topology: {}
+  unbundled:
+    link:
+      server:
+        port: server-su00-n03/enp2s6
+      switch:
+        port: leaf-su00-r1/E1/16
+---
+apiVersion: wiring.githedgehog.com/v1beta1
+kind: Connection
+metadata:
+  name: server-su00-n03-r6-leaf-su00-r2
+spec:
+  topology: {}
+  unbundled:
+    link:
+      server:
+        port: server-su00-n03/enp2s7
+      switch:
+        port: leaf-su00-r2/E1/16
+---
+apiVersion: wiring.githedgehog.com/v1beta1
+kind: Connection
+metadata:
+  name: server-su00-n03-r7-leaf-su00-r3
+spec:
+  topology: {}
+  unbundled:
+    link:
+      server:
+        port: server-su00-n03/enp2s8
+      switch:
+        port: leaf-su00-r3/E1/16
+---
+apiVersion: wiring.githedgehog.com/v1beta1
+kind: Connection
+metadata:
+  name: spine-s00--fabric--leaf-su00-r0
+spec:
+  fabric:
+    links:
+    - leaf:
+        port: leaf-su00-r0/E1/1
+      spine:
+        port: spine-s00/E1/1
+    - leaf:
+        port: leaf-su00-r0/E1/2
+      spine:
+        port: spine-s00/E1/2
+    - leaf:
+        port: leaf-su00-r0/E1/3
+      spine:
+        port: spine-s00/E1/3
+    - leaf:
+        port: leaf-su00-r0/E1/4
+      spine:
+        port: spine-s00/E1/4
+  topology: {}
+---
+apiVersion: wiring.githedgehog.com/v1beta1
+kind: Connection
+metadata:
+  name: spine-s00--fabric--leaf-su00-r1
+spec:
+  fabric:
+    links:
+    - leaf:
+        port: leaf-su00-r1/E1/1
+      spine:
+        port: spine-s00/E1/5
+    - leaf:
+        port: leaf-su00-r1/E1/2
+      spine:
+        port: spine-s00/E1/6
+    - leaf:
+        port: leaf-su00-r1/E1/3
+      spine:
+        port: spine-s00/E1/7
+    - leaf:
+        port: leaf-su00-r1/E1/4
+      spine:
+        port: spine-s00/E1/8
+  topology: {}
+---
+apiVersion: wiring.githedgehog.com/v1beta1
+kind: Connection
+metadata:
+  name: spine-s00--fabric--leaf-su00-r2
+spec:
+  fabric:
+    links:
+    - leaf:
+        port: leaf-su00-r2/E1/1
+      spine:
+        port: spine-s00/E1/9
+    - leaf:
+        port: leaf-su00-r2/E1/2
+      spine:
+        port: spine-s00/E1/10
+    - leaf:
+        port: leaf-su00-r2/E1/3
+      spine:
+        port: spine-s00/E1/11
+    - leaf:
+        port: leaf-su00-r2/E1/4
+      spine:
+        port: spine-s00/E1/12
+  topology: {}
+---
+apiVersion: wiring.githedgehog.com/v1beta1
+kind: Connection
+metadata:
+  name: spine-s00--fabric--leaf-su00-r3
+spec:
+  fabric:
+    links:
+    - leaf:
+        port: leaf-su00-r3/E1/1
+      spine:
+        port: spine-s00/E1/13
+    - leaf:
+        port: leaf-su00-r3/E1/2
+      spine:
+        port: spine-s00/E1/14
+    - leaf:
+        port: leaf-su00-r3/E1/3
+      spine:
+        port: spine-s00/E1/15
+    - leaf:
+        port: leaf-su00-r3/E1/4
+      spine:
+        port: spine-s00/E1/16
+  topology: {}
+---
+apiVersion: wiring.githedgehog.com/v1beta1
+kind: Connection
+metadata:
+  name: spine-s01--fabric--leaf-su00-r0
+spec:
+  fabric:
+    links:
+    - leaf:
+        port: leaf-su00-r0/E1/5
+      spine:
+        port: spine-s01/E1/1
+    - leaf:
+        port: leaf-su00-r0/E1/6
+      spine:
+        port: spine-s01/E1/2
+    - leaf:
+        port: leaf-su00-r0/E1/7
+      spine:
+        port: spine-s01/E1/3
+    - leaf:
+        port: leaf-su00-r0/E1/8
+      spine:
+        port: spine-s01/E1/4
+  topology: {}
+---
+apiVersion: wiring.githedgehog.com/v1beta1
+kind: Connection
+metadata:
+  name: spine-s01--fabric--leaf-su00-r1
+spec:
+  fabric:
+    links:
+    - leaf:
+        port: leaf-su00-r1/E1/5
+      spine:
+        port: spine-s01/E1/5
+    - leaf:
+        port: leaf-su00-r1/E1/6
+      spine:
+        port: spine-s01/E1/6
+    - leaf:
+        port: leaf-su00-r1/E1/7
+      spine:
+        port: spine-s01/E1/7
+    - leaf:
+        port: leaf-su00-r1/E1/8
+      spine:
+        port: spine-s01/E1/8
+  topology: {}
+---
+apiVersion: wiring.githedgehog.com/v1beta1
+kind: Connection
+metadata:
+  name: spine-s01--fabric--leaf-su00-r2
+spec:
+  fabric:
+    links:
+    - leaf:
+        port: leaf-su00-r2/E1/5
+      spine:
+        port: spine-s01/E1/9
+    - leaf:
+        port: leaf-su00-r2/E1/6
+      spine:
+        port: spine-s01/E1/10
+    - leaf:
+        port: leaf-su00-r2/E1/7
+      spine:
+        port: spine-s01/E1/11
+    - leaf:
+        port: leaf-su00-r2/E1/8
+      spine:
+        port: spine-s01/E1/12
+  topology: {}
+---
+apiVersion: wiring.githedgehog.com/v1beta1
+kind: Connection
+metadata:
+  name: spine-s01--fabric--leaf-su00-r3
+spec:
+  fabric:
+    links:
+    - leaf:
+        port: leaf-su00-r3/E1/5
+      spine:
+        port: spine-s01/E1/13
+    - leaf:
+        port: leaf-su00-r3/E1/6
+      spine:
+        port: spine-s01/E1/14
+    - leaf:
+        port: leaf-su00-r3/E1/7
+      spine:
+        port: spine-s01/E1/15
+    - leaf:
+        port: leaf-su00-r3/E1/8
+      spine:
+        port: spine-s01/E1/16
+  topology: {}
+#
+# VPCList
+#
+---
+apiVersion: vpc.githedgehog.com/v1beta1
+kind: VPC
+metadata:
+  name: vpc-0
+spec:
+  subnets:
+    default:
+      dhcp: {}
+      subnet: 10.0.0.0/13
+      vlan: 1000
+  topology: {}
+  vlanNamespace: default
+---
+apiVersion: vpc.githedgehog.com/v1beta1
+kind: VPC
+metadata:
+  name: vpc-1
+spec:
+  subnets:
+    default:
+      dhcp: {}
+      subnet: 10.8.0.0/13
+      vlan: 1001
+  topology: {}
+  vlanNamespace: default
+#
+# VPCAttachmentList
+#
+---
+apiVersion: vpc.githedgehog.com/v1beta1
+kind: VPCAttachment
+metadata:
+  annotations:
+    fabric.githedgehog.com/p2p-link: 10.0.0.0/31
+  name: vpc-0-server-su00-n00-r0-leaf-su00-r0
+spec:
+  connection: server-su00-n00-r0-leaf-su00-r0
+  subnet: vpc-0/default
+  topology: {}
+---
+apiVersion: vpc.githedgehog.com/v1beta1
+kind: VPCAttachment
+metadata:
+  annotations:
+    fabric.githedgehog.com/p2p-link: 10.1.0.0/31
+  name: vpc-0-server-su00-n00-r1-leaf-su00-r1
+spec:
+  connection: server-su00-n00-r1-leaf-su00-r1
+  subnet: vpc-0/default
+  topology: {}
+---
+apiVersion: vpc.githedgehog.com/v1beta1
+kind: VPCAttachment
+metadata:
+  annotations:
+    fabric.githedgehog.com/p2p-link: 10.2.0.0/31
+  name: vpc-0-server-su00-n00-r2-leaf-su00-r2
+spec:
+  connection: server-su00-n00-r2-leaf-su00-r2
+  subnet: vpc-0/default
+  topology: {}
+---
+apiVersion: vpc.githedgehog.com/v1beta1
+kind: VPCAttachment
+metadata:
+  annotations:
+    fabric.githedgehog.com/p2p-link: 10.3.0.0/31
+  name: vpc-0-server-su00-n00-r3-leaf-su00-r3
+spec:
+  connection: server-su00-n00-r3-leaf-su00-r3
+  subnet: vpc-0/default
+  topology: {}
+---
+apiVersion: vpc.githedgehog.com/v1beta1
+kind: VPCAttachment
+metadata:
+  annotations:
+    fabric.githedgehog.com/p2p-link: 10.4.0.0/31
+  name: vpc-0-server-su00-n00-r4-leaf-su00-r0
+spec:
+  connection: server-su00-n00-r4-leaf-su00-r0
+  subnet: vpc-0/default
+  topology: {}
+---
+apiVersion: vpc.githedgehog.com/v1beta1
+kind: VPCAttachment
+metadata:
+  annotations:
+    fabric.githedgehog.com/p2p-link: 10.5.0.0/31
+  name: vpc-0-server-su00-n00-r5-leaf-su00-r1
+spec:
+  connection: server-su00-n00-r5-leaf-su00-r1
+  subnet: vpc-0/default
+  topology: {}
+---
+apiVersion: vpc.githedgehog.com/v1beta1
+kind: VPCAttachment
+metadata:
+  annotations:
+    fabric.githedgehog.com/p2p-link: 10.6.0.0/31
+  name: vpc-0-server-su00-n00-r6-leaf-su00-r2
+spec:
+  connection: server-su00-n00-r6-leaf-su00-r2
+  subnet: vpc-0/default
+  topology: {}
+---
+apiVersion: vpc.githedgehog.com/v1beta1
+kind: VPCAttachment
+metadata:
+  annotations:
+    fabric.githedgehog.com/p2p-link: 10.7.0.0/31
+  name: vpc-0-server-su00-n00-r7-leaf-su00-r3
+spec:
+  connection: server-su00-n00-r7-leaf-su00-r3
+  subnet: vpc-0/default
+  topology: {}
+---
+apiVersion: vpc.githedgehog.com/v1beta1
+kind: VPCAttachment
+metadata:
+  annotations:
+    fabric.githedgehog.com/p2p-link: 10.0.0.2/31
+  name: vpc-0-server-su00-n01-r0-leaf-su00-r0
+spec:
+  connection: server-su00-n01-r0-leaf-su00-r0
+  subnet: vpc-0/default
+  topology: {}
+---
+apiVersion: vpc.githedgehog.com/v1beta1
+kind: VPCAttachment
+metadata:
+  annotations:
+    fabric.githedgehog.com/p2p-link: 10.1.0.2/31
+  name: vpc-0-server-su00-n01-r1-leaf-su00-r1
+spec:
+  connection: server-su00-n01-r1-leaf-su00-r1
+  subnet: vpc-0/default
+  topology: {}
+---
+apiVersion: vpc.githedgehog.com/v1beta1
+kind: VPCAttachment
+metadata:
+  annotations:
+    fabric.githedgehog.com/p2p-link: 10.2.0.2/31
+  name: vpc-0-server-su00-n01-r2-leaf-su00-r2
+spec:
+  connection: server-su00-n01-r2-leaf-su00-r2
+  subnet: vpc-0/default
+  topology: {}
+---
+apiVersion: vpc.githedgehog.com/v1beta1
+kind: VPCAttachment
+metadata:
+  annotations:
+    fabric.githedgehog.com/p2p-link: 10.3.0.2/31
+  name: vpc-0-server-su00-n01-r3-leaf-su00-r3
+spec:
+  connection: server-su00-n01-r3-leaf-su00-r3
+  subnet: vpc-0/default
+  topology: {}
+---
+apiVersion: vpc.githedgehog.com/v1beta1
+kind: VPCAttachment
+metadata:
+  annotations:
+    fabric.githedgehog.com/p2p-link: 10.4.0.2/31
+  name: vpc-0-server-su00-n01-r4-leaf-su00-r0
+spec:
+  connection: server-su00-n01-r4-leaf-su00-r0
+  subnet: vpc-0/default
+  topology: {}
+---
+apiVersion: vpc.githedgehog.com/v1beta1
+kind: VPCAttachment
+metadata:
+  annotations:
+    fabric.githedgehog.com/p2p-link: 10.5.0.2/31
+  name: vpc-0-server-su00-n01-r5-leaf-su00-r1
+spec:
+  connection: server-su00-n01-r5-leaf-su00-r1
+  subnet: vpc-0/default
+  topology: {}
+---
+apiVersion: vpc.githedgehog.com/v1beta1
+kind: VPCAttachment
+metadata:
+  annotations:
+    fabric.githedgehog.com/p2p-link: 10.6.0.2/31
+  name: vpc-0-server-su00-n01-r6-leaf-su00-r2
+spec:
+  connection: server-su00-n01-r6-leaf-su00-r2
+  subnet: vpc-0/default
+  topology: {}
+---
+apiVersion: vpc.githedgehog.com/v1beta1
+kind: VPCAttachment
+metadata:
+  annotations:
+    fabric.githedgehog.com/p2p-link: 10.7.0.2/31
+  name: vpc-0-server-su00-n01-r7-leaf-su00-r3
+spec:
+  connection: server-su00-n01-r7-leaf-su00-r3
+  subnet: vpc-0/default
+  topology: {}
+---
+apiVersion: vpc.githedgehog.com/v1beta1
+kind: VPCAttachment
+metadata:
+  annotations:
+    fabric.githedgehog.com/p2p-link: 10.8.0.0/31
+  name: vpc-1-server-su00-n02-r0-leaf-su00-r0
+spec:
+  connection: server-su00-n02-r0-leaf-su00-r0
+  subnet: vpc-1/default
+  topology: {}
+---
+apiVersion: vpc.githedgehog.com/v1beta1
+kind: VPCAttachment
+metadata:
+  annotations:
+    fabric.githedgehog.com/p2p-link: 10.9.0.0/31
+  name: vpc-1-server-su00-n02-r1-leaf-su00-r1
+spec:
+  connection: server-su00-n02-r1-leaf-su00-r1
+  subnet: vpc-1/default
+  topology: {}
+---
+apiVersion: vpc.githedgehog.com/v1beta1
+kind: VPCAttachment
+metadata:
+  annotations:
+    fabric.githedgehog.com/p2p-link: 10.10.0.0/31
+  name: vpc-1-server-su00-n02-r2-leaf-su00-r2
+spec:
+  connection: server-su00-n02-r2-leaf-su00-r2
+  subnet: vpc-1/default
+  topology: {}
+---
+apiVersion: vpc.githedgehog.com/v1beta1
+kind: VPCAttachment
+metadata:
+  annotations:
+    fabric.githedgehog.com/p2p-link: 10.11.0.0/31
+  name: vpc-1-server-su00-n02-r3-leaf-su00-r3
+spec:
+  connection: server-su00-n02-r3-leaf-su00-r3
+  subnet: vpc-1/default
+  topology: {}
+---
+apiVersion: vpc.githedgehog.com/v1beta1
+kind: VPCAttachment
+metadata:
+  annotations:
+    fabric.githedgehog.com/p2p-link: 10.12.0.0/31
+  name: vpc-1-server-su00-n02-r4-leaf-su00-r0
+spec:
+  connection: server-su00-n02-r4-leaf-su00-r0
+  subnet: vpc-1/default
+  topology: {}
+---
+apiVersion: vpc.githedgehog.com/v1beta1
+kind: VPCAttachment
+metadata:
+  annotations:
+    fabric.githedgehog.com/p2p-link: 10.13.0.0/31
+  name: vpc-1-server-su00-n02-r5-leaf-su00-r1
+spec:
+  connection: server-su00-n02-r5-leaf-su00-r1
+  subnet: vpc-1/default
+  topology: {}
+---
+apiVersion: vpc.githedgehog.com/v1beta1
+kind: VPCAttachment
+metadata:
+  annotations:
+    fabric.githedgehog.com/p2p-link: 10.14.0.0/31
+  name: vpc-1-server-su00-n02-r6-leaf-su00-r2
+spec:
+  connection: server-su00-n02-r6-leaf-su00-r2
+  subnet: vpc-1/default
+  topology: {}
+---
+apiVersion: vpc.githedgehog.com/v1beta1
+kind: VPCAttachment
+metadata:
+  annotations:
+    fabric.githedgehog.com/p2p-link: 10.15.0.0/31
+  name: vpc-1-server-su00-n02-r7-leaf-su00-r3
+spec:
+  connection: server-su00-n02-r7-leaf-su00-r3
+  subnet: vpc-1/default
+  topology: {}
+---
+apiVersion: vpc.githedgehog.com/v1beta1
+kind: VPCAttachment
+metadata:
+  annotations:
+    fabric.githedgehog.com/p2p-link: 10.8.0.2/31
+  name: vpc-1-server-su00-n03-r0-leaf-su00-r0
+spec:
+  connection: server-su00-n03-r0-leaf-su00-r0
+  subnet: vpc-1/default
+  topology: {}
+---
+apiVersion: vpc.githedgehog.com/v1beta1
+kind: VPCAttachment
+metadata:
+  annotations:
+    fabric.githedgehog.com/p2p-link: 10.9.0.2/31
+  name: vpc-1-server-su00-n03-r1-leaf-su00-r1
+spec:
+  connection: server-su00-n03-r1-leaf-su00-r1
+  subnet: vpc-1/default
+  topology: {}
+---
+apiVersion: vpc.githedgehog.com/v1beta1
+kind: VPCAttachment
+metadata:
+  annotations:
+    fabric.githedgehog.com/p2p-link: 10.10.0.2/31
+  name: vpc-1-server-su00-n03-r2-leaf-su00-r2
+spec:
+  connection: server-su00-n03-r2-leaf-su00-r2
+  subnet: vpc-1/default
+  topology: {}
+---
+apiVersion: vpc.githedgehog.com/v1beta1
+kind: VPCAttachment
+metadata:
+  annotations:
+    fabric.githedgehog.com/p2p-link: 10.11.0.2/31
+  name: vpc-1-server-su00-n03-r3-leaf-su00-r3
+spec:
+  connection: server-su00-n03-r3-leaf-su00-r3
+  subnet: vpc-1/default
+  topology: {}
+---
+apiVersion: vpc.githedgehog.com/v1beta1
+kind: VPCAttachment
+metadata:
+  annotations:
+    fabric.githedgehog.com/p2p-link: 10.12.0.2/31
+  name: vpc-1-server-su00-n03-r4-leaf-su00-r0
+spec:
+  connection: server-su00-n03-r4-leaf-su00-r0
+  subnet: vpc-1/default
+  topology: {}
+---
+apiVersion: vpc.githedgehog.com/v1beta1
+kind: VPCAttachment
+metadata:
+  annotations:
+    fabric.githedgehog.com/p2p-link: 10.13.0.2/31
+  name: vpc-1-server-su00-n03-r5-leaf-su00-r1
+spec:
+  connection: server-su00-n03-r5-leaf-su00-r1
+  subnet: vpc-1/default
+  topology: {}
+---
+apiVersion: vpc.githedgehog.com/v1beta1
+kind: VPCAttachment
+metadata:
+  annotations:
+    fabric.githedgehog.com/p2p-link: 10.14.0.2/31
+  name: vpc-1-server-su00-n03-r6-leaf-su00-r2
+spec:
+  connection: server-su00-n03-r6-leaf-su00-r2
+  subnet: vpc-1/default
+  topology: {}
+---
+apiVersion: vpc.githedgehog.com/v1beta1
+kind: VPCAttachment
+metadata:
+  annotations:
+    fabric.githedgehog.com/p2p-link: 10.15.0.2/31
+  name: vpc-1-server-su00-n03-r7-leaf-su00-r3
+spec:
+  connection: server-su00-n03-r7-leaf-su00-r3
+  subnet: vpc-1/default
+  topology: {}

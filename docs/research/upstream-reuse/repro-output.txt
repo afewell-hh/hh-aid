@@ -1,0 +1,44 @@
+go: downloading go1.27.3 (darwin/arm64)
+=== default: hhfab vlab gen
+gen: exit 0
+  objects: 28, servers: 6, sha1: c3464751cdf9
+  validate: OK (0s)
+=== default-repeat: hhfab vlab gen
+gen: exit 0
+  objects: 28, servers: 6, sha1: c3464751cdf9
+  validate: OK (0s)
+=== gpu-rail: hhfab vlab gen-gpu-rail --units 1
+gen: exit 0
+  objects: 87, servers: 4, sha1: ffb2bfcc60be
+  validate: FAIL: validating vpc attachments: validating *v1beta1.VPCAttachment "vpc-0-server-su00-n00-r0-leaf-su00-r0": empty p2p link annotation subnet
+=== gpu-rail-p2p: hhfab vlab gen-gpu-rail --units 1 --p2p
+gen: exit 0
+  objects: 87, servers: 4, sha1: f2a69060e28d
+  validate: OK (0s)
+=== gpu-rail-p2p-su3: hhfab vlab gen-gpu-rail --units 3 --p2p --servers 8
+gen: exit 0
+  objects: 859, servers: 48, sha1: d9de8efa2987
+  validate: OK (6s)
+=== gpu-rail-p2p-su4: hhfab vlab gen-gpu-rail --units 4 --p2p --servers 8
+gen: exit 0
+     9 10:34:11 ERR Too many interfaces for switch switch=spine-s00
+     9 10:34:11 ERR Too many interfaces for switch switch=spine-s01
+  objects: 1143, servers: 64, sha1: dbfe136e91bf
+  validate: FAIL: validating connections: validating *v1beta1.Connection "spine-s00--fabric--leaf-su03-r0": port spine-s00/E1/53 is not allowed for switch spine-s00
+=== unbundled-40: hhfab vlab gen --unbundled-servers 40
+gen: exit 0
+  objects: 184, servers: 84, sha1: 36308ac0e2d4
+  validate: OK (1s)
+=== unbundled-60: hhfab vlab gen --unbundled-servers 60
+gen: exit 0
+    11 10:34:19 ERR Too many interfaces for switch switch=leaf-01
+    11 10:34:19 ERR Too many interfaces for switch switch=leaf-03
+  objects: 264, servers: 124, sha1: 6a5dd129836b
+  validate: FAIL: validating connections: validating *v1beta1.Connection "server-112--unbundled--leaf-03": port leaf-03/E1/49 is not allowed for switch leaf-03
+=== unbundled-300: hhfab vlab gen --unbundled-servers 300
+gen: exit 0
+  objects: 200, servers: 92, sha1: 25960800d60a
+  validate: FAIL: validating connections: validating *v1beta1.Connection "spine-02--fabric--leaf-01": port leaf-01/E1/49 is not allowed for switch leaf-01
+=== real-profile: hhfab vlab gen --sp celestica-ds5000
+gen: exit 1
+     1 10:34:19 ERR generating VLAB wiring diagram: unsupported default switch profile celestica-ds5000

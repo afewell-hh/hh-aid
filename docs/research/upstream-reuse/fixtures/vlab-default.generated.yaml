@@ -1,0 +1,392 @@
+#
+# FabricList
+#
+apiVersion: wiring.githedgehog.com/v1beta1
+kind: Fabric
+metadata:
+  name: default
+spec:
+  domains:
+    default:
+      gatewayASN: 4200006133
+      spineASN: 4200005633
+  leafASNEnd: 4200015631
+  leafASNStart: 4200006632
+#
+# VLANNamespaceList
+#
+---
+apiVersion: wiring.githedgehog.com/v1beta1
+kind: VLANNamespace
+metadata:
+  name: default
+spec:
+  ranges:
+  - from: 1000
+    to: 2999
+#
+# IPv4NamespaceList
+#
+---
+apiVersion: vpc.githedgehog.com/v1beta1
+kind: IPv4Namespace
+metadata:
+  name: default
+spec:
+  subnets:
+  - 10.0.0.0/16
+  topology: {}
+#
+# SwitchGroupList
+#
+---
+apiVersion: wiring.githedgehog.com/v1beta1
+kind: SwitchGroup
+metadata:
+  name: empty
+spec:
+  topology: {}
+---
+apiVersion: wiring.githedgehog.com/v1beta1
+kind: SwitchGroup
+metadata:
+  name: eslag-1
+spec:
+  topology: {}
+#
+# SwitchList
+#
+---
+apiVersion: wiring.githedgehog.com/v1beta1
+kind: Switch
+metadata:
+  name: leaf-01
+spec:
+  boot:
+    mac: 0c:20:12:ff:00:00
+  description: VS-01 ESLAG 1
+  ecmp: {}
+  groups:
+  - eslag-1
+  profile: vs
+  redundancy:
+    group: eslag-1
+    type: eslag
+  role: server-leaf
+  topology:
+    domains:
+    - default
+---
+apiVersion: wiring.githedgehog.com/v1beta1
+kind: Switch
+metadata:
+  name: leaf-02
+spec:
+  boot:
+    mac: 0c:20:12:ff:01:00
+  description: VS-02 ESLAG 1
+  ecmp: {}
+  groups:
+  - eslag-1
+  profile: vs
+  redundancy:
+    group: eslag-1
+    type: eslag
+  role: server-leaf
+  topology:
+    domains:
+    - default
+---
+apiVersion: wiring.githedgehog.com/v1beta1
+kind: Switch
+metadata:
+  name: leaf-03
+spec:
+  boot:
+    mac: 0c:20:12:ff:02:00
+  description: VS-03
+  ecmp: {}
+  profile: vs
+  redundancy: {}
+  role: server-leaf
+  topology:
+    domains:
+    - default
+---
+apiVersion: wiring.githedgehog.com/v1beta1
+kind: Switch
+metadata:
+  name: spine-01
+spec:
+  boot:
+    mac: 0c:20:12:ff:03:00
+  description: VS-04
+  ecmp: {}
+  profile: vs
+  redundancy: {}
+  role: spine
+  topology: {}
+---
+apiVersion: wiring.githedgehog.com/v1beta1
+kind: Switch
+metadata:
+  name: spine-02
+spec:
+  boot:
+    mac: 0c:20:12:ff:04:00
+  description: VS-05
+  ecmp: {}
+  profile: vs
+  redundancy: {}
+  role: spine
+  topology: {}
+#
+# ServerList
+#
+---
+apiVersion: wiring.githedgehog.com/v1beta1
+kind: Server
+metadata:
+  name: server-01
+spec:
+  description: S-01 ESLAG leaf-01 leaf-02
+  inspect: {}
+---
+apiVersion: wiring.githedgehog.com/v1beta1
+kind: Server
+metadata:
+  name: server-02
+spec:
+  description: S-02 ESLAG leaf-01 leaf-02
+  inspect: {}
+---
+apiVersion: wiring.githedgehog.com/v1beta1
+kind: Server
+metadata:
+  name: server-03
+spec:
+  description: S-03 Unbundled leaf-01
+  inspect: {}
+---
+apiVersion: wiring.githedgehog.com/v1beta1
+kind: Server
+metadata:
+  name: server-04
+spec:
+  description: S-04 Bundled leaf-02
+  inspect: {}
+---
+apiVersion: wiring.githedgehog.com/v1beta1
+kind: Server
+metadata:
+  name: server-05
+spec:
+  description: S-05 Unbundled leaf-03
+  inspect: {}
+---
+apiVersion: wiring.githedgehog.com/v1beta1
+kind: Server
+metadata:
+  name: server-06
+spec:
+  description: S-06 Bundled leaf-03
+  inspect: {}
+#
+# ConnectionList
+#
+---
+apiVersion: wiring.githedgehog.com/v1beta1
+kind: Connection
+metadata:
+  name: server-01--eslag--leaf-01--leaf-02
+spec:
+  eslag:
+    links:
+    - server:
+        port: server-01/enp2s1
+      switch:
+        port: leaf-01/E1/1
+    - server:
+        port: server-01/enp2s2
+      switch:
+        port: leaf-02/E1/1
+  topology: {}
+---
+apiVersion: wiring.githedgehog.com/v1beta1
+kind: Connection
+metadata:
+  name: server-02--eslag--leaf-01--leaf-02
+spec:
+  eslag:
+    links:
+    - server:
+        port: server-02/enp2s1
+      switch:
+        port: leaf-01/E1/2
+    - server:
+        port: server-02/enp2s2
+      switch:
+        port: leaf-02/E1/2
+  topology: {}
+---
+apiVersion: wiring.githedgehog.com/v1beta1
+kind: Connection
+metadata:
+  name: server-03--unbundled--leaf-01
+spec:
+  topology: {}
+  unbundled:
+    link:
+      server:
+        port: server-03/enp2s1
+      switch:
+        port: leaf-01/E1/3
+---
+apiVersion: wiring.githedgehog.com/v1beta1
+kind: Connection
+metadata:
+  name: server-04--bundled--leaf-02
+spec:
+  bundled:
+    links:
+    - server:
+        port: server-04/enp2s1
+      switch:
+        port: leaf-02/E1/3
+    - server:
+        port: server-04/enp2s2
+      switch:
+        port: leaf-02/E1/4
+  topology: {}
+---
+apiVersion: wiring.githedgehog.com/v1beta1
+kind: Connection
+metadata:
+  name: server-05--unbundled--leaf-03
+spec:
+  topology: {}
+  unbundled:
+    link:
+      server:
+        port: server-05/enp2s1
+      switch:
+        port: leaf-03/E1/1
+---
+apiVersion: wiring.githedgehog.com/v1beta1
+kind: Connection
+metadata:
+  name: server-06--bundled--leaf-03
+spec:
+  bundled:
+    links:
+    - server:
+        port: server-06/enp2s1
+      switch:
+        port: leaf-03/E1/2
+    - server:
+        port: server-06/enp2s2
+      switch:
+        port: leaf-03/E1/3
+  topology: {}
+---
+apiVersion: wiring.githedgehog.com/v1beta1
+kind: Connection
+metadata:
+  name: spine-01--fabric--leaf-01
+spec:
+  fabric:
+    links:
+    - leaf:
+        port: leaf-01/E1/4
+      spine:
+        port: spine-01/E1/1
+    - leaf:
+        port: leaf-01/E1/5
+      spine:
+        port: spine-01/E1/2
+  topology: {}
+---
+apiVersion: wiring.githedgehog.com/v1beta1
+kind: Connection
+metadata:
+  name: spine-01--fabric--leaf-02
+spec:
+  fabric:
+    links:
+    - leaf:
+        port: leaf-02/E1/5
+      spine:
+        port: spine-01/E1/3
+    - leaf:
+        port: leaf-02/E1/6
+      spine:
+        port: spine-01/E1/4
+  topology: {}
+---
+apiVersion: wiring.githedgehog.com/v1beta1
+kind: Connection
+metadata:
+  name: spine-01--fabric--leaf-03
+spec:
+  fabric:
+    links:
+    - leaf:
+        port: leaf-03/E1/4
+      spine:
+        port: spine-01/E1/5
+    - leaf:
+        port: leaf-03/E1/5
+      spine:
+        port: spine-01/E1/6
+  topology: {}
+---
+apiVersion: wiring.githedgehog.com/v1beta1
+kind: Connection
+metadata:
+  name: spine-02--fabric--leaf-01
+spec:
+  fabric:
+    links:
+    - leaf:
+        port: leaf-01/E1/6
+      spine:
+        port: spine-02/E1/1
+    - leaf:
+        port: leaf-01/E1/7
+      spine:
+        port: spine-02/E1/2
+  topology: {}
+---
+apiVersion: wiring.githedgehog.com/v1beta1
+kind: Connection
+metadata:
+  name: spine-02--fabric--leaf-02
+spec:
+  fabric:
+    links:
+    - leaf:
+        port: leaf-02/E1/7
+      spine:
+        port: spine-02/E1/3
+    - leaf:
+        port: leaf-02/E1/8
+      spine:
+        port: spine-02/E1/4
+  topology: {}
+---
+apiVersion: wiring.githedgehog.com/v1beta1
+kind: Connection
+metadata:
+  name: spine-02--fabric--leaf-03
+spec:
+  fabric:
+    links:
+    - leaf:
+        port: leaf-03/E1/6
+      spine:
+        port: spine-02/E1/5
+    - leaf:
+        port: leaf-03/E1/7
+      spine:
+        port: spine-02/E1/6
+  topology: {}
