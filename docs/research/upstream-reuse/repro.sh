@@ -9,6 +9,12 @@ FABRICATOR_TAG=v0.51.4   # d2316aca666eb278541276a11a5f8dae372bf629; go.mod pins
 export GOTOOLCHAIN=go1.27.3 CGO_ENABLED=0 GOPATH="$W/gopath" GOCACHE="$W/gocache"
 
 git clone -q --branch "$FABRICATOR_TAG" https://github.com/githedgehog/fabricator "$W/fabricator"
+FABRICATOR_COMMIT=d2316aca666eb278541276a11a5f8dae372bf629
+actual_commit=$(git -C "$W/fabricator" rev-parse HEAD)
+if [[ "$actual_commit" != "$FABRICATOR_COMMIT" ]]; then
+  echo "Fabricator source mismatch: expected $FABRICATOR_COMMIT, got $actual_commit" >&2
+  exit 1
+fi
 # Mirrors justfile `_touch_embed` (placeholder embeds; enough for init/gen/validate, NOT for `hhfab build`/VLAB up).
 touch "$W/fabricator/pkg/embed/recipebin/hhfab-recipe.gz" "$W/fabricator/pkg/embed/flatcaroem/oem.cpio.gz" "$W/fabricator/pkg/embed/flatcaroem/hhfab-flatcar-install"
 (cd "$W/fabricator" && go build --tags containers_image_openpgp,containers_image_storage_stub,containers_image_docker_daemon_stub \
