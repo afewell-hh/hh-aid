@@ -1,11 +1,11 @@
 # SYNTHETIC, UNQUALIFIED illustration for R06 (#7) revision 2. Hypothetical profiles/assemblies per R04/R05 rules; no real SKU, product drawing, customer data or site measurement.
 # One row per CONNECTOR END. Links reference ends; an assembly with several ends shares one assembly_id and one replacement unit.
-# X-0001 optics+fiber (2 modules C-0001/C-0002 + 1 jumper); X-0002 integrated DAC, native 1x mode both ends; X-0003 integrated 1:2 breakout, both legs used;
+# X-0001 optics+fiber (2 modules C-0001/C-0002 + 1 jumper C-0003); X-0002 integrated DAC, native 1x mode both ends; X-0003 integrated 1:2 breakout, both legs used;
 # X-0004 integrated 1:2 breakout with leg B PARKED (lane 2 reserved, not spare); X-0005 OOB management copper, physical-only (no Connection object).
 # orderable rule: sku_length_m = smallest qualified SKU length >= routed_length_m + slack_m (values here are placeholders, not qualified lengths).
 row_id,design_rev,assembly_id,end_id,assembly_class,component_ids,replacement_unit_links,link_ids,link_class,device,port,cage_mode,lanes,rack,ru,connector,polarity_method,route_id,routed_length_m,slack_m,length_source,sku_length_m,rail,plane,label,line_state
-1,7,X-0001,A,fiber-jumper+separate-optics,C-0001,L-f01,L-f01,fabric,leaf-r0-p0,E1/33,1x800G,,R01,40,module-C-0001,TBD-site-method,RT-012,9.0,2.0,derived:placement-v3+route-RT-012,TBD,,P0,L-f01 X-0001.A,planned
-2,7,X-0001,B,fiber-jumper+separate-optics,C-0002,L-f01,L-f01,fabric,spine-00,E1/1,1x800G,,R02,40,module-C-0002,TBD-site-method,RT-012,9.0,2.0,derived:placement-v3+route-RT-012,TBD,,P0,L-f01 X-0001.B,planned
+1,7,X-0001,A,fiber-jumper+separate-optics,C-0001;C-0003,L-f01,L-f01,fabric,leaf-r0-p0,E1/33,1x800G,,R01,40,module-C-0001,TBD-site-method,RT-012,9.0,2.0,derived:placement-v3+route-RT-012,TBD,,P0,L-f01 X-0001.A,planned
+2,7,X-0001,B,fiber-jumper+separate-optics,C-0002;C-0003,L-f01,L-f01,fabric,spine-00,E1/1,1x800G,,R02,40,module-C-0002,TBD-site-method,RT-012,9.0,2.0,derived:placement-v3+route-RT-012,TBD,,P0,L-f01 X-0001.B,planned
 3,7,X-0002,A,integrated-dac,,L-s01,L-s01,server,leaf-r0-p0,E1/34,1x800G,,R01,40,integrated,n/a-integrated,RT-001,1.2,0.3,user-supplied,TBD,R0,P0,L-s01 X-0002.A R0 P0,planned
 4,7,X-0002,B,integrated-dac,,L-s01,L-s01,server,srv-0001,nic0-p0,native,,R01,30,integrated,n/a-integrated,RT-001,1.2,0.3,user-supplied,TBD,R0,P0,L-s01 X-0002.B R0 P0,planned
 5,7,X-0003,P,integrated-breakout-1to2,,L-s02;L-s03,L-s02;L-s03,server,leaf-r0-p0,E1/2,2x400G,1;2,R01,40,integrated,n/a-integrated,RT-002,2.5,0.3,user-supplied,TBD,R0,P0,X-0003.P E1/2 lanes 1-2,planned

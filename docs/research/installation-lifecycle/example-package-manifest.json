@@ -36,7 +36,7 @@
     "A2.unbound": ["A2.fabric", "A2.switches", "A2.servers-connections"]
   },
   "packages": [
-    {"package_id": "PKG-OPTICS-1", "scope": "fabric-link optics for leaf-spine links", "readiness": "procurement-candidate", "included": ["module class for L-f01 ends (C-0001, C-0002)"], "excluded": ["fiber jumpers (cabling plant/route unresolved)"], "dependency_risks": ["module connector depends on cabling plant type"], "line_state": "planned", "approver": "<named role, pending>"},
+    {"package_id": "PKG-OPTICS-1", "scope": "fabric-link optics for leaf-spine links", "readiness": "blocked", "blocked_by": ["exact qualified module SKU is a placeholder", "fixed qualified cabling plant not established"], "included": ["exact module SKU <placeholder, R05-qualified> x2 for L-f01 ends (C-0001, C-0002)"], "excluded": ["fiber jumpers (cabling plant/route unresolved)"], "dependency_risks": ["module connector depends on cabling plant type"], "line_state": "planned", "approver": "<named role, pending>"},
     {"package_id": "PKG-CABLES-1", "scope": "server integrated assemblies X-0002..X-0004", "readiness": "blocked", "blocked_by": ["exact orderable lengths/branch geometry", "qualified SKU per R05"], "line_state": "planned"},
     {"package_id": "PKG-INSTALL-1", "scope": "installation design package", "readiness": "not-ready", "blocked_by": ["PKG-CABLES-1", "A6 routes for RT-012"]}
   ],
@@ -54,7 +54,7 @@
     "binding_input": {"instance_id": "A11.inputs", "sha256": null},
     "transformation": {"tool": null, "version": null, "permitted_fields": ["Switch.spec.boot.serial", "Switch.spec.boot.mac", "Server.spec.inspect.expectedSysName", "server-side Connection port strings via link map"], "changes": []},
     "bound_manifest_hash": null,
-    "operator_receipt": {"receipt_id": null, "kind": "bound-snapshot", "covers": "imported bytes of bound manifest", "real_config_digest": null}
+    "operator_receipt": {"receipt_id": null, "kind": "bound-snapshot", "covers": [], "covers_schema": {"instance_id": "bound instance ID", "include_path": "include/<basename>", "sha256": "digest of imported bytes"}, "real_config_digest": null}
   },
   "approvals": [
     {"role": "designer (P2)", "name": "<named person>", "approval_class": "full", "design_hash": "sha256:<placeholder>", "at": "<timestamp>"},
