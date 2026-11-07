@@ -1,0 +1,25 @@
+R03 author notes: ad-hoc validation timings (NOT part of the checked-in repro harness)
+
+Status: author notes for provenance only. Single runs, one machine (Apple Silicon laptop, macOS arm64),
+hhfab built as described in upstream-reuse.md §10 (restricted local build, not a release binary).
+Not a benchmark. Not reproducible from repro.sh. Do not extrapolate.
+
+Recorded 2026-11-07 ~10:30 local, in the author's session, before repro.sh existed.
+Command as run (H = locally built hhfab; S = session scratch directory; zsh):
+
+  export HHFAB_PREVIEW=true
+  for u in 1 2 3; do d=$S/runs/time-su$u; rm -rf $d; mkdir -p $d; cd $d
+    $H init --dev >/dev/null 2>&1
+    $H vlab gen-gpu-rail --units $u --p2p --servers 8 >/dev/null 2>&1
+    n=$(grep -c '^kind:' include/vlab.generated.yaml)
+    /usr/bin/time -p $H validate 2>&1 | grep -E 'ERR|valid|real' | tr '\n' ' '; echo " units=$u objects=$n"
+  done
+
+Output, verbatim:
+
+  10:30:43 INF Fabricator config and wiring are valid real 0.74  units=1 objects=291
+  10:30:46 INF Fabricator config and wiring are valid real 2.66  units=2 objects=575
+  10:30:52 INF Fabricator config and wiring are valid real 5.74  units=3 objects=859
+
+The checked-in harness (repro.sh) records only the 859-object case, as whole seconds
+(case gpu-rail-p2p-su3, "validate: OK (6s)" in repro-output.txt).
