@@ -5,7 +5,7 @@
 | Issue | [#2 R01](https://github.com/afewell-hh/hh-aid/issues/2) (coordination [#1](https://github.com/afewell-hh/hh-aid/issues/1)) |
 | Role / author | **scout**, Product discovery lead (AI agent, Claude Opus 5.5, session of 2026-11-07) |
 | Independent reviewers | UX researcher (`ux`, D02 owner) and sponsor. **Not yet reviewed.** |
-| Status | Revision 2: public-source-only draft for review, after lead's [#2 comment](https://github.com/afewell-hh/hh-aid/issues/2). Not self-approved. Every user, target, release policy and slice recommendation here is a **proposal**. |
+| Status | Revision 3: public-source-only draft for review. §13 consolidated with compat's review and bridge revision 2, per lead's [#2 comment 6712216941](https://github.com/afewell-hh/hh-aid/issues/2#issuecomment-6712216941). Not self-approved. Every user, target, release policy and slice recommendation here is a **proposal**. |
 | Evidence date | 2026-11-07 |
 
 ## 1. Question and scope
@@ -40,7 +40,7 @@ Every claim below carries one of these labels.
 | githedgehog/docs | `master` @ `1be68948e177dcc031e91659ab5293ba19893ccf` (2026-11-05) | The docs site is versioned with mike. Master may run slightly ahead of 26.05; R02 should confirm against the published 26.05 docs. |
 | hedgehog.cloud, its ROI page, plan.hedgehog.cloud | Fetched 2026-11-07 (live pages, not pinnable) | Marketing and ROI context only. |
 | Sponsor-owned public repos | [afewell-hh/aid](https://github.com/afewell-hh/aid) @ `134fe442` (2026-08-22); [afewell-hh/hh-netbox-plugin](https://github.com/afewell-hh/hh-netbox-plugin) @ `5e0a2cfa` (2026-11-02); [afewell-hh/OCP-OCDAI-training-fabric](https://github.com/afewell-hh/OCP-OCDAI-training-fabric) @ `d4178b5e` | READMEs and public issue records only. I did not inspect their code. |
-| Sibling hh-aid drafts (unaccepted) | compat R02 [PR #17](https://github.com/afewell-hh/hh-aid/pull/17) @ `2adcb6eb`; bridge R03 [PR #18](https://github.com/afewell-hh/hh-aid/pull/18) and its [#4 handoff](https://github.com/afewell-hh/hh-aid/issues/4) | Cited only to reconcile wording (§13). They are under review, so their claims are **not** treated as accepted facts. |
+| Sibling hh-aid reports (under review) | compat R02 [PR #17](https://github.com/afewell-hh/hh-aid/pull/17) @ `2adcb6eb` and compat's [#4 review 6711820797](https://github.com/afewell-hh/hh-aid/issues/4#issuecomment-6711820797); bridge R03 [PR #18](https://github.com/afewell-hh/hh-aid/pull/18) revision 2 @ `7459463` | Cited only to reconcile wording (§13). Their claims are **not** treated as accepted hh-aid facts. |
 
 The Fabric commit `4bde5082…` equals the "public Fabric master snapshot" pinned in the sponsor's earlier HNP research reset (for example [hh-netbox-plugin#761](https://github.com/afewell-hh/hh-netbox-plugin/issues/761)). That snapshot is therefore exactly Fabric v0.144.1, the 26.05 Fabric version. **F**
 
@@ -48,7 +48,7 @@ The Fabric commit `4bde5082…` equals the "public Fabric master snapshot" pinne
 
 1. **hh-aid is not starting from zero, so its first product decision is how it relates to existing tools.** Public sources show several adjacent tools (§3): hand-authored wiring plus `hhfab validate`/`diagram`, VLAB generators including a hidden preview GPU-rail generator, an earlier sponsor "AI Infrastructure Designer" (AID), a NetBox plugin (HNP) with a long research-reset history, and published OCP reference-design repositories with BOMs and wiring. Whatever workflow pre-sales uses *today* is not documented publicly. It is a hypothesis to establish in interviews (§3.3). Decision D1 asks whether hh-aid replaces, absorbs, integrates with or ignores each tool. **F/H**
 2. **Proposal: the primary users are Hedgehog pre-sales/solutions engineers and fabric designers, possibly the same people.** Installers and operators consume hh-aid's outputs, and executive buyers appear to be the audience of the public ROI page. This needs interview validation. **H**
-3. **The costliest failures are probably physical and contractual, not arithmetic.** Examples: ordering the wrong optics or cables, under-sizing spines, wiring rails incorrectly, presenting an unsupported design as deployable, and renaming objects on regeneration. Another is choosing fabric or domain structure without considering growth. In 26.05 a Fabric's leaf ASN range, domains and their ASNs are fixed once it is created, and domains cannot be added, removed or renamed ([multi-fabric.md L265](https://github.com/githedgehog/docs/blob/1be68948e177dcc031e91659ab5293ba19893ccf/docs/user-guide/multi-fabric.md#L265)). Which growth or migration routes remain is **unresolved** (§5, §13). **F/H**
+3. **The costliest failures are probably physical and contractual, not arithmetic.** Examples: ordering the wrong optics or cables, under-sizing spines, wiring rails incorrectly, presenting an unsupported design as deployable, and renaming objects on regeneration. Another is choosing fabric or domain structure without considering growth. In 26.05 a Fabric's leaf ASN range, domains and their ASNs are fixed once it is created, and domains cannot be added, removed or renamed ([multi-fabric.md L265](https://github.com/githedgehog/docs/blob/1be68948e177dcc031e91659ab5293ba19893ccf/docs/user-guide/multi-fabric.md#L265)). Several alternatives are not forbidden, but they are not proven equivalent (§13.2). **F/H**
 4. **The sponsor's earlier effort is a process warning.** It produced many gated research records. The final comparison ticket stopped "unaccepted at finite cap" and recommended ending desk comparison ([hh-netbox-plugin#763](https://github.com/afewell-hh/hh-netbox-plugin/issues/763)). hh-aid's own risk register already names "documents but no validated delivery path." I propose timeboxed learning goals that produce executable evidence early (§10). **F/H**
 5. **Proposed first-slice direction (D06 decides):** a progressive, rail-aware backend design for 32–64 HGX-class servers on one plane, exported to wiring that passes pinned upstream validation, plus a reconciled BOM, with a sparse-input provisional front end. The fallback is a lower-risk single-fabric frontend leaf-spine slice. The full supported-topology coverage ledger stays open (§10.3). **H**
 
@@ -59,19 +59,19 @@ The Fabric commit `4bde5082…` equals the "public Fabric master snapshot" pinne
 | Offering | What it does | Overlap with hh-aid | Evidence |
 | --- | --- | --- | --- |
 | Hand-authored wiring YAML, documented in *Build Wiring Diagram* | Users write Fabric, VLANNamespace, IPv4Namespace, Switch, Server and Connection objects. Every wiring diagram needs at least one `Fabric`. | This is today's primary path from design to deployment, and the format hh-aid must produce. It offers no planning help. | [build-wiring.md L15](https://github.com/githedgehog/docs/blob/1be68948e177dcc031e91659ab5293ba19893ccf/docs/install-upgrade/build-wiring.md#L15) **F** |
-| `hhfab validate` / `hhfab build` | Validates wiring and Fabricator configuration, and builds installers | Downstream validator and consumer of hh-aid exports. A pass at the pinned version is a **necessary versioned check, not proof** of admission parity, support, hardware compatibility or fitness for purpose. The sibling drafts report open gaps, including gateway dataplane checks outside the offline path, discarded warnings, a Connection-variant exclusivity question, and first-error-only reporting. See §13.1. | docs as above; compat [PR #17](https://github.com/afewell-hh/hh-aid/pull/17), bridge [#4](https://github.com/afewell-hh/hh-aid/issues/4) (both unaccepted) **F/Q** |
+| `hhfab validate` / `hhfab build` | Validates wiring and Fabricator configuration, and builds installers | Downstream validator and consumer of hh-aid exports. A pass at the pinned version is a **necessary versioned check, not proof** of full admission, lifecycle legality, support, hardware compatibility or fitness for purpose. Peer reports list gaps: CRD schema, gateway dataplane, discarded warnings, update webhooks, variant exclusivity, and first-error-only reporting. See §13.1. | docs as above; compat [#4 review](https://github.com/afewell-hh/hh-aid/issues/4#issuecomment-6711820797), bridge [7459463](https://github.com/afewell-hh/hh-aid/commit/7459463688a35f1fb8c1d4b0093c241a1f23c149) (peer reports under review) **F/Q** |
 | `hhfab diagram` | Renders wiring, or the live API with `--live`, as drawio, dot or mermaid | Reuse it for visualisation instead of rebuilding. | [main.go L963](https://github.com/githedgehog/fabricator/blob/d2316aca666eb278541276a11a5f8dae372bf629/cmd/hhfab/main.go#L963) **F** |
 | `hhfab vlab generate` | Generates VLAB topologies from counts: spines, ESLAG groups, orphan leaves, server types, extra domain, shared leaves, extra fabric, externals and gateways | A generator for test topologies with abstract counts. It has no rails, physical BOM or progressive input. | [main.go L1148](https://github.com/githedgehog/fabricator/blob/d2316aca666eb278541276a11a5f8dae372bf629/cmd/hhfab/main.go#L1148) **F** |
 | `hhfab vlab generate-gpu-rail` (**PREVIEW**, hidden unless `HHFAB_PREVIEW=true`) | "GPU rail-optimized fabric with 8 rails, 4 leafs per scalable unit." Hard-coded to 2 spines, 4 links per spine–leaf pair and 8 rails. Rail *r* goes to leaf *r mod 4*, so each leaf carries two rails. Default switch profile is `vs` (virtual). Ports are allocated sequentially. Past port 76 the allocator only logs an error. bridge reports, unreviewed, that its default output fails `hhfab validate` at this pin. | **Direct conceptual overlap** with the sponsor's rail-packing scenario. It may indicate maintainer interest in rail-optimised designs (**I**, unconfirmed: Q-M1). It is VLAB-only, fixed-shape, has no physical profiles, and is not a support statement. | [main.go L174](https://github.com/githedgehog/fabricator/blob/d2316aca666eb278541276a11a5f8dae372bf629/cmd/hhfab/main.go#L174), [L1222](https://github.com/githedgehog/fabricator/blob/d2316aca666eb278541276a11a5f8dae372bf629/cmd/hhfab/main.go#L1222); [vlabbuilder.go L1098–L1119, L1231](https://github.com/githedgehog/fabricator/blob/d2316aca666eb278541276a11a5f8dae372bf629/pkg/hhfab/vlabbuilder.go#L1098), [L1304–L1314](https://github.com/githedgehog/fabricator/blob/d2316aca666eb278541276a11a5f8dae372bf629/pkg/hhfab/vlabbuilder.go#L1304) **F** (R03 owns the full trace) |
 | AI Network Planner ([plan.hedgehog.cloud](https://plan.hedgehog.cloud/)) and the ROI page | The public ROI page links it as "Calculate your AI Network Value" and the "Hedgehog ROI Calculator". It promises to "calculate your savings and revenue impact" and addresses AI cloud providers, DevOps teams and executives weighing CapEx, OpEx and revenue. The planner page is client-rendered; I did not operate it. Public material describes **no topology sizing or wiring output**. | Apparently a different persona and job (**H**). Possible hand-off: cluster size and architecture choice there become the opening intent in hh-aid. Avoid naming collisions ("planner"). | Fetched [hedgehog.cloud](https://hedgehog.cloud), the [ROI page](https://hedgehog.cloud/ai-network-planning-roi) and [plan.hedgehog.cloud](https://plan.hedgehog.cloud/) (page title only), 2026-11-07 **F/H** |
 | Free consultation; NVIDIA and OCP reference-architecture pages on hedgehog.cloud | Human design service and marketing references | The consultation is presumably delivered today by the persona hh-aid serves. **H** | hedgehog.cloud fetch **F** |
-| 26.05 multi-fabric and multi-domain | One controller manages several fabrics. A fabric can have several domains (spine sets). This explicitly enables "multi-plane backends with dedicated spines per plane and shared leaves." | Documented *use* of domains for multi-plane backends. A domain is an upstream spine set with EVPN route boundaries. It is **not** a first-hop rail domain, and documented use does not establish arbitrary plane-isolation or physical failure-domain guarantees (compat reconciliation requested, §13.3). This affects R02, R04 and D01. | [release notes L19–L22](https://github.com/githedgehog/docs/blob/1be68948e177dcc031e91659ab5293ba19893ccf/docs/release-notes/index.md#L19); [multi-fabric.md L19, L29, L308](https://github.com/githedgehog/docs/blob/1be68948e177dcc031e91659ab5293ba19893ccf/docs/user-guide/multi-fabric.md#L29) **F** |
+| 26.05 multi-fabric and multi-domain | One controller manages several fabrics. A fabric can have several domains (spine sets). This explicitly enables "multi-plane backends with dedicated spines per plane and shared leaves." | Documented *use* of domains for multi-plane backends. A domain is an upstream spine set with EVPN route boundaries. It is **not** a first-hop rail domain, and documented use does not establish arbitrary plane-isolation or physical failure-domain guarantees (§13.3). This affects R02, R04 and D01. | [release notes L19–L22](https://github.com/githedgehog/docs/blob/1be68948e177dcc031e91659ab5293ba19893ccf/docs/release-notes/index.md#L19); [multi-fabric.md L19, L29, L308](https://github.com/githedgehog/docs/blob/1be68948e177dcc031e91659ab5293ba19893ccf/docs/user-guide/multi-fabric.md#L29) **F** |
 
 ### 3.2 Sponsor-owned public prior work
 
 | Asset | Observed purpose (README level) | Product implication |
 | --- | --- | --- |
-| [afewell-hh/aid](https://github.com/afewell-hh/aid), "AI Infrastructure Designer", about 151 commits, last pushed 2026-08-22 | Calculates switch infrastructure from server inventory, validates mesh/Clos/dual-plane constraints, derives a hierarchical BOM, exports hhfab-validated wiring, and optionally publishes to NetBox. Stack: MoonBit kernel with formally proved arithmetic cores, Rust/Go adapters, WASM components. | The **same product thesis**. Its history and results are the most relevant discovery input; why it is no longer active (last push 2026-08-22) is an open question (Q-SP1). The sponsor's HNP R4 record calls AID's "current implementation … uninspected, historical only" ([hh-netbox-plugin#758](https://github.com/afewell-hh/hh-netbox-plugin/issues/758)). **F** |
+| [afewell-hh/aid](https://github.com/afewell-hh/aid), "AI Infrastructure Designer", about 151 commits, last pushed 2026-08-22 | Calculates switch infrastructure from server inventory, validates mesh/Clos/dual-plane constraints, derives a hierarchical BOM, exports hhfab-validated wiring, and optionally publishes to NetBox. Stack: MoonBit kernel with formally proved arithmetic cores, Rust/Go adapters, WASM components. | The **same product thesis**. Its history and results are the most relevant discovery input. Its current status is an open question (Q-SP1); the commit dates alone show nothing either way. The sponsor's HNP R4 record calls AID's "current implementation … uninspected, historical only" ([hh-netbox-plugin#758](https://github.com/afewell-hh/hh-netbox-plugin/issues/758)). **F** |
 | [afewell-hh/hh-netbox-plugin](https://github.com/afewell-hh/hh-netbox-plugin) (HNP), about 624 commits | A NetBox plugin for Hedgehog CRDs with a self-service catalogue and Kubernetes sync. Issues #754–#764 record a "research reset" covering salvage, a blank-sheet designer, a progressive questionnaire (R6, accepted as source research) and a repair-versus-rebuild comparison. | It contains source research accepted *within that project, with qualifications*, on progressive questionnaires (#760) and salvage (#758). Proposal: hh-aid uses those conclusions as **inputs to evaluate**, not as accepted hh-aid decisions, and avoids repeating them. The record shows heavy review overhead, and #763 stopped "unaccepted"; that is a process lesson. **F** |
 | [afewell-hh/OCP-OCDAI-training-fabric](https://github.com/afewell-hh/OCP-OCDAI-training-fabric) and the inference counterpart | Hedgehog and Celestica OCP reference-architecture assets: connectivity maps, topology-map YAML, per-fabric wiring, draw.io diagrams and NetBox inventory for OPG-64…512 and XOC-256…1024, in rail-optimised and single-homed variants. Some large compositions are "partially populated where scale pushes against current port budgets." | **Candidate golden-fixture source** (CC0-1.0 licence observed via the GitHub API) and a public, non-customer scenario set. Each asset still needs verification against the 26.05 support contract. **F/H** |
 | [afewell-hh/hh-validator](https://github.com/afewell-hh/hh-validator) (2025-07) | `hhfab validate` as a web service and CLI | An earlier answer to "validate without installing hhfab." Relevant to D05. **F** |
@@ -118,7 +118,7 @@ This is the product-level journey. R06 will refine stages J4–J7 into artifacts
 
 The docs also mention that after an upgrade "more domains need a new Fabric". That suggests at least one alternative, a separate Fabric, but I have not established its consequences for an existing design. **F/Q**
 
-Proposal (**H**): ask growth questions (planes, domains, ASN ranges) before J3 approval, and warn when a requested change touches an immutable field. This document does **not** claim that a new plane always requires a rebuild. Which changes are forbidden, and which alternative designs or migrations remain, is unresolved; reconciliation with compat is requested (§13.2).
+Proposal (**H**): ask growth questions (planes, domains, ASN ranges) before J3 approval, and warn when a requested change touches an immutable field. This document does **not** claim that a new plane always requires a rebuild. Forbidden transitions and the non-forbidden but unproven alternatives are summarised in §13.2.
 
 ## 6. Costly failure modes
 
@@ -132,7 +132,7 @@ Ranked by my estimate of cost × likelihood (**H**; to be validated in interview
 | FM4 | Rail or plane mis-mapping (a NIC on the wrong rail leaf, planes crossed) | Customer (silent collective-communication performance loss) | Hard to diagnose; looks like a performance problem, not a wiring fault | Rail/plane membership checks; installer cable schedule names rails explicitly |
 | FM5 | Silent assumptions: defaults presented as facts | SE and customer | The quote or design is wrong and nobody knows why | Provenance per value; provisional watermark; "next useful question" |
 | FM6 | Non-deterministic regeneration: names or ports reshuffle after a small change | Installer, operator | Cabling rework, invalid labels, broken as-built records | Stable identity and semantic diff (D01); regeneration test in the slice |
-| FM7 | Lifecycle-hostile structure (domains/ASNs chosen without considering growth) | Operator | A later change may touch fields fixed at creation (**F**). Whether that forces disruption, and which migration paths exist, is unresolved (§5, §13.2). | Growth questions before J3; an explicit "immutable after creation" warning |
+| FM7 | Lifecycle-hostile structure (domains/ASNs chosen without considering growth) | Operator | A later change may touch fields fixed at creation (**F**). Alternatives exist but are unproven, and migration safety is unresolved (§13.2). | Growth questions before J3; an explicit "immutable after creation" warning |
 | FM8 | Double counting, or missing components such as a multi-ended shuffle counted as several cables, or management/BMC links forgotten | Procurement | Over- or under-ordering | BOM reconciliation checks (R05/D04) |
 | FM9 | Too slow or too laborious for the pre-sales turnaround, so users go back to the spreadsheet | Product adoption | hh-aid becomes another unused tool (cf. §3.2) | Time-to-estimate success measure (§7) |
 | FM10 | Customer data committed to a public repo or sent to the wrong party | Hedgehog legal and reputational | Contractual breach | Data-handling boundary (D3/D5); no customer fixtures in this repo (**S**, AGENTS.md) |
@@ -189,7 +189,7 @@ This is a proposal for **sponsor review**, which the acceptance criterion requir
 
 | ID | Question | Tests |
 | --- | --- | --- |
-| Q-SP1 | Which existing tools should hh-aid replace, absorb, integrate with or leave alone (AID, HNP, the OCP repositories, the gpu-rail preview generator, and any current internal design or operations tools)? Why did AID stop? | A-08, A-13, D1 | A-08, D1 |
+| Q-SP1 | Which existing tools should hh-aid replace, absorb, integrate with or leave alone (AID, HNP, the OCP repositories, the gpu-rail preview generator, and any current internal design or operations tools)? What is AID's current status, and what did it teach? | A-08, A-13, D1 |
 | Q-SP2 | Who runs hh-aid in its first year: Hedgehog SEs only, partners, or customers? | A-02, A-10, D3 |
 | Q-SP3 | Which Hedgehog releases must be supported: latest only (26.05), or N-1 too? | A-11, D4 |
 | Q-SP4 | May sanitised real designs be used as private fixtures? Where may they live? | D5 |
@@ -317,43 +317,78 @@ All recommendations below are scout's proposals for the sponsor. None is a decis
 | D6 | Process weight | Current gates / lighter caps | One author, one independent reviewer, one correction round per M1 ticket. Escalate only on a factual dispute. |
 | D7 | Accept or adjust the success measures (§7) and learning goals (§10.1) | — | Accept SM1–SM5 for the first slice |
 
-## 13. Cross-ticket reconciliation (open)
+## 13. Cross-ticket reconciliation
 
-Revision 1 of this draft said `hhfab validate` "proves admission" and that a later plane or domain is "a disruptive change, not an edit". Lead flagged both as over-strong. They are corrected above. This section records what remains open. compat has been asked for a precise reconciliation (§17). Until it arrives, product artifacts must use the qualified wording.
+Revision 1 of this draft said `hhfab validate` "proves admission" and that a later plane or domain is "a disruptive change, not an edit". Lead flagged both as over-strong, and they are corrected above. Revision 3 brings in two sibling documents:
+
+- compat's independent review of R03 ([#4 comment 6711820797](https://github.com/afewell-hh/hh-aid/issues/4#issuecomment-6711820797), with the [#3 reconciliation 6711823329](https://github.com/afewell-hh/hh-aid/issues/3#issuecomment-6711823329));
+- bridge's R03 revision 2 ([commit 7459463](https://github.com/afewell-hh/hh-aid/blob/7459463688a35f1fb8c1d4b0093c241a1f23c149/docs/research/upstream-reuse.md)).
+
+Both are **peer research reports under review**, not accepted hh-aid facts. Neither one executed admission, runtime or hardware checks. Lead independently source-checked the validation and immutability points ([#3 comment 6712217138](https://github.com/afewell-hh/hh-aid/issues/3#issuecomment-6712217138)). R01 uses the wording below and will follow later corrections.
 
 ### 13.1 What a pinned `hhfab validate` pass means
 
-| Evidence | Source | Status |
-| --- | --- | --- |
-| Fabric documents an intent that hhfab validation match webhook admission | bridge's #4 handoff citing Fabric `pkg/ctrl/README.md` | Documented intent (**I/F**), not demonstrated parity |
-| Gateway create webhooks invoke dataplane checks beyond offline validation | compat PR #17 (`[F-ctrl]`) | Reported gap, unreviewed |
-| Fabricator `defaultAndValidate` discards warnings, so a pass can hide MCLAG's "unsupported" warning | compat PR #17 | Reported gap, unreviewed |
-| `Validate(ctx, nil, cfg)` skips cross-object checks; CRD schema admission and update/delete webhooks are separate from create-time Go validation | compat PR #17 | Reported, unreviewed |
-| Connection-variant exclusivity: a static finding to reproduce | compat PR #17, Q4 | Unexecuted check |
-| Only the first error is reported, and which error comes first varies between runs | bridge #4 | Reported observation, unreviewed |
+**compat's proposition ([#4](https://github.com/afewell-hh/hh-aid/issues/4#issuecomment-6711820797)).** A successful pinned run establishes only one thing: this input, configuration, defaulted and hydrated in-memory snapshot, and the registered profiles completed the checks that CLI executes, without a returned error. It does **not** establish any of the following:
+
+- full Kubernetes structural (CRD schema) admission;
+- gateway dataplane acceptance;
+- update/delete legality against an installed fabric;
+- controller or NOS convergence;
+- physical compatibility;
+- performance;
+- support for warning-only deprecated features.
+
+bridge's revision 2 defines this as the **U-gate**. It reads a pass as "accepted by upstream semantic validation at pin P, excluding G1–G6" and lists the gaps G1–G7 ([§3.1](https://github.com/afewell-hh/hh-aid/blob/7459463688a35f1fb8c1d4b0093c241a1f23c149/docs/research/upstream-reuse.md#L101)).
+
+| Gap | Evidence status |
+| --- | --- |
+| Fabric's design rule that hhfab validation match webhooks (`pkg/ctrl/README.md`) | Documented **intent**, not demonstrated parity. The same README lists a Gateway/GatewayPeering exception ([README](https://github.com/githedgehog/fabric/blob/4bde50829fd7cfebac69332982abd1dee504a8a3/pkg/ctrl/README.md)). |
+| G1 CRD schema admission not applied offline | bridge reports a 1-link ESLAG Connection passing `hhfab validate` although the CRD has `minItems: 2`. This is **author-reported execution**, not independently reproduced. Real API-server rejection was not executed. |
+| G2 gateway dataplane checks in create webhooks | Source-read by compat and bridge ([gateway_wh.go L57](https://github.com/githedgehog/fabric/blob/4bde50829fd7cfebac69332982abd1dee504a8a3/pkg/ctrl/gateway_wh.go#L57)) |
+| G3 warnings discarded (`defaultAndValidate`), for example MCLAG's "unsupported" warning | Source-read by compat and bridge |
+| G4 creation-order dependence; G5 update/delete webhooks; G6 Connection-variant exclusivity | Inference, or static findings not executed |
+| G7 NOS/controller convergence, hardware, optics, RoCE, planning intent | Out of scope of `Validate()` |
+| First error only; which error comes first varies between runs | bridge observation (single runs). compat: "all errors" cannot simply be collected from early-return validators. |
 
 **Product consequence (H).** A pinned validation pass is one necessary gate (SM3). The installation-ready gate also needs:
 
 - R02 support-matrix rows for every capability used;
-- captured warnings;
+- hh-aid's own rejection of unsupported or warning-only families;
+- a CRD-schema check;
+- extra handling, or an explicit label, for gateway-bearing exports;
 - D04's independent checks for rails, planes, capacity and BOM;
 - explicit statements of what hardware and runtime facts remain unproven.
 
+UX implication for D02: validation messages may be one-at-a-time and order-unstable. Any user-facing "all problems" list is advisory diagnostics, and the gate's verdict is authoritative.
+
 ### 13.2 Immutable Fabric fields and growth
 
-- **Documented (F):** a Fabric's leaf ASN range, domains and their ASNs are fixed at creation. Fabric and domain references on objects are immutable. After an upgrade, more domains need a new Fabric. Fabrics are not cabled to each other; traffic between fabrics goes through external systems ([multi-fabric.md](https://github.com/githedgehog/docs/blob/1be68948e177dcc031e91659ab5293ba19893ccf/docs/user-guide/multi-fabric.md)).
-- **Unresolved (Q):**
-  - Can a design pre-declare domains for future planes?
-  - Is a separate Fabric a valid "new plane" for a given endpoint design, given that fabrics interconnect only through externals?
-  - What does delete-and-recreate migration cost in practice?
-  - Are other routes available?
+**Documented and source-read (F):** the docs say a Fabric's leaf ASN range, domains and ASNs are fixed at creation ([multi-fabric.md L265](https://github.com/githedgehog/docs/blob/1be68948e177dcc031e91659ab5293ba19893ccf/docs/user-guide/multi-fabric.md#L265)). compat's narrower reading of [FabricWebhook.ValidateUpdate](https://github.com/githedgehog/fabric/blob/4bde50829fd7cfebac69332982abd1dee504a8a3/pkg/ctrl/fabric_wh.go#L115) is that an update to an existing Fabric may not:
 
-  This document draws no universal rule from these facts.
+- change already-nonzero leaf ASN bounds;
+- remove or rename a populated domain;
+- change a domain's already-nonzero spine or gateway ASNs;
+- add domain names when the old domain map is non-empty.
+
+Legacy unset values can be filled, subject to validation. `disableBFD` is not frozen by these checks. [SwitchWebhook.ValidateUpdate](https://github.com/githedgehog/fabric/blob/4bde50829fd7cfebac69332982abd1dee504a8a3/pkg/ctrl/switch_wh.go#L72) freezes a switch's ASN, Fabric membership and normalised domain membership. Reordering the list is not a membership change.
+
+**Alternatives that are not forbidden (compat, unexecuted):**
+
+- a new installation that declares several domains from the start;
+- adding switches to an already-declared domain;
+- a separate new Fabric with disjoint ASNs and explicit interconnection through externals;
+- a separately designed replacement or migration.
+
+These are **not proven equivalent** in availability, physical isolation, addressing or interruption. Migration sequencing, disruption and rollback need ops (R06) and domain-authority review. Delete-and-recreate is not a safe procedure just because an error message mentions it.
+
+**Product consequence (H):** growth intent (future planes or domains, ASN ranges) is a high-value question to ask before J3 approval. hh-aid should show which planned changes would hit a forbidden transition, and should list alternatives as options with open risks, not as a rebuild rule.
 
 ### 13.3 Planes, domains and rail domains
 
-- Public docs describe the *use* of multiple domains for "multi-plane backends with dedicated spines per plane and shared leaves" (release notes, multi-fabric intro). bridge reports that the code shows only naming evidence (`plane-a`/`plane-b` in tests). compat classifies plane isolation as **conditional**.
-- Working position (**H**): "plane" and "first-hop rail domain" are hh-aid planning concepts. A plane may *map to* an upstream domain or a separate Fabric, subject to R02's support rows. Documented use is not a guarantee of arbitrary plane isolation or of physical failure-domain independence.
+- **Documented use (F):** the pinned 26.05 docs describe multiple domains (spine sets) within one Fabric for "multi-plane backends with dedicated spines per plane and shared leaves" ([release notes L19](https://github.com/githedgehog/docs/blob/1be68948e177dcc031e91659ab5293ba19893ccf/docs/release-notes/index.md#L19), [multi-fabric.md L19](https://github.com/githedgehog/docs/blob/1be68948e177dcc031e91659ab5293ba19893ccf/docs/user-guide/multi-fabric.md#L19)). compat calls this "documented support within stated constraints". bridge's revision 2 withdraws its earlier "weak naming signal" reading ([§6.1](https://github.com/afewell-hh/hh-aid/blob/7459463688a35f1fb8c1d4b0093c241a1f23c149/docs/research/upstream-reuse.md#L187)).
+- **Separate concept:** a first-hop rail domain (servers whose rail NICs share a set of rail leaves) is an hh-aid planning concept. A spine belongs to exactly one upstream domain, so the sponsor's "two first-hop domains under a common spine layer" reads as **one** upstream domain, with the first-hop grouping held only in hh-aid (bridge §6.1; maintainer question pending).
+- **Not established:** rail identity and GPU–NIC association; full plane isolation (underlay, failure independence, capacity, shared-leaf hardware); support for specific B300 plane designs on selected hardware. Shared leaves share physical failure exposure. Separate Fabric objects are another documented separation model, but they are not interchangeable with domains.
+- **Working position (H):** "plane" and "first-hop rail domain" stay hh-aid planning concepts. A plane may map to an upstream domain, or to a separate Fabric, only where R02/R04/R05 confirm the scenario.
 
 ## 14. Acceptance criteria and evidence (#2)
 
@@ -363,8 +398,8 @@ Revision 1 of this draft said `hhfab validate` "proves admission" and that a lat
 | Prioritised interview guide and assumptions register; missing stakeholder evidence recorded without blocking synthesis | §9 (prioritised, mapped to assumptions), §11; the gap is stated in §1 and LG1 | Draft complete; interviews not conducted |
 | Measurable learning goals and candidate vertical slices that preserve full coverage | §10.1, §10.2, §10.3 | Draft complete |
 | Ownership boundaries for procurement, live deployment and lifecycle, with sponsor review | §8.2 | **Awaiting sponsor review** |
-| Facts, hypotheses, inferred maintainer intent and open questions separated; source versions and reproducible evidence | Labels throughout; §1 baseline; §15 commands; public sources only (§1, §3.3) | Done, pending reviewer check. Cross-ticket items open (§13). |
-| Independent reviewer disposition; sponsor/domain decisions recorded | — | **Not started.** Reviewers: ux and sponsor. Decisions D1–D7 pending. compat reconciliation pending (§13). |
+| Facts, hypotheses, inferred maintainer intent and open questions separated; source versions and reproducible evidence | Labels throughout; §1 baseline; §15 commands; public sources only (§1, §3.3) | Done, pending reviewer check. Cross-ticket wording consolidated (§13); peer reports remain under review. |
+| Independent reviewer disposition; sponsor/domain decisions recorded | — | **Not started.** Reviewers: ux and sponsor. Decisions D1–D7 pending. ux review assigned by lead. |
 
 ## 15. Reproducible evidence
 
@@ -410,7 +445,7 @@ Branch/PR and artifact paths: branch r01-product-discovery, draft PR (see #2 com
 Source releases/commits: Hedgehog 26.05; fabric v0.144.1 4bde5082; fabricator v0.51.4 d2316aca; docs master 1be68948
 Key findings: §2 (overlap with existing public tools; SE/designer proposed primary; physical/support failures probably costliest; immutable Fabric fields affect growth planning; process-overhead precedent; VS-C→VS-B proposed)
 Acceptance criteria with evidence: §14
-Cross-ticket reconciliation: §13 (validation meaning, immutability, planes/domains) — compat requested
+Cross-ticket reconciliation: §13 consolidated from compat #4 review 6711820797 and bridge 7459463
 Assumptions and unresolved questions: §11, §9, §13, §16
 Decisions requested (with alternatives): §12 D1–D7
 Independent reviewer and review status: ux + sponsor — not yet reviewed
