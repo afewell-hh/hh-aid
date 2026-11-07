@@ -1,0 +1,351 @@
+{
+  "project": {
+    "url": "https://github.com/users/afewell-hh/projects/6",
+    "number": 6,
+    "id": "PVT_kwHOC49dqc4BqomA"
+  },
+  "epic": 1,
+  "tasks": [
+    {
+      "key": "R01",
+      "title": "Discover users, outcomes, scope, and the first learning goals",
+      "role": "Product discovery lead",
+      "reviewer": "UX researcher and sponsor",
+      "phase": 1,
+      "deps": [],
+      "artifact": "docs/research/product-discovery.md",
+      "brief": "Turn the sponsor brief into a product opportunity map. Prepare interviews for sales/solutions engineers, fabric designers, installers, and operators; the sponsor relays questions. Inspect existing Hedgehog planning offerings for overlap. Distinguish reported requirements, hypotheses, and actual user evidence. Do not invent interviews.",
+      "checks": [
+        "Define personas/jobs, exploration-to-installation journeys, costly failure modes, success measures, and explicit product boundaries.",
+        "Produce a prioritized interview guide and assumptions register; record missing stakeholder evidence without blocking useful draft synthesis.",
+        "Propose measurable learning goals and candidate vertical slices, preserving the full supported-topology coverage commitment.",
+        "Identify ownership boundaries for procurement, live deployment, and lifecycle management; obtain sponsor review."
+      ],
+      "number": 2,
+      "url": "https://github.com/afewell-hh/hh-aid/issues/2",
+      "nickname": "scout"
+    },
+    {
+      "key": "R02",
+      "title": "Establish the versioned Hedgehog topology support contract",
+      "role": "Hedgehog upstream compatibility researcher",
+      "reviewer": "Network topology specialist; sponsor-designated Hedgehog authority for disputed claims",
+      "phase": 1,
+      "deps": [],
+      "artifact": "docs/research/hedgehog-support-contract.md",
+      "brief": "Deeply inspect githedgehog/fabric APIs, validation, controllers, switch profiles, tests, documentation and relevant dependent repositories. Select and justify a compatible release/commit baseline. Inventory all supported topology and connection families, not just the sponsor examples. Trace representability through semantic admission and runtime/hardware restrictions.",
+      "checks": [
+        "Publish a pinned source map and exhaustive inventory method, including connection variants, associated resources, namespaces, names, port IDs, and global constraints.",
+        "Create a matrix of supported, unsupported, conditional, and unknown capabilities with permalinks, symbols/tests, version boundaries, and evidence confidence.",
+        "Explain mesh/leaf-spine and redundancy semantics and whether rails/planes/domains are upstream concepts or hh-aid planning policies; investigate management/external fabric boundaries.",
+        "Specify reusable validation entry points and gaps; list questions for actual maintainers without claiming schema acceptance proves support."
+      ],
+      "number": 3,
+      "url": "https://github.com/afewell-hh/hh-aid/issues/3",
+      "nickname": "compat"
+    },
+    {
+      "key": "R03",
+      "title": "Investigate hhfab generation, reuse seams, and maintainer design principles",
+      "role": "Hedgehog integration and code archaeology specialist",
+      "reviewer": "Upstream compatibility researcher and architecture lead",
+      "phase": 1,
+      "deps": [],
+      "artifact": "docs/research/upstream-reuse.md",
+      "brief": "Trace hhfab vlab gen in githedgehog/fabricator from flags through graph construction, allocation, validation and serialization. Inspect Fabric conventions and relevant tests/PR discussions. Infer design principles cautiously from evidence; do not impersonate authors. Evaluate adapting reusable libraries, wrapping a CLI, or building a versioned adapter.",
+      "checks": [
+        "Pin Fabricator and compatible Fabric versions; map the exact generation call graph and identify VLAB-specific assumptions and scale limitations.",
+        "Inventory reusable APIs/profiles/validators/naming/export helpers with dependency, license, maintenance and upgrade implications.",
+        "Provide a small worked trace from simplified input to wiring output and identify where real hardware/racks/rails/planes exceed current generation semantics.",
+        "Separate documented maintainer intent, observed conventions and inferred preferences; propose focused questions and a reuse recommendation with alternatives."
+      ],
+      "number": 4,
+      "url": "https://github.com/afewell-hh/hh-aid/issues/4",
+      "nickname": "bridge"
+    },
+    {
+      "key": "R04",
+      "title": "Formalize topology scenarios, rail domains, planes, and sizing constraints",
+      "role": "GPU Ethernet topology architect",
+      "reviewer": "Independent verification specialist and upstream compatibility researcher",
+      "phase": 1,
+      "deps": [],
+      "artifact": "docs/research/topology-scenarios.md",
+      "brief": "Translate the sponsor examples into explicit graphs, equations and constraints. Verify hardware claims against primary vendor material where needed. Cover frontend/storage/management/backend, singleton and redundant attachment, rail packing, domains, plane isolation, mesh and leaf-spine subject to Hedgehog support. Distinguish server/tray/GPU/rack cardinalities.",
+      "checks": [
+        "Produce worked 32/64/128-node rail cases with endpoint, leaf, uplink and spine accounting; explicitly leave unknown hardware/support facts unresolved.",
+        "Describe B300 two-plane and NVL72 per-rack/two-rack/shuffle variants with exact assumptions, rather than declaring one universal design.",
+        "Specify hard constraints versus optimization preferences: placement, redundancy, failure domains, growth, uplink policy, bandwidth units and oversubscription definition.",
+        "Provide feasible and infeasible boundary cases, including odd counts, partial domains, reserved ports, conflicting constraints, and spare-port policies; distinguish bandwidth balance from nonblocking proof."
+      ],
+      "number": 5,
+      "url": "https://github.com/afewell-hh/hh-aid/issues/5",
+      "nickname": "topo"
+    },
+    {
+      "key": "R05",
+      "title": "Define hardware profiles and physical connection BOM semantics",
+      "role": "Hardware connectivity and BOM specialist",
+      "reviewer": "Network topology architect and installation specialist",
+      "phase": 1,
+      "deps": [],
+      "artifact": "docs/research/hardware-and-bom.md",
+      "brief": "Design evidence-backed catalog requirements for servers, switches and connection assemblies. Investigate native cages, logical ports, lane/bank restrictions, breakout configurations, optics, fiber, DAC/AEC/AOC, integrated RJ45 and shuffle cables. Focus on compatibility/accounting boundaries, not a speculative exhaustive SKU catalog.",
+      "checks": [
+        "Define version/provenance and supported-combination requirements for profiles; distinguish upstream SwitchProfile/ServerProfile fields from missing planning data.",
+        "Show one separate-optics-plus-fiber link, one integrated cable, a breakout and a multi-ended shuffle assembly with exact counting rules and end-to-end mappings.",
+        "Identify speed/media/connector/reach/polarity constraints, placement implications, spares policy, and unknown-compatibility behavior.",
+        "Describe BOM quantities versus pricing freshness/estimates, avoid double-counting, and define which physical uncertainties block installation output."
+      ],
+      "number": 6,
+      "url": "https://github.com/afewell-hh/hh-aid/issues/6",
+      "nickname": "parts"
+    },
+    {
+      "key": "R06",
+      "title": "Map installation artifacts and lifecycle handoff",
+      "role": "Deployment and fabric operations specialist",
+      "reviewer": "Product discovery lead and upstream integration specialist",
+      "phase": 1,
+      "deps": [],
+      "artifact": "docs/research/installation-lifecycle.md",
+      "brief": "Investigate how approved designs become usable wiring manifests, cabling schedules, labeling, installation checks and as-built records. Map interfaces to hhfab/Fabric rather than replacing controller responsibilities. Include change/replacement/growth scenarios and drift between plan and installation.",
+      "checks": [
+        "Provide an exploration \u2192 approved design \u2192 procurement package \u2192 installation \u2192 acceptance \u2192 lifecycle journey with actors and handoffs.",
+        "Specify required export/import artifacts, stable identities, revision/checksum conventions, port naming and provenance; separate desired, installed and observed states.",
+        "Define installation acceptance evidence and how deviations invalidate/regenerate outputs while preserving approved baselines.",
+        "Prepare operator/installer validation questions and state boundaries for live writes, secrets, credentials, and ownership."
+      ],
+      "number": 7,
+      "url": "https://github.com/afewell-hh/hh-aid/issues/7",
+      "nickname": "ops"
+    },
+    {
+      "key": "D01",
+      "title": "Design the domain model and progressive input contracts",
+      "role": "Domain modeling and data architecture specialist",
+      "reviewer": "Upstream compatibility researcher, topology architect, and UX designer",
+      "phase": 2,
+      "deps": [
+        "R01",
+        "R02",
+        "R03",
+        "R04",
+        "R05",
+        "R06"
+      ],
+      "artifact": "docs/design/domain-model.md",
+      "brief": "Facilitate asynchronous event storming and agree a shared glossary. Model design intent, catalogs, constraint decisions, realized graphs, physical assemblies and exports without prematurely selecting a database. The conceptual questionnaire is a dependency-aware input model, not a giant fixed wizard.",
+      "checks": [
+        "Deliver a glossary and entity/relationship model covering fabrics, servers, trays, racks, rails, planes, domains, physical cages, logical lanes and assemblies.",
+        "Specify unknown/assumed/user/derived/conflicting/stale input states, provenance, defaults, locks/overrides, scenario branches and dependency invalidation.",
+        "Define stable identity, deterministic regeneration, semantic diff, schema migration, catalog/upstream version pinning and planning-to-wiring mapping contracts.",
+        "Walk through sparse eight-rack and 512-node requests, a newly answered question, a conflict and a user override; show deployability/completeness gates."
+      ],
+      "number": 8,
+      "url": "https://github.com/afewell-hh/hh-aid/issues/8",
+      "nickname": "model"
+    },
+    {
+      "key": "D02",
+      "title": "Prototype progressive design and large topology review workflows",
+      "role": "UX researcher and interaction designer",
+      "reviewer": "Product discovery lead, installation specialist, and sponsor",
+      "phase": 2,
+      "deps": [
+        "R01",
+        "R04",
+        "R06"
+      ],
+      "artifact": "docs/design/experience-design.md",
+      "brief": "Explore how users enter minimal intent, refine profiles, compare scenarios, understand constraints, review BOMs and inspect many thousands of links. Produce low-fidelity task flows or an appropriate prototype; do not build the production website. Reconcile vocabulary/contracts with D01 before acceptance.",
+      "checks": [
+        "Prototype initial estimate, next useful question, rail/plane inspection, infeasible request explanation, input-change impact and installation export.",
+        "Make assumptions, unknowns, stale outputs, confidence and completeness visible; provide table/search/filter/summary approaches beyond an unreadable giant graph.",
+        "Define accessibility and error-recovery requirements plus task-based evaluation scripts and measurable usability goals.",
+        "Record real sponsor/user feedback when available; distinguish heuristic walkthroughs from user testing and resolve critical trust/comprehension failures."
+      ],
+      "number": 9,
+      "url": "https://github.com/afewell-hh/hh-aid/issues/9",
+      "nickname": "ux"
+    },
+    {
+      "key": "D03",
+      "title": "Design topology allocation and constraint explanation strategies",
+      "role": "Graph algorithms and constraint optimization specialist",
+      "reviewer": "Topology architect and independent verification specialist",
+      "phase": 2,
+      "deps": [
+        "R02",
+        "R03",
+        "R04",
+        "R05",
+        "D01"
+      ],
+      "artifact": "docs/design/topology-engine.md",
+      "brief": "Compare constructive algorithms, constraint programming/optimization and hybrid approaches against supported topology families. Separate feasibility from optimization objectives such as switch count, growth, rack policy, failure tolerance and cabling. Do not select a solver by familiarity alone.",
+      "checks": [
+        "Specify input/output contracts, ordered constraints, allocation invariants and deterministic tie breaking, including rails sharing leaves and domains spanning many leaves.",
+        "Compare candidate methods on complexity, explainability, extensibility, dependency/license cost and upstream reuse.",
+        "Define actionable infeasibility explanations, unknown-input handling, bounded search/timeouts, and no silent constraint relaxation.",
+        "Work through packing, per-rack underfill, two planes, breakout contention and insufficient spine capacity; provide a reproducible spike plan and proposed scale targets for review."
+      ],
+      "number": 10,
+      "url": "https://github.com/afewell-hh/hh-aid/issues/10",
+      "nickname": "solver"
+    },
+    {
+      "key": "D04",
+      "title": "Design independent correctness verification and coverage evidence",
+      "role": "Independent verification and test architect",
+      "reviewer": "Upstream compatibility researcher and topology architect",
+      "phase": 2,
+      "deps": [
+        "R02",
+        "R04",
+        "R05",
+        "D01"
+      ],
+      "artifact": "docs/design/verification-strategy.md",
+      "brief": "Create a verification strategy independent of the generator's implementation. Define proof obligations, fixtures, upstream validation adapters and capability-to-test traceability. A generator that reproduces its own assumptions is not an independent oracle.",
+      "checks": [
+        "Define checks for unique ports, complete endpoints, lane exclusivity, rail/domain/plane membership, redundant placement, link compatibility, uplink/spine constraints and assembly/BOM reconciliation.",
+        "Specify golden/manual oracle cases, property-based generation, metamorphic relations, deliberate invalid mutations and diagnostic expectations.",
+        "Separate schema/admission/runtime/hardware/performance evidence and explain VLAB's limits; define supported-topology coverage and upgrade regressions.",
+        "Propose measurable performance/reproducibility targets and severity-based gates for provisional, validated and installation-ready outputs."
+      ],
+      "number": 11,
+      "url": "https://github.com/afewell-hh/hh-aid/issues/11",
+      "nickname": "check"
+    },
+    {
+      "key": "D05",
+      "title": "Evaluate application architecture, deployment, security, and integration options",
+      "role": "Application architect with platform and security perspective",
+      "reviewer": "Domain modeler, integration specialist, and independent verification specialist",
+      "phase": 2,
+      "deps": [
+        "R01",
+        "R03",
+        "R06",
+        "D01"
+      ],
+      "artifact": "docs/design/architecture-options.md",
+      "brief": "Compare proportionate deployment and technology options after understanding workflows and reuse boundaries. Evaluate local/offline use, shared service/collaboration, topology data sensitivity, imports, export safety, job execution and catalog updates. Do not preselect a language/framework or add infrastructure without need.",
+      "checks": [
+        "Produce system context/component diagrams, contracts and two or more viable deployment/stack alternatives with evidence and tradeoffs.",
+        "Define trust boundaries, authorization/audit/version history requirements, input safety, secrets handling, and data retention/export expectations.",
+        "Address large graph storage/navigation, asynchronous jobs/cancellation, deterministic builds, observability and upstream version adapters.",
+        "Draft ADRs with explicit decision owners, unresolved dependencies and experiment criteria; validate fit with D02/D03/D04 before final acceptance."
+      ],
+      "number": 12,
+      "url": "https://github.com/afewell-hh/hh-aid/issues/12",
+      "nickname": "arch"
+    },
+    {
+      "key": "D06",
+      "title": "Run inception synthesis and select the first vertical delivery slice",
+      "role": "Lead coordinator and product strategist",
+      "reviewer": "Sponsor plus topology, UX and integration representatives",
+      "phase": 2,
+      "deps": [
+        "R01",
+        "R02",
+        "R03",
+        "R04",
+        "R05",
+        "R06",
+        "D01",
+        "D02",
+        "D03",
+        "D04",
+        "D05"
+      ],
+      "artifact": "docs/design/inception-outcome.md",
+      "brief": "Synthesize specialist evidence through the five inception sessions in docs/design-process.md. Resolve terminology and scope conflicts, rank risks and agree the smallest useful end-to-end product experiment. Preserve the full Hedgehog topology coverage ledger and visible deferrals.",
+      "checks": [
+        "Publish agreed outcomes, story map, MVP canvas, success metrics, scope exclusions and prioritized unresolved questions.",
+        "Choose one supported scenario for the first slice using value/risk evidence and define its exact baseline inputs and outputs.",
+        "Record sponsor decisions and independent design reviews; do not turn unresolved critical constraints into undocumented defaults.",
+        "Specify spike acceptance criteria and an initial release hypothesis; update issue dependencies and identify any follow-up research."
+      ],
+      "number": 13,
+      "url": "https://github.com/afewell-hh/hh-aid/issues/13",
+      "nickname": "lead"
+    },
+    {
+      "key": "S01",
+      "title": "Execute a bounded topology generation and upstream validation spike",
+      "role": "Integration prototyper",
+      "reviewer": "Independent verification specialist and upstream compatibility researcher",
+      "phase": 3,
+      "deps": [
+        "D03",
+        "D04",
+        "D05",
+        "D06"
+      ],
+      "artifact": "spikes/topology-feasibility/README.md",
+      "brief": "Build only enough executable code to test the accepted first-slice contracts and highest-risk upstream reuse assumptions. Use pinned source/catalog versions and documented fixture data. Keep this explicitly disposable until design review accepts a production path.",
+      "checks": [
+        "Demonstrate input \u2192 allocation \u2192 independent checks \u2192 upstream validation \u2192 wiring and BOM artifacts with reproducible commands and captured results.",
+        "Include at least one rail/domain case, redundancy or placement constraint, breakout case and impossible request as selected in D06.",
+        "Regenerate after an input change and show stable identities/deterministic output plus a meaningful diff; exercise at least one selected large case and measure resource/time behavior.",
+        "Record environment limits and failures; show exactly which validators ran and which hardware/runtime properties remain unproven."
+      ],
+      "number": 14,
+      "url": "https://github.com/afewell-hh/hh-aid/issues/14",
+      "nickname": "spike"
+    },
+    {
+      "key": "S02",
+      "title": "Independently challenge the spike and close critical design risks",
+      "role": "Independent verification specialist",
+      "reviewer": "Topology architect, hardware specialist, and sponsor",
+      "phase": 3,
+      "deps": [
+        "S01"
+      ],
+      "artifact": "docs/design/feasibility-review.md",
+      "brief": "Review the spike as an adversarial consumer. Recompute quantities independently, inspect mappings, introduce invalid cases, and test whether assumptions are disclosed. Revisit architecture/UX contracts when evidence contradicts the design.",
+      "checks": [
+        "Reproduce documented runs and manually verify representative complete wiring/BOM cases against independent expectations.",
+        "Demonstrate detection of duplicate ports, lane collisions, lost endpoints, crossed planes/rails, broken redundancy, insufficient capacity and BOM double-counting.",
+        "Compare scale results and failure explanations against accepted targets; record remaining unknowns and necessary hardware/operator validation.",
+        "Publish pass/changes-required decisions per criterion and a prioritized risk closure list; no production-ready claim based solely on VLAB."
+      ],
+      "number": 15,
+      "url": "https://github.com/afewell-hh/hh-aid/issues/15",
+      "nickname": "check"
+    },
+    {
+      "key": "S03",
+      "title": "Approve the architecture baseline and create an executable delivery backlog",
+      "role": "Lead coordinator and delivery planner",
+      "reviewer": "Sponsor and specialist reviewers",
+      "phase": 3,
+      "deps": [
+        "S02",
+        "D02",
+        "D06"
+      ],
+      "artifact": "docs/design/delivery-plan.md",
+      "brief": "Turn reviewed evidence into accepted architecture decisions and small vertical implementation stories. Reconcile the final product, model, algorithm, UX, physical accounting, integration and verification designs. The outcome is an implementable plan, not an automatic authorization to deploy.",
+      "checks": [
+        "Resolve or explicitly defer risks with owners; obtain sponsor acceptance of release scope and designated technical review of correctness claims.",
+        "Publish accepted ADRs, a requirements-to-capability-to-test traceability index and a versioned coverage roadmap for all supported topology families.",
+        "Create prioritized implementation issues with dependencies, measurable acceptance criteria, test plans and review owners; estimate only after evidence supports sizing.",
+        "Define demo/release acceptance, migration/version policy and follow-up discovery cadence; record which user/hardware validations still precede installation use."
+      ],
+      "number": 16,
+      "url": "https://github.com/afewell-hh/hh-aid/issues/16",
+      "nickname": "lead"
+    }
+  ],
+  "role_aliases": {
+    "t1": "lead",
+    "t2": "scout",
+    "t3": "compat",
+    "t4": "bridge"
+  }
+}
