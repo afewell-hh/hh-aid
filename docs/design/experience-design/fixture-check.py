@@ -112,4 +112,50 @@ assert 2 * 48 - 80 == 16                                        # unused ports
 assert (2 + 0, 2 + 2) == (2, 4)                                 # OOB mesh | ls
 assert f3(60)[:5] == (4, 120, 12, F(2, 1), 2)
 
+
+# --- Revision 3: independent questions; undecided choices as alternatives. ---
+def leaves(n, links, slots, pack, blocks=None):
+    """Leaves for n endpoints under a packing; blocks = per-rack counts."""
+    blocks = blocks or [n]
+    total = 0
+    for b in blocks:
+        if pack == "rail":
+            total += links * ceil_div(b, slots)
+        elif pack == "pair":
+            total += 2 * ceil_div(b, slots // (links // 2))
+        else:
+            total += ceil_div(b, slots // links)
+    return total
+
+
+# 128 B200 (8 x 400G, 64 slots/leaf): every packing gives 16 leaves.
+assert {leaves(128, 8, 64, k) for k in ("rail", "pair", "same")} == {16}
+# 136: rail 24 | dual-homed pairs 18 | all links on one leaf 17 (alternatives).
+assert [leaves(136, 8, 64, k) for k in ("rail", "pair", "same")] == [24, 18, 17]
+assert [x * 32 for x in (24, 18, 17)] == [768, 576, 544]       # leaf uplinks
+assert spines(24, 32, 64) == spines(18, 32, 64) == spines(17, 32, 64) == 16
+# 136 endpoints vs 8 racks x 16 = 128 positions: contradiction; 9 racks fit.
+assert 136 > 8 * 16 and 136 <= 9 * 16 and ceil_div(136, 16) == 9
+# Rail-optimized, rack-local in 9 racks (16,...,16,8): 72 leaves, 2,304
+# uplinks > 32 x 64 = 2,048: no single spine layer (conflict, that alternative).
+blocks9 = [16] * 8 + [8]
+assert leaves(136, 8, 64, "rail", blocks9) == 72 and 72 * 32 > 32 * 64
+# Count range 120-136, rail-optimized: 16-24 leaves, 960-1,088 links.
+assert (leaves(120, 8, 64, "rail"), leaves(136, 8, 64, "rail")) == (16, 24)
+assert (120 * 8, 136 * 8) == (960, 1088)
+# Racks only: 4 NVL72-style racks x 18 = 72 trays x 4 links = 288.
+assert 4 * 18 * 4 == 288
+# Mixed inventory: 128 B200 backend (16 leaves, 8 spines) + 40 general
+# servers dual-homed on storage (2 leaves, 2 spines, min 2); OOB 28.
+assert leaves(40, 2, 48, "pair") == 2 and spines(2, 8, 32, min_s=2) == 2
+assert 16 + 8 + 2 + 2 == 28
+# S4 placeholder: 96 dual-homed 2 x 25G -> 4 leaves, 2 spines, 32 links, OOB 6.
+assert leaves(96, 2, 48, "pair") == 4 and spines(4, 8, 32, min_s=2) == 2
+assert (4 * 8, 4 + 2) == (32, 6)
+# Session 3 growth: 260 rail-optimized endpoints -> 40 leaves (24 ordered +
+# 16 proposed); 16 ordered spines x 64 = 1,024 ports.
+assert leaves(260, 8, 64, "rail") == 40
+assert 40 * 32 == 1280 > 16 * 64 == 1024                        # no D/U limit
+assert 32 * 32 + 8 * ceil_div(4 * 400, 800) == 1040 > 1024       # D/U <= 1
+
 print("D02 fixture arithmetic passed")

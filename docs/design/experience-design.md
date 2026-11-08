@@ -2,11 +2,11 @@
 
 | Field | Value |
 | --- | --- |
-| Issue | [#9 D02](https://github.com/afewell-hh/hh-aid/issues/9). Assignments: [6715064986](https://github.com/afewell-hh/hh-aid/issues/9#issuecomment-6715064986) (BOM-first design), [6717783503](https://github.com/afewell-hh/hh-aid/issues/9#issuecomment-6717783503) (sponsor-feedback revision) |
+| Issue | [#9 D02](https://github.com/afewell-hh/hh-aid/issues/9). Assignments: [6715064986](https://github.com/afewell-hh/hh-aid/issues/9#issuecomment-6715064986) (BOM-first design), [6717783503](https://github.com/afewell-hh/hh-aid/issues/9#issuecomment-6717783503) (workspace revision), [6718215963](https://github.com/afewell-hh/hh-aid/issues/9#issuecomment-6718215963) (starter research and library) |
 | Author | **t5 / ux** (AI agent). Not self-approved. |
 | Reviewers | t2 / scout, t9 / ops, sponsor, once lead dispatches them. Vocabulary reconciliation with D01 (t10 / model) is required before acceptance (§16). |
-| Status | **Revision 2.** It responds to actual sponsor feedback on revision 1 (§2). The sponsor gave feedback on the revision 1 walkthrough. **No SE usability testing has taken place**, and revision 2 has not been shown to the sponsor. |
-| Companion artifacts | [walkthrough.html](experience-design/walkthrough.html): a self-contained, clickable, low-fidelity workspace prototype on synthetic data. [fixture-check.py](experience-design/fixture-check.py): an independent check of the fixture arithmetic. [prototype-check.html](experience-design/prototype-check.html): an automated interaction check of the prototype. |
+| Status | **Revision 3.** It responds to actual sponsor feedback on revisions 1 and 2 (§2). Revision 3 adds a bounded starter-UX evidence pass, a question protocol and a comparison of two alternatives ([appendix A](experience-design/starter-evidence.md)). It replaces the single-choice starter with independent questions and keeps the home categories as views of a starter library. **No SE usability testing has taken place**, and revision 3 has not been shown to the sponsor. |
+| Companion artifacts | [walkthrough.html](experience-design/walkthrough.html): a self-contained, clickable, low-fidelity workspace prototype on synthetic data. [fixture-check.py](experience-design/fixture-check.py): an independent check of the fixture arithmetic. [prototype-check.html](experience-design/prototype-check.html): an automated interaction check of the prototype. [starter-evidence.md](experience-design/starter-evidence.md): appendix A (evidence-to-decision table, question protocol, alternatives, library). |
 
 ## 1. Scope, inputs and labels
 
@@ -32,6 +32,8 @@
 | --- | --- | --- |
 | Sponsor direction | main [`5c64850`](https://github.com/afewell-hh/hh-aid/blob/5c648506d0ff258f030da85741835e09dc25165b/docs/product-context.md) | Audience, BOM first, latest-release target |
 | Sponsor walkthrough feedback | main [`9f6194b`](https://github.com/afewell-hh/hh-aid/blob/9f6194b61d728f4b8cb60ffcb0c2fded2fae0110/docs/product-context.md) | Persistent workspace, no completion pressure, B200 as one fixture (§2) |
+| Sponsor feedback on revision 2 | main [`c018fa9`](https://github.com/afewell-hh/hh-aid/blob/c018fa9c8f3ce1b696bd6c3741c10a5ae77faf6c/docs/product-context.md) | Independent questions instead of a bundled classification; home categories as views of one starter library; placeholders now (§2) |
+| Starter UX sources | Six sources; dates and evidence types in [appendix A §A1](experience-design/starter-evidence.md#a1-evidence-to-decision-table) | Question protocol, control choice, library views |
 | R01 product discovery | [`75fe3ed`](https://github.com/afewell-hh/hh-aid/blob/75fe3edccafc756c6b92ad44dff9b71af73d3138/docs/research/product-discovery.md) | Personas, failure modes, measures SM1–SM9, interview guide |
 | R02 support contract | [`bf7437c`](https://github.com/afewell-hh/hh-aid/blob/bf7437c3fc852cfe06663073edc36a08de75efbc/docs/research/hedgehog-support-contract.md) | C03 ESLAG and C07 mesh (conditional), K09 profile features |
 | R03 upstream reuse | [`2b54790`](https://github.com/afewell-hh/hh-aid/blob/2b547901413c00fb8d7ce3eeff7d6669f2b78135/docs/research/upstream-reuse.md) | U-gate meaning, first-error-only diagnostics |
@@ -45,7 +47,7 @@ Labels used in this document:
 | Label | Meaning |
 | --- | --- |
 | **F** | Fact stated in a cited input |
-| **S** | Sponsor decision or actual sponsor feedback (main `5c64850`, `9f6194b`) |
+| **S** | Sponsor decision or actual sponsor feedback (main `5c64850`, `9f6194b`, `c018fa9`) |
 | **H** | Design hypothesis or proposal from this draft. It needs user evidence. |
 | **I** | Inferred intent. None about maintainers is used here. |
 | **Q** | Open question |
@@ -70,6 +72,22 @@ All hardware in the fixtures is **hypothetical**: R04's H400 leaf, a 64-port 800
 | Too fitted to B200 | Single F1 fixture and B200 vocabulary | Approach, endpoint profile and switch profiles are replaceable data. Sections appear by applicability. The same starter and workspace run three fixtures: rail-based servers, rack-based placement, and redundant endpoints on mesh or leaf-spine. A custom profile covers any vendor. Network scope is an explicit choice. | §6.7, §7 |
 | Readiness is not questionnaire completion | Summary strip only | "Details recorded" (supplied/assumed/unknown) is explicitly labelled as not a readiness score. Output readiness is stated per output: BOM lines, package, connection map. | §5.3 |
 | Keep good evidence controls | — | Kept: claim/precision/rests-on, traces for **every** quantity, separate alternative totals, conflicts with candidate relaxations, locks, release review, scale review. | §8–§12 |
+
+**Actual feedback on revision 2 (S, main `c018fa9`; not a usability study and not design acceptance).** The sponsor liked the overall workspace direction but rejected the single-choice “What do you know now?”. For example, “Servers by count, rail-based” bundles a quantity with a topology preference. The sponsor wants:
+- several focused questions that elicit the minimum and encourage optional detail;
+- research before choosing controls, and no checkbox that turns “not known” into “no”;
+- the home categories (server count, rack count and similar) **kept** as overlapping views of one library of starter designs;
+- placeholders until the same from-scratch tooling can build real starters.
+
+| Feedback (revision 2) | Revision 3 change | Where |
+| --- | --- | --- |
+| Single-choice classification bundles independent facts | Removed. Each dimension is its own question per endpoint group: count, endpoint type, network, rail preference, redundancy, racks, endpoints per rack and leaf placement. Planning policy follows from the answers, not from an entry category. | §6.1, §6.7; appendix A §A2 |
+| Research first; compare alternatives | Six sources in an evidence-to-decision table. Grouped essentials in the workspace (A) compared with progressively revealed groups (B); **A recommended**, with a stated switch condition. | Appendix A §A1, §A3 |
+| Minimum useful input, encourage detail | The minimum is defined per attainable output: an endpoint count and type give link counts, leaf counts and a first BOM. Optional questions sit beside their effect (“Affects: …”). | §6.1; appendix A §A2 |
+| Unknown is not false | Yes/no questions have no default. Unanswered stays “not answered”. “Customer hasn't decided (asked)” is distinct, and a **Clear answer** action exists. Undecided choices produce labelled **alternatives**, collapsed when every alternative gives the same number. Count ranges produce bounded lines. | §6.3, §7 |
+| Keep and value the home categories | “Start from a design” keeps endpoint count, rack count, topology and network purpose as **views** over one placeholder library. A starter appears once per view with “also listed under …”, and the selection survives view changes. | §6.8 |
+| Starters customised in the same tooling | Choosing a starter copies its answers into a new project as **assumptions from starter S2 v0**, computed by the same planning policies and edited in the same details panel. | §6.8 |
+| Placeholders, not a catalog | Every starter is labelled “placeholder v0 — synthetic, not supported”. The earlier rail/rack/mesh fixtures now live as placeholders S1–S4 and test fixtures. | §6.8, §7 |
 
 ## 3. Design principles (H, derived from S/F)
 
@@ -140,15 +158,30 @@ Answering more questions can leave readiness unchanged. Answering one decisive q
 
 ## 6. Workspace information architecture (H)
 
-### 6.1 Minimal starter
+### 6.1 Starting a project (revision 3)
 
-One screen, used only to create a project:
-- project name;
-- "What do you know now?": rail-based servers / rack-based placement / redundant endpoints / **not sure yet** (an empty workspace);
-- the customer request text, kept as written;
-- the minimum for that approach: the endpoint count (or rack count) and the endpoint profile; a custom profile adds link count and rate.
+The home screen offers two distinct paths:
+- **Start from scratch** answers independent questions.
+- **Start from a design** chooses a placeholder starter from the library (§6.8).
 
-Every input may be left blank. Buttons: "Create workspace and generate first BOM" and "Create workspace without generating". The starter says: *"This is the only guided step… Finishing the starter does not finish the project."* The minimum is per approach and per requested output, not the questionnaire's universe (S).
+They lead to the same workspace and the same details. The evidence, question protocol and alternatives are in [appendix A](experience-design/starter-evidence.md).
+
+**From scratch (alternative A, recommended; appendix A §A3).** There is no separate starter screen.
+- “Start from scratch” opens the workspace with focus on **How many endpoints?** and a getting-started note: *“For a first BOM, answer How many endpoints? and What kind of endpoint?… Everything else is optional.”*
+- The first endpoint group is expanded and shows:
+  - **What and how many** (needed for a first BOM): count, which may be a range; endpoint type; links; rate;
+  - **How they connect** (optional): network, rail preference, redundancy;
+  - **Where they sit** (optional): racks, endpoints per rack, leaf placement;
+  - **Leaf switch** (optional).
+- Each question shows **what it affects**.
+- The outputs area lists **what each output needs** and which outputs are available now.
+
+**Minimum per attainable output** (appendix A §A2):
+- an endpoint count, or racks × endpoints per rack, plus an endpoint type gives link and port counts, leaf counts (with alternatives for undecided choices), spine counts and cable totals;
+- rack-aware placement additionally needs a rack count;
+- packages and the connection map are later stages.
+
+**Not used:** a single-choice “kind of project” question (S `c018fa9`; appendix A E2); a staged wizard (E4); checkboxes for yes/no/unknown dimensions (S; E2).
 
 ### 6.2 Workspace layout
 
@@ -163,22 +196,41 @@ On wide screens the details panel scrolls independently, so details and outputs 
 
 ### 6.3 Details panel
 
-- **Sections are disclosures**, opened in any order. Each summary shows its own supplied/assumed/unknown counts. Proposed sections: Request and scope; Endpoint profile; Quantity; Rails and planes; Racks and placement; Redundancy and topology; Switch profiles; Failure and oversubscription; Cabling; Installation target and evidence.
-- **Applicability-driven.** A section or field appears only when its applicability predicate holds for the approach (D01 §3 "applicability predicates"). Inapplicable sections are listed with the reason ("used only by rack-scale placement planning"). Answers in them are kept if the approach changes.
-- **Every field shows its origin.** Fields can be supplied, assumed (with its source), unknown or conflicting. Assumed values offer **Confirm** (creates a supplied answer) and **Don't assume** (an explicit unknown). Supplied values offer **Use default**.
+- **Sections are disclosures**, opened in any order. Each summary shows its own supplied/assumed/derived/open counts. Sections:
+  - Project and request;
+  - **one section per endpoint group** (mixed inventory: up to three in the prototype), with the four sub-groups above;
+  - Networks in scope;
+  - Spine and uplink profiles;
+  - Topology, failure and oversubscription;
+  - Cabling;
+  - Installation target and evidence.
+
+  There are at most two disclosure levels (appendix A E4).
+- **Yes/no dimensions are radios with no default** (appendix A E2, E5):
+  - options plus “Customer hasn't decided (asked)”;
+  - unanswered stays “not answered” and is never treated as “no”;
+  - **Clear answer** returns to not answered.
+- **Applicability-driven.** A field that does not apply shows a one-line reason instead of controls; for example, rail preference for single-link endpoints. No conditional reveals are used (appendix A E2). Earlier answers are kept and return when the field applies again (D01 §3 applicability predicates).
+- **Every field shows its origin.** Fields can be supplied, assumed (with its source), unknown or conflicting. Assumed values offer **Confirm** (creates a supplied answer) and **Don't assume** (an explicit unknown). Supplied and asked-undecided values offer **Clear answer**.
 - **Find a detail.** One search box covers every field label, help text and section. It lists matches, including inapplicable ones marked as such, and jumps to the field, so users never step through unrelated questions.
 - **Edits save immediately** and create a new details revision. They reach outputs only when the user generates. The UI says so.
-- **Network scope is an explicit field.** The approach's network is the default (`assumed`). Added networks appear as "Not estimated" lines. Removed ones are listed as "Out of scope", never as 0.
+- **Network purpose is two separate questions.** Each endpoint group says which network it serves. Project scope is a yes/no/undecided per network, derived as “in scope” when a group uses it. Unanswered networks are listed “scope not decided”. A network in scope without a group shows “Not estimated”. A group serving an out-of-scope network is a contradiction. None is ever shown as 0.
 
 ### 6.4 Generated outputs
 
-- **Generate** is always available once an approach is chosen. It shows "Generate revision N+1 from current details" or "Up to date". Generation computes every line it can. Lines whose required inputs are unknown say what they need. Lines blocked by a conflict are suspended; the others keep their values.
+- **Generate** is always available. It shows "Generate revision N+1 from current details" or "Up to date". Generation computes every line it can. Lines whose required inputs are unknown say what they need. Lines blocked by a conflict are suspended; the others keep their values.
 - Each output revision records its **session, details revision, evidence snapshot and target**. Older revisions stay read-only and can be compared.
 - **Later stages** (connection map, procurement package, installation package) are shown as their own outputs with their prerequisites. They are never prerequisites for the BOM.
 
 ### 6.5 Suggested questions (optional)
 
-A small, hideable list of up to four detail links, each with a reason: "blocks 3 lines", "7 lines rest on this assumption", "not yet checked by 2 lines". There is also "Copy open questions for the customer". The proposed product ranks by **quantity swing and claim unblocking** (D01 §3 H). The prototype approximates this: it weights the number of affected lines by a hand-set swing estimate per question. That approximation is not a validated ranking (T3/UG4). Suggestions never block anything, and nothing is re-asked.
+A small, hideable list of up to four detail links. Each has a reason computed from the current state:
+- “needed by endpoint links”;
+- “deciding could change leaf-to-spine links (544 to 768)”, from the actual spread across the current alternatives;
+- “a narrower count would narrow leaf switches (16–24)”;
+- “feeds an open conflict”.
+
+There is also “Copy open questions for the customer”, which lists unanswered, undecided and assumed questions in plain language. This follows the D01 hypothesis of ranking by quantity swing and claim unblocking (D01 §3). It is a prototype heuristic, not a validated ranking (UG11). Suggestions never block anything, and nothing is re-asked.
 
 ### 6.6 Sessions, revisions and staleness
 
@@ -190,75 +242,77 @@ A small, hideable list of up to four detail links, each with a reason: "blocks 3
 | Session | Save and close ends a session. Resume starts the next one and shows the resume banner. Sessions carry no completion state. |
 | Diff (Changes tab) | Pick any two revisions. It shows a summary of quantity deltas and changed/unchanged counts; detail changes between their details revisions; the evidence change; changed lines with reasons ("suspended by conflict", "rests on 8 → 7 assumptions"); and unchanged lines collapsed. |
 
-### 6.7 Scenario plug-in model
+### 6.7 Planning policies follow answers, not entry categories
 
-The interaction is common; the scenario-specific parts are data and policies:
+Discovery navigation (home categories, library views) never selects a calculation. The planning policy for each endpoint group is derived from its answers:
 
-| Plug-in | Examples in the prototype | Supplies |
+| Answers | Leaf packing (prototype policy) | Evidence |
 | --- | --- | --- |
-| **Approach** (planning policy) | rail-based servers (R04 S02/S03); rack-local placement (R04 S06-1/S06-2); redundant endpoints with ESLAG pairs on mesh or leaf-spine (R02 C03/C07) | Applicable sections, required inputs per line, derivations, conflicts, link patterns |
-| **Endpoint profile** | B200 HGX-class (sponsor); NVL72-style tray; general 2 × 25G server; **custom** (any vendor) | Default link count and rate, with source |
-| **Switch profiles** | Hypothetical H400 / 64 × 800G; hypothetical 48 × 25G / 32 × 100G; "other (needs catalog evidence)" | Port modes and capacities; "other" makes dependent lines "Not estimated" |
-| **Network roles** | backend, frontend, storage, in-band management | Scope; the approach's role is the default |
+| Rail-optimized = yes | One leaf per rail for each block of up to *slots* endpoints | R04 S02/S03 |
+| Dual-homed = yes, rail-optimized = no | ESLAG leaf pairs; links split evenly across the pair | R02 C03 (conditional) |
+| Both = no | All of an endpoint's links on one leaf | — |
+| Rail and/or redundancy undecided | **Every consistent packing computed and shown as labelled alternatives**; identical results collapse to one number | D01 §4 (alternatives never summed) |
+| Rail = yes and dual-homed = yes | Contradiction explained (needs two links per rail; not modelled) | — |
+| Racks known, placement = in each rack | Packing applied per rack (rack-local leaves) | R04 S06-1 |
+| Racks known, placement undecided | Rack-local and shared shown as alternatives | — |
+| No racks | Placement not considered (labelled in the trace) | — |
 
-A first implementation slice can ship one approach without changing the workspace, sections model, readiness language or revision model (S: "must not hard-code the overall product around B200").
+Each **network** (backend, frontend, storage, management, or “not decided”) then gets its own spine layer per uplink family; mixed inventory therefore yields separate switch sets per network. Replaceable data:
+- endpoint profiles (B200 HGX-class, NVL72-style tray, general 2 × 25G, **custom**);
+- hypothetical leaf and spine profiles;
+- per-family uplink counts.
 
-## 7. Three fixtures through the same workspace
+A first implementation slice can ship one policy without changing the workspace, readiness language, revision model or library (S).
 
-All counts are checked by `fixture-check.py` and reproduced by the prototype (`prototype-check.html`).
+### 6.8 Starter-design library (placeholders)
 
-### 7.1 F1: rail-based servers (B200 is one profile)
+- **Paths stay distinct.** “Start from a design” is a browsing task; “Start from scratch” is an answering task. Both end in the same workspace.
+- **Views:** By endpoint count · By rack count · By topology · By network purpose. These are the sponsor's home categories kept as tabs (S). Buckets are **derived from each starter's answers**, so a starter has one identity and appears exactly once in every view, with “also listed under …” for the others (appendix A E6). The selected starter survives view changes.
+- **Preview** lists the answers the starter will set and a computed summary, using the same planning policies.
+- **Customise in workspace** copies the answers into a new project as **assumptions** (“from starter S2 v0 (placeholder)”). The project header shows “Started from: S2 v0”. Every value can be confirmed, changed or cleared like any other answer.
+- **Placeholders:**
+  - S1: rail-optimized GPU backend, 128 servers;
+  - S2: rack-scale backend, 8 racks, rack-local leaves;
+  - S3: small dual-homed frontend pair (mesh);
+  - S4: dual-homed storage leaf-spine.
 
-Starter: "128 B200 HGX servers", profile B200 (8 × 400G). First output (revision 1):
+  All are synthetic, labelled “placeholder v0 — not supported or qualified”, and are not a catalog.
+- **Later (S):** real starters are authored with the same workspace and promoted to the library. Curation, release compatibility, versioning and update offers are open contracts (appendix A §A4; Q-UX-8).
 
-| Line | Quantity | Rests on (examples) |
+## 7. Mixed knowledge from scratch, and the placeholders
+
+All counts are checked by `fixture-check.py` and reproduced by the prototype (`prototype-check.html`). Hardware is hypothetical.
+
+### 7.1 From scratch: two answers, then more as they arrive
+
+| Details answered | Output (selected lines) | What the UI says |
 | --- | --- | --- |
-| Endpoint-to-leaf links (400G) | **1,024** | links per endpoint, link rate (from profile) |
-| Leaf switches | **16** | + plane count, leaf-per-rail policy, leaf profile |
-| Leaf endpoint cages (2 × 400G) | **512** | as above |
-| Endpoint cable construction | **either** 512 split assemblies **or** 512 2-port modules + 1,024 endpoint modules + 1,024 fibers | not checked: construction, reach |
-| Spine switches | **8** | + spine profile, D/U limit, spine-failure policy |
-| Leaf-to-spine links (800G) | **512** (4 per pair) | as above |
-| Leaf-to-spine cable construction | **either** 512 integrated **or** 1,024 modules + 512 fibers | not checked: construction, reach |
-| Switch OOB management ports | **24** (external dependency) | as spines |
+| Count 128, type B200 (8 × 400G). Rail preference, redundancy, racks and network **not answered** | Links **1,024**; leaves **16**; cages **512**; spines **8**; leaf-to-spine links **512**; OOB **24** | “Undecided choices shown as alternatives: rail preference / redundancy”. All three packings give the same numbers here, so each line shows one number. Lines are labelled “Network not decided”. |
+| Count → **136** | Links 1,088 and cages 544 under every alternative. **Leaves: rail-optimized 24 · dual-homed pairs 18 · all links on one leaf 17** (separate totals). Leaf-to-spine links 768 · 576 · 544. Spines 16 under all. | Top suggestion: “Should the links be rail-optimized? — deciding could change leaf-to-spine links (544 to 768)”. |
+| Racks **8**, endpoints per rack **16** | **Contradiction:** “136 endpoints cannot fit 8 racks × 16 = 128 positions. Both answers are kept; nothing was changed.” Leaf lines suspended; links kept. | Ways forward with Preview: “the racks are right: use 128 endpoints” or “the count is right: use 9 racks”. |
+| Racks **9** | No contradiction; “8 rack positions unused”. **Placement undecided** adds alternatives: rail-optimized, rack-local → **72 leaves**, whose 2,304 uplinks exceed one spine layer (conflict **only under that alternative**). | Placement shown to matter, not silently chosen |
+| Rail-optimized = yes, placement = shared | Leaves **24**, spines **16** | Alternatives resolve; the diff explains it |
+| Count `120-136` (range) instead | Leaves **16–24**, links **960–1,088**, precision “bounded (range)” | A narrower count is suggested |
+| Second endpoint group: 40 general servers (2 × 25G), storage network, dual-homed | Storage: 2 leaves, 2 spines (100G family); backend unchanged; OOB **28** | Separate switches per network. Storage scope is derived as “in”; other networks are listed “scope not decided”. |
+| Racks only (4 NVL72-style racks, 18 per rack by profile default) | Count **derived** = 72; tray links **288** | Count shown as derived, not supplied |
 
-### 7.2 F2: rack-based placement
+### 7.2 Placeholder starters (same policies, same workspace)
 
-Starter: "eight NVL72 racks", profile NVL72-style tray (4 × 400G, 18 trays per rack assumed; tray generation unverified per R04 §S06). Sections "Racks and placement" appear and "Rails and planes" do not.
-
-| Line | Quantity | Note |
+| Starter | Answers it sets (as assumptions) | Output |
 | --- | --- | --- |
-| Tray-to-leaf links | **576** | 8 racks × 18 trays × 4 |
-| Rack-local leaves | **32** | 4 per rack; placement overrides port minimisation (R04 S06-1) |
-| Leaf endpoint cages | **288** | 9 per leaf; **736 growth-reserved** (23 per leaf), shown as an intentional exception |
-| Spines | **5** (2 links per pair) | 10 active uplinks per leaf assumed (R04 S06-2); normal D/U 9/10 |
-| Leaf-to-spine links | **320** | — |
-| OOB ports | **37** | — |
+| S1 · Rail-optimized GPU backend, 128 servers | count 128, B200, backend, rail yes, single-homed | 16 leaves, 8 spines, 512 leaf-to-spine links |
+| S2 · Rack-scale backend, 8 racks | NVL72-style, 8 racks × 18, rack-local, rail yes, 10 active uplinks per leaf | 576 tray links, **32** rack-local leaves, 288 cages (736 growth-reserved), **5** spines, 320 links, OOB 37 (R04 S06-1/S06-2) |
+| S3 · Small dual-homed frontend pair | 40 × 2 × 25G, dual-homed, mesh, 2 racks × 20 | 2 leaves, **0** spines (mesh), 8 mesh links, OOB 2; ESLAG flagged unverified; mesh conditional (R02 C07) |
+| S4 · Dual-homed storage leaf-spine | 96 × 2 × 25G, dual-homed, storage | 4 leaves, 2 spines, 32 links, OOB 6 |
 
-The same "full bandwidth after one spine failure" answer that is impossible for F1 is feasible here with **10 spines**, because the leaves are underfilled. The policy decides; the UI just explains.
+Views: S1 is under “65–256 endpoints”, “No rack information”, “Leaf-spine, rail-optimized” and “Backend scale-out”. S2 is under “65–256 endpoints” (144 derived), “5–16 racks”, “Leaf-spine, rail-optimized” and “Backend scale-out”.
 
-### 7.3 F3: redundant endpoints on mesh or leaf-spine
+### 7.3 Gating without invention
 
-Starter: "40 general-purpose servers, dual-homed, 2 × 25G", profile general server. "Redundancy and topology" appears. The topology is unknown, so outputs show **separate alternatives**:
-
-| Line | Quantity |
-| --- | --- |
-| Endpoint-to-leaf links (25G) | **80** |
-| Leaf switches | **2** (one ESLAG pair). Flag: "ESLAG on this leaf profile: unverified (R02 C03, K09)" |
-| Leaf endpoint ports | **80** (16 unused) |
-| Spines | **Mesh: 0** · **Leaf-spine: 2** |
-| Inter-switch links (100G) | **Mesh: 8** · **Leaf-spine: 16** |
-| Inter-switch cables | four separate totals (topology × construction) |
-| OOB ports | **Mesh: 2** · **Leaf-spine: 4** |
-
-There is no D/U limit by default (`unknown`), so lines say "Not checked: D/U limit"; the trace shows normal D/U 5/4. Setting the limit to 1 produces a conflict on both alternatives. Mesh is "conditional (R02 C07); no performance or failure guarantee". At 60 servers: 4 leaves; mesh 12 links (2 per leaf pair) versus leaf-spine 2 spines.
-
-### 7.4 Gating without invention
-
-- With the count blank, links, leaves and spines all say "Not estimated — needs: endpoint count".
-- A custom profile without a link count is not estimated.
-- "Two planes" with a one-link-per-rail profile is not modelled. The line says why and cites R04 S05/S06-4; no number is produced.
-- "Other leaf profile" makes leaf-dependent lines need catalog evidence.
+- With the count blank, links, leaves and spines say “Not estimated — needs endpoint count”.
+- A custom endpoint without a link count is not estimated.
+- “Other leaf profile” makes dependent lines need catalog evidence.
+- Rail-optimized plus dual-homed for the same links is explained as a contradiction.
 
 ## 8. "Why this number?" (quantity trace)
 
@@ -266,15 +320,12 @@ There is no D/U limit by default (`unknown`), so lines say "Not checked: D/U lim
 
 ```
 8 spines [exact under stated assumptions · conditional estimate]
-- 8 spines = smallest S that divides 32 uplinks per leaf evenly, with 64·S ≥ 512 leaf uplinks
-  (spine profile: assumed · spine-failure policy: assumed)
-  - 16 leaves = 2 groups × 8 rails (one leaf per rail per group)
-    - 2 first-hop groups = ceil(128 endpoints ÷ 64 endpoint slots per leaf) (endpoint count: supplied)
-      - 64 slots per leaf = 32 cages × 2 per cage at 400 Gb/s (leaf profile: assumed)
-  - 64 ports per spine
-  - normal D/U on the busiest leaf = 1 (D/U limit: assumed)
-Counts: requirement dem:spines (stable aggregate demand ID; not yet expanded to instances)
-What would change it: links per endpoint · link rate · plane count · … · spine-failure policy
+- 8 spines = smallest S ≥ 2 that divides 32 uplinks per leaf evenly, with 64·S ≥ 512 leaf uplinks
+  (800G spine profile: assumed · uplinks per 800G leaf: assumed · minimum spines: assumed · spine-failure policy: not answered)
+  - 16 leaves in this network (from the endpoint groups above) (endpoint count: supplied · rail preference: not answered · …)
+  - normal D/U on the busiest leaf = 1 (D/U limit: not answered)
+Counts: requirement dem:n.undecided.800.spines (stable aggregate demand ID; not yet expanded to instances)
+What would change it: rail preference · redundancy · links per endpoint · … · spine-failure policy
 ```
 
 Requirements (H):
@@ -285,39 +336,39 @@ Requirements (H):
 
 ## 9. Infeasible requests and conflicts
 
-Session 2 of the demo sets "after one spine failure: full bandwidth" on F1:
+With the §7.1 project at 128 endpoints, setting "after one spine failure: full bandwidth" gives:
 
 ```
-Cannot satisfy: D/U ≤ 1 after one spine failure   [demonstrated infeasible under these inputs]
+Network not decided: cannot satisfy D/U ≤ 1 after one spine failure   [demonstrated: these answers cannot all hold]
 Because: each full leaf has D = 25,600 Gb/s and U = 25,600 Gb/s. Losing 1 of S spines leaves U·(S−1)/S,
   so D/U after the loss exceeds 1 for every S. Routing cannot add missing cut capacity (R04 T06, N04).
-Conflicting inputs: spine-failure policy (supplied) · leaf profile (assumed)
-Candidate relaxations (nothing relaxed automatically; not checked for minimality):
+Inputs involved: spine-failure policy (supplied) · uplinks per 800G leaf (assumed) · 800G spine profile (assumed)
+Ways forward (nothing is changed automatically; not checked for minimality):
   1. Accept D/U ≤ 8/7 after a spine loss          [Preview] [Use as my answer]
   2. No spine-failure requirement                  [Preview] [Use as my answer]
-  3. Fewer endpoint cages per leaf — not modelled in this prototype
-  4. A leaf profile with more uplink capacity (needs catalog evidence)   [Go to detail]
-Suspended lines: spine switches, leaf-to-spine links, leaf-to-spine cables, OOB ports (now a lower bound). Every other line keeps its value.
+  3. Fewer endpoints per leaf or a leaf with more uplink capacity (needs catalog evidence)   [Go to detail]
+Suspended: spines, links, cables, OOB. Every other line keeps its value.
 ```
 
 - **Preview** computes the effect without changing anything, for example "spines — suspended → 8 · leaf-to-spine links — suspended → 512 · OOB ≥ 16 → 24 · no conflicts".
 - **Use as my answer** records a supplied answer only. The conflict remains until the user generates.
-- The headline distinguishes **demonstrated infeasible** from **not proven feasible** (for example, when no even spine allocation was found but non-uniform ones were not searched).
+- The headline distinguishes **demonstrated** (these answers cannot all hold), **contradictory answers** (for example a network marked out of scope but used) and **not proven feasible** (not modelled or not searched).
+- Contradictions between answers (count versus rack capacity, rail versus dual-homing) use the same panel. Both answers are kept and shown with their origins.
+- When alternatives are shown, a conflict that holds under only some of them says “Only under: rail-optimized · rack-local leaves”.
 - OOB becomes a labelled **lower bound** (≥ 16) while the spine count is open.
 - Fields that feed the conflict show a "conflicting" chip in the details panel.
 
 ## 10. Multi-session refinement, commitments and regeneration
 
-Demo for the moderated walkthrough (the order is a facilitator script, not product navigation):
+Demo for the moderated walkthrough (the order is a facilitator script, not product navigation; presets `#demo-s1` to `#demo-s3`):
 
 | Session | User action | System response |
 | --- | --- | --- |
-| 1 | Starter → first BOM (revision 1). Opens a trace. Save and close. | Project listed with "latest output revision 1". |
-| 2 | Resume. Opens **Failure and oversubscription** directly (or finds "spine"). Sets full bandwidth. | Resume banner. Spine-dependent lines turn stale; links and leaves do not. |
-| 2 | Generate (revision 2). | Conflict (§9). Other lines kept. Diff: spines → suspended. |
-| 2 | Previews and uses 8/7. Generate (revision 3). | Conflict resolved. Diff with revision 2: spines suspended → 8. Compared with revision 1, the spine count is unchanged and rests on one fewer assumption. |
-| 3 | Records orders: 16 leaves, 8 spines. Save and close; resume. In **Quantity**, sets 128 → 136. | 3 edits since the output. 8 lines marked stale. |
-| 3 | Generate (revision 4). | Endpoint links 1,088 (+64); leaves **24 = 16 ordered + 8 proposed**; cages 544 (+32). **Conflict:** "8 ordered spines × 64 = 512 ports, all needed; 16 leaves × 32 + 8 leaves × 4 = 544 uplink ports: 32 more than the locked spines have." |
+| 1 | Start from scratch. Count 128, type B200; nothing else. Generate (revision 1). Opens a trace. Save and close. | First BOM (§7.1, row 1). Project listed with “latest output revision 1”. |
+| 2 | Resume. Count → 136; racks 8 × 16 (the “Where they sit” sub-group of the same section). Generate (revision 2). | Resume banner. The edits mark only dependent lines stale. Revision 2: the rack contradiction is shown with both answers kept; links kept. |
+| 2 | Chooses “the count is right: use 9 racks”; decides rail-optimized, shared placement, backend. Generate (revision 3). | 24 leaves, 16 spines. Changes tab: alternatives resolved, contradiction resolved, detail changes listed. |
+| 3 | Records orders: 24 leaves, 16 spines. Save and close; resume. Count → 260, racks → 17. | “4 edits since this output … lines marked stale”. |
+| 3 | Generate (revision 4). | Leaves **40 = 24 ordered + 16 proposed**. **Conflict:** “16 ordered spines × 64 = 1,024 ports. With no D/U limit set, every leaf keeps all 32 uplinks: 40 leaves × 32 = 1,280 uplink ports, 256 more than the ordered spines have.” One way forward is “Set a D/U limit: partly filled leaves may then need fewer uplinks” (with D/U ≤ 1 the need is 1,040: still 16 short). |
 
 Rules (H):
 - Ordered quantities are never re-optimised or removed. Surplus or shortfall needs an explicit disposition.
@@ -325,8 +376,8 @@ Rules (H):
 - An override that conflicts with a rule is stored as `supplied`. It survives regeneration, and its conflict re-appears until resolved.
 - Candidate relaxations for the locked-spine conflict:
   - add spine capacity and rebalance — an approved-cabling change (R06 class T2);
-  - take uplinks from existing leaves, giving D/U 16/15, which breaks the supplied policy;
-  - a different packing policy.
+  - set a D/U limit so partly filled leaves need fewer uplinks (offered only when no limit is set);
+  - take uplinks from existing leaves, raising their D/U (not modelled).
 
   Only the first leads to an action in the prototype; the others are labelled "not modelled".
 - Approvals on an earlier revision apply to that revision's hash only (D01 §3). The prototype records no approvals and says so.
@@ -353,7 +404,7 @@ Rules (H):
 | --- | --- | --- |
 | "Is it right overall?" | Summary per network, group and plane | Output status and BOM summary strip |
 | "What's wrong?" | **Exceptions first**: conflicts, stale lines, changed patterns, intentional unused ports, unverified compatibility | Links tab exceptions strip |
-| "Where is endpoint X?" | Search by ID, rail, group, rack, cage | Rail locator: "endpoint 77 rail 5 → leaf-B-r5 cage 7 lane 2". The locator is rail-approach only. |
+| "Where is endpoint X?" | Search by ID, rail, group, rack, cage | Rail locator: "endpoint 77 rail 5 → leaf G1-B-r5 cage 7 lane 2". Only for one rail-optimized group with shared placement. |
 | "Show me a slice" | Facets and text filter | Text filter over patterns; "changed since previous only" |
 | Reviewing links | **Pattern rows** that expand to per-link rows; virtualised tables; CSV export of filtered views | Pattern rows with unchanged patterns collapsed. Per-link rows and CSV are **not built**. |
 | Structure | Small schematic per pattern, with a table equivalent | Not built |
@@ -398,68 +449,84 @@ Each BOM line, its link patterns and the planning identities form one hierarchy.
 
 | Type | Who | Counts as | Status |
 | --- | --- | --- | --- |
-| Heuristic walkthrough | An agent or reviewer, against Nielsen heuristics and §13 | Design-defect findings only | Author passes on revisions 1 and 2 (§15.4). Independent pass requested. |
-| Sponsor walkthrough | Sponsor | Domain-fit feedback, not usability evidence | **Revision 1: actual feedback recorded** (§2, main `9f6194b`). Revision 2 not yet reviewed. |
+| Heuristic walkthrough | An agent or reviewer, against Nielsen heuristics and §13 | Design-defect findings only | Author passes on revisions 1–3 (§15.4). Independent pass requested. |
+| Published guidance and research | Design systems, NN/g, survey methodology | Inputs to design decisions, not evidence about our users | Six sources in [appendix A](experience-design/starter-evidence.md) |
+| Sponsor walkthrough | Sponsor | Domain-fit feedback, not usability evidence | **Actual feedback recorded** on revision 1 (main `9f6194b`) and revision 2 (main `c018fa9`); §2. Revision 3 not yet reviewed. |
 | Task-based usability test | Real SEs (R01 §9 screening) | Usability evidence, qualitative at n≈3–4 | **Not done.** No recruitment has taken place. |
 | Automated prototype checks | Scripts | That the prototype computes and behaves as specified; not usability | `fixture-check.py`, `prototype-check.html` (§19) |
 
-### 15.2 Task scripts (rewritten for the workspace)
+### 15.2 Task scripts (revision 3)
 
-**Before any session,** someone other than the facilitator writes the expected answers (topo or check; R01 §7). Participants start from the project list. Tasks T1 and T3 may be split across two sittings, or simulated with the resume presets.
+**Before any session,** someone other than the facilitator writes the expected answers (topo or check; R01 §7). Participants start from the project list. Multi-session tasks may be split across sittings or simulated with the resume presets. Participant briefs are **customer emails written in the customer's words**, so tasks test whether SEs map facts to the right questions.
 
 | ID | Task (participant instructions) | Expected answer source | Records |
 | --- | --- | --- | --- |
-| T1 | "A customer emailed '128 B200 HGX servers'. Get something you could discuss on a call, then stop." | §7.1 | Time to first output; whether they stop without trying to complete other sections; assumptions noticed |
-| T2 | "Why 8 spines? What would change it?" | §8 | Explanation correctness; path |
-| T3 | "It's a week later. Reopen the project. What's changed since you left, and what is still assumed?" | Resume banner, history | Finds the project and latest output; states the assumptions |
-| T4 | "The customer now says the fabric must keep full bandwidth if a spine fails. Record that and update the BOM." | §9 | Goes **directly** to the relevant detail (search or section) without stepping through unrelated sections; regenerates; recognises infeasibility; picks a way forward |
-| T5 | "What changed between the last two versions, and why?" | Changes tab | Explains the diff, including "quantity unchanged, fewer assumptions" |
-| T6 | "For each line, could you put this number in a quote? Order it? Install from it?" | §5.1 | Readiness comprehension (SM9); critical misreads |
-| T7 | "16 leaves and 8 spines are already ordered. The customer now wants 136 servers. Refresh the BOM." | §10 | Finds the conflict; does not assume ordered parts change |
-| T8 | "Plan a different customer: eight NVL72-style racks" (or "40 dual-homed general servers"). | §7.2 / §7.3 | Uses the same workspace without help; notices which sections apply; reads alternatives as separate totals |
-| T9 | "A new Hedgehog release is out. Is this design still good to install on it?" | §11 placeholders | Distinguishes the evidence version from the target; finds changed and unknown items |
-| T10 | "Find which leaf endpoint 77's rail-5 link uses." | F1 allocation | Time; search/filter path; correctness |
+| T1 | “A customer emailed ‘about 128 B200 HGX servers for training; rest TBD’. Get something you could discuss on a call, then stop.” | §7.1 row 1 | Path chosen (scratch or library); time to first output; **whether they stop** without filling optional questions; essentials found without help (switch condition for alternative B) |
+| T2 | “A week later the customer adds: ‘136 servers, eight racks of sixteen, and we want rail-optimized backend.’ Bring the BOM up to date.” | §7.1 rows 2–5 | **Provides the extra information in the right places** (count, racks, rail) without stepping through unrelated questions; notices and resolves the contradiction; regenerates |
+| T3 | “Reopen the project. What changed since you left, and what is still assumed or undecided?” | Resume banner, history, BOM | Finds the latest output and pending edits; **lists assumptions and undecided choices correctly** (no unanswered item read as “no”) |
+| T4 | “The customer says the fabric must keep full bandwidth if a spine fails. Record that and update the BOM.” | §9 | Direct access (search, section, suggestion or trace “Change”); recognises infeasibility; picks a way forward |
+| T5 | “What changed between the last two versions, and why?” | Changes tab | Explains the diff, including resolved alternatives |
+| T6 | “The leaf count shows three numbers. What decides between them, and what would you ask the customer?” | §6.7, §7.1 row 2 | Reads alternatives as separate options, never a sum or an average; names rail preference and redundancy; uses or ignores the suggestion |
+| T7 | “For each line, could you put this number in a quote? Order it? Install from it?” | §5.1 | Readiness comprehension (SM9) |
+| T8 | “Another customer has rack-scale NVL72-style systems. Find a starting design using the library, look at it from a different view, and adapt it to 10 racks.” | §6.8, §7.2 | **Chooses a starter via at least two views**; recognises it is the same starter; understands placeholder status; customises in the same details panel; recognises starter values as assumptions |
+| T9 | “24 leaves and 16 spines are ordered. The customer now wants 260 servers in 17 racks. Refresh the BOM.” | §10 | Finds the conflict; does not assume ordered parts change |
+| T10 | “A new Hedgehog release is out. Is this design still good to install on it?” | §11 placeholders | Distinguishes evidence from target |
+| T11 | “Find which leaf endpoint 77's rail-5 link uses.” | Rail allocation | Time; path; correctness |
 
 ### 15.3 Usability goals (H; per participant; small samples are learning evidence only)
 
 | Goal | Measure | Target for proceeding |
 | --- | --- | --- |
-| UG1 Readiness comprehension (SM9) | T6 answers | **No critical misread**: treating a conditional estimate as orderable, the BOM as installable, or "details recorded" as readiness |
-| UG2 Stop and resume | T1 and T3 | Participant stops after the first useful output without believing the project is incomplete or failed; on resume, finds the latest output and pending edits unaided |
-| UG3 Direct access | T4 | Reaches the relevant detail without opening unrelated sections; record the path (search, section, suggestion or trace "Change") |
-| UG4 Refresh and diff | T4, T5, T7 | Regenerates and explains what changed and why |
-| UG5 Trace usefulness | T2 | Correct explanation without help |
-| UG6 Infeasibility and commitments | T4, T7 | No participant believes hh-aid relaxed a constraint or changed an order |
-| UG7 Scenario breadth | T8 | Completes a first output in a second scenario without facilitator help; no comment that the tool "is for B200" |
-| UG8 Release distinction | T9 | Never reads the evidence version as the target, or the design as current while review is pending |
+| UG1 Readiness comprehension (SM9) | T7 | **No critical misread**: a conditional estimate treated as orderable, the BOM as installable, or “details recorded” as readiness |
+| UG2 Stop and resume | T1, T3 | Stops after the first useful output without believing the project is incomplete; on resume finds the latest output and pending edits unaided |
+| UG3 Extra information placed directly | T2, T4 | Enters each new fact in its own question without opening unrelated sections; record the path |
+| UG4 Unknown is not false | T3, T6 | No participant reads an unanswered rail/redundancy/scope question as “no”, or treats alternatives as a total. Overuse of “hasn't decided” when the brief has the answer is recorded (appendix A E5). |
+| UG5 Refresh and diff | T2, T5, T9 | Regenerates and explains what changed |
+| UG6 Infeasibility, contradictions and commitments | T2, T4, T9 | No participant believes hh-aid changed an answer, relaxed a constraint or changed an order |
+| UG7 Library discovery | T8 | Finds a fitting starter through at least two views; states it is a placeholder; identifies starter values as assumptions |
+| UG8 Release distinction | T10 | Never reads the evidence version as the target |
 | UG9 Same-scenario time (SM1) | T1 against the incumbent path | Target set after the baseline |
-| UG10 Scale navigation | T10 | Time and path reported |
-| UG11 Suggestion usefulness | Whether suggestions were used, ignored or hidden, and why | Reported; informs the ranking design (T3/UG4 in revision 1) |
+| UG10 Trace and scale | T4, T11 | Correct explanation; time and path reported |
+| UG11 Suggestion usefulness | Suggestions used, ignored or hidden, and why | Reported |
+| UG12 Essentials found (alternative A) | T1 | Every participant finds both essential questions unaided. If not, evaluate alternative B (appendix A §A3). |
 
-A critical misread under UG1, UG2, UG6 or UG8 is a **trust failure**. It must be resolved and retested before the affected flow is accepted.
+A critical misread under UG1, UG2, UG4, UG6 or UG8 is a **trust failure**. It must be resolved and retested before the affected flow is accepted.
 
 ### 15.4 Author heuristic walkthroughs (not user testing)
 
-**Method.** The same author built and reviewed the prototype against Nielsen's heuristics and §13. Rendering checks: headless Chrome at 1,300 px, and in a 320 px iframe, measured for horizontal overflow on every tab, the project list and the starter. Results are design-defect findings only.
+**Method.** The same author built and reviewed the prototype against Nielsen's heuristics, §13 and appendix A. Rendering checks: screenshots in headless Chrome at 1,300 px; in a 320 px iframe, horizontal overflow was measured on every output tab, the project list, all four library views, the starter preview, a from-scratch workspace and a two-group workspace. Results are design-defect findings only.
 
 Revision 1 findings HW1–HW11 are kept in git history at `5a20827`. HW1–HW8 were fixed there. HW11 (only one quantity was traceable) is **fixed** in revision 2: every quantity opens its own trace. HW9 and HW10 remain open.
 
-Revision 2 findings:
+Revision 2 findings (dispositions updated for revision 3):
 
 | # | Finding | Heuristic / requirement | Severity | Disposition |
 | --- | --- | --- | --- | --- |
-| HW12 | The first ranking of suggested questions surfaced profile-derived inputs (links per endpoint, link rate) before the spine-failure policy and cable construction, because it only counted affected lines | Match with real world; help | Major (usefulness) | Weighted by a hand-set swing estimate per question. Still unvalidated: UG11 and T4. |
+| HW12 | The first ranking of suggested questions surfaced profile-derived inputs before decisive ones | Match with real world; help | Major (usefulness) | Revision 3 ranks by what an answer unblocks and the **actual quantity swing across current alternatives and ranges** (“deciding could change leaf-to-spine links (544 to 768)”). Still unvalidated: UG11. |
 | HW13 | "Rests on 7–8 assumptions" on spine lines counts every transitive input, so the number can feel like noise | Aesthetic and minimalist design | Open risk | Kept for honesty. Candidate: group by source ("profile: 2 · policy: 3"). Test in T6. |
 | HW14 | After a count change, every line is correctly stale and the whole table turns amber, so the signal weakens | Visibility of status | Minor | The status line names the changed detail and counts lines. Keep, and observe in T7. |
-| HW15 | A switch profile answered under one approach displayed as "Unknown" after changing approach, although the answer was kept | Visibility of status; error prevention | Major | Fixed. The value stays selected, labelled "not offered for this approach". The dependent lines explain why. |
+| HW15 | An answer kept across a change displayed as “Unknown” | Visibility of status; error prevention | Major | Fixed in revision 2. Revision 3 has no approach switch; inapplicable fields show a reason and keep their answer. |
 | HW16 | Number fields save on blur or Enter, not per keystroke; users may not notice the save point | Visibility of status | Minor | Each save is announced ("Saved; not yet in an output"), and the status bar counts edits. Observe. |
 | HW17 | On narrow screens the outputs are far below the details panel | Flexibility | Minor | Skip links added. A tabbed "Details / Outputs" toggle on narrow screens is a candidate. |
-| HW18 | The disabled "Revalidate" button does not itself say what is missing | Help users recognise | Minor | The note below the table explains it. Product: an inline reason on the button. Open. |
+| HW18 | The disabled “Revalidate” button did not say what is missing | Help users recognise | Minor | Fixed in revision 3: an inline reason appears beside it. |
 | HW19 | Removing an order record uses a browser `confirm()` | Error prevention | Minor (mock) | The text names the affected lines. Product: an accessible dialog. |
-| HW9 | Evidence/target banner on every screen (banner blindness) | Minimalist design | Open risk | Kept (S). T9/UG8. |
-| HW10 | "Exact" beside "conditional estimate" may read as a contradiction | Match with real world | Open risk (critical if misread) | T6/UG1 |
+| HW9 | Evidence/target banner on every screen (banner blindness) | Minimalist design | Open risk | Kept (S). T10/UG8. |
+| HW10 | "Exact" beside "conditional estimate" may read as a contradiction | Match with real world | Open risk (critical if misread) | T7/UG1 |
 
-**Critical trust/comprehension failures (criterion 4).** None can be rated critical without users. Open risks: HW10, HW9, HW13. An independent heuristic pass and a sponsor review of revision 2 are requested.
+Revision 3 findings:
+
+| # | Finding | Heuristic / requirement | Severity | Disposition |
+| --- | --- | --- | --- | --- |
+| HW20 | A from-scratch project shows “6 assumed” before the user answers anything (project-level spine and uplink defaults), which may read as hh-aid having guessed | Visibility of status; match with real world | Minor | Open. Candidate: count project defaults only once an output uses them. Observe in T1/T3. |
+| HW21 | Library buckets appeared in first-seen order (“65–256” before “Up to 64”) | Consistency | Minor | Fixed: defined bucket order per view. |
+| HW22 | Wrapped link-style buttons in the suggestion list were centre-aligned | Aesthetic | Minor | Fixed. |
+| HW23 | With undecided choices that do not change any number (128 servers), the “alternatives” note still appears | Minimalist design | Open | Kept: it explains why lines are single numbers. Observe in T1. |
+| HW24 | With two undecided dimensions, alternative labels get long (“dual-homed pairs · rack-local leaves / dual-homed pairs · shared leaves”) | Recognition; minimalism | Open risk | Candidate: a small matrix view. T6/UG4. |
+| HW25 | The Links tab shows patterns for the first alternative only | Visibility of status | Minor | Labelled on screen; open. |
+| HW26 | “Not checked: redundancy” remains when rail-optimized is chosen | Match with real world | Minor | Accurate (redundancy still unanswered) but possibly confusing; observe in T3. |
+| HW27 | An endpoint-group section has 11 questions, although only two are needed for a first BOM | Progressive disclosure (appendix A E4) | Open risk (the main risk of alternative A) | Mitigated by sub-headings, “needed for a first BOM” chips, a getting-started note and initial focus. UG12 decides whether to try B. |
+
+**Critical trust/comprehension failures (criterion 4).** None can be rated critical without users. Open risks: HW10, HW9, HW13, HW24, HW27. An independent heuristic pass and a sponsor review of revision 3 are requested.
 
 ## 16. Vocabulary and contracts with D01
 
@@ -482,7 +549,11 @@ Terms adopted in revision 1 are unchanged (D01 [PR #23 @ `3d313fe`](https://gith
 2. **Partial generation.** One generation run yields estimated, not-estimated and conflict-suspended lines together. Is that one candidate revision with per-line results, as D02 assumes?
 3. **Presentation grouping.** Is question-to-section grouping presentation metadata (D02-owned), or part of the question definition?
 
-D02 does not ask for a D01 rewrite. Model indicated persistent partial state may already cover this.
+4. **Starter provenance (revision 3).** Starter values arrive as `assumed` with source “from starter S2 v0”. Is that the right origin, with the starter (ID, version) as the named default? Or does D01 want a distinct provenance reference on the AnswerRecord?
+5. **Undecided versus unanswered.** D02 distinguishes not answered from “customer hasn't decided (asked)”; both are `unknown`. Is “asked” a flag or source detail on the AnswerRecord, or a D02-only presentation state?
+6. **Alternatives from undecided choices.** One generation evaluates every consistent combination of undecided packing and placement choices and shows separate totals. Are these one candidate revision with alternative results (D01 “alternatives have separate totals”), or scenario branches?
+
+D02 does not ask for a D01 rewrite. Model indicated persistent partial state may already cover items 1–3; items 4–6 are posted on #8 with this revision.
 
 ## 17. Decisions and questions
 
@@ -490,20 +561,22 @@ D02 does not ask for a D01 rewrite. Model indicated persistent partial state may
 | --- | --- | --- | --- |
 | Q-UX-1 | What may partner SEs see or edit? | Sponsor | Show scope; confirm before sharing |
 | Q-UX-2 | Which claim must the first slice reach? | Sponsor + D06 | Design supports all; nothing implies orderable |
-| Q-UX-3 | Which scenario anchors the first evaluation (now: one of three fixtures plus breadth task T8)? | Sponsor | Rail fixture for T1–T7; T8 for breadth |
-| Q-UX-4 | May the sponsor review revision 2 and introduce 3–4 SEs (R01 §9 screening)? | Sponsor | Heuristic evidence only until then |
+| Q-UX-3 | Which scenario anchors the first evaluation? | Sponsor | From-scratch rail story for T1–T6; library task T8 for breadth |
+| Q-UX-4 | May the sponsor review revision 3 and introduce 3–4 SEs (R01 §9 screening)? | Sponsor | Heuristic evidence only until then |
 | Q-UX-5 | Does release review need an approver when every item is unchanged with evidence? | Sponsor + ops | Show review pending; no auto-approval |
 | Q-UX-6 | May customers receive trace text directly? | Sponsor | Copyable text with assumptions |
-| Q-UX-7 | What is the minimum starter per approach (count + profile proposed), and should "Not sure yet" exist? | Sponsor | As proposed |
+| Q-UX-7 | Is alternative A (grouped essentials in the workspace) acceptable, given its risk of a long section (HW27)? Should the explicit “Customer hasn't decided” option stay (appendix A E5)? | Sponsor | A, with UG12 as the switch condition to B |
+| Q-UX-8 | Starter library contracts: who curates, how release compatibility and versions are shown, and whether an updated starter is offered to projects started from it (proposed: a reviewable diff, never silent) | Sponsor + model + compat | Placeholders only; no updates propagate |
+| Q-UX-9 | Which views should the library keep beyond the four current categories (for example vendor, budget band), and when should it move from tabs to multi-select facets? | Sponsor | The four sponsor categories as tabs |
 
 ## 18. Acceptance criteria and evidence (#9)
 
 | Criterion | Evidence | Status |
 | --- | --- | --- |
-| Persistent, non-linear BOM-first workspace: minimal starter, editable details panel, save/resume/refine/regenerate across sessions; three scenario types; B200 not a fixed schema; estimate, next question, traceability, infeasibility, input-change impact, latest-release refresh; map and installation as later stages | §2, §6, §7, §8–§11; walkthrough; `prototype-check.html` | Draft complete; **untested with users** |
+| Persistent, non-linear BOM-first workspace: minimal starter, editable details panel, save/resume/refine/regenerate across sessions; three scenario types; B200 not a fixed schema; estimate, next question, traceability, infeasibility, input-change impact, latest-release refresh; map and installation as later stages | §2, §6 (including §6.1 independent questions and §6.8 library), §7, §8–§11; appendix A; walkthrough; `prototype-check.html` | Draft complete; **untested with users** |
 | Assumptions, unknowns, stale outputs, confidence and completeness visible; table/search/filter/summary beyond a giant graph | §5, §6.6, §12 | Draft complete. Per-link rows and CSV not built. |
 | Accessibility, error recovery, task scripts, measurable goals | §13, §14, §15.2–§15.3 | Draft complete |
-| Real sponsor/user feedback; heuristic vs testing distinguished; critical trust failures resolved | §2 (actual sponsor feedback on revision 1), §15.1, §15.4 | Sponsor feedback recorded and addressed. **No SE feedback.** HW9, HW10, HW13 open. |
+| Real sponsor/user feedback; heuristic vs testing distinguished; critical trust failures resolved | §2 (actual sponsor feedback on revisions 1 and 2), §15.1, §15.4 | Sponsor feedback recorded and addressed. **No SE feedback.** HW9, HW10, HW13, HW24, HW27 open. |
 | Facts, hypotheses, intent and questions separated; versions; reproduction | §1, §19 | Draft complete |
 | Independent disposition; sponsor/domain decisions | — | **Pending** |
 
@@ -512,18 +585,20 @@ D02 does not ask for a D01 rewrite. Model indicated persistent partial state may
 ```sh
 python3 -I docs/design/experience-design/fixture-check.py   # prints: D02 fixture arithmetic passed
 open docs/design/experience-design/walkthrough.html          # any modern browser; no network or backend
-# Facilitator deep links: walkthrough.html#demo-s1, #demo-s2, #demo-s3, #example-rail, #example-rack, #example-mesh
+# Facilitator deep links: walkthrough.html#demo-s1, #demo-s2, #demo-s3, #scratch, #library
 # Automated interaction check (Chrome; file iframes need this flag):
 "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" --headless=new --allow-file-access-from-files \
   --virtual-time-budget=8000 --dump-dom docs/design/experience-design/prototype-check.html | grep -E 'ALL PASS|FAIL'
 ```
 
 **What is real in the prototype:**
-- the starter, saved projects, sessions and resume summary;
-- the details panel, with origins, Confirm, Don't assume and Use default;
-- applicability and Find a detail;
-- generation by three small planning policies;
-- Not-estimated gating, alternatives and staleness;
+- from-scratch entry (alternative A), saved projects, sessions and the resume summary;
+- the starter library: four views over four placeholder starters, preview, and customise as assumptions;
+- endpoint groups (mixed inventory, up to three), with independent questions; radios with no default, “hasn't decided”, and Clear answer;
+- the details panel with origins, Confirm and Don't assume; applicability reasons; Find a detail;
+- generation by answer-driven packing and placement policies, with alternatives for undecided choices and ranges for count ranges;
+- contradictions (count versus rack capacity, rail versus dual-homing, scope versus use);
+- Not-estimated gating and staleness;
 - a trace for every quantity, with copy;
 - conflicts with Preview and Use as my answer;
 - order records and the locked-spine conflict;
@@ -533,12 +608,14 @@ open docs/design/experience-design/walkthrough.html          # any modern browse
 
 **What is mock:**
 - the planning policies are illustrative, on hypothetical hardware;
+- library starters are placeholders; there is no curation, versioning or update flow;
 - release rows are examples;
 - no approvals, packages, per-link rows, CSV, connection map or customer export (copy only);
 - storage is per-browser `localStorage`, and the prototype says when it is unavailable.
 
 **Limitations:**
-- **No SE interviews or usability tests.** Sponsor feedback exists for revision 1 only.
+- **No SE interviews or usability tests.** Sponsor feedback exists for revisions 1 and 2 only; revision 3 is unreviewed.
+- The six sources are guidance and adjacent-domain research, not evidence about SEs (appendix A).
 - No screen-reader testing.
 - The 320 px check is an overflow measurement in an iframe, not a device test.
 - No upstream, hardware or solver execution.
