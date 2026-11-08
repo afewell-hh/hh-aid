@@ -66,39 +66,51 @@ All hardware in the fixtures is **hypothetical**: R04's H400 leaf and a 64-port 
 - **Partner access implication (H):** partner SEs may see projects, catalogs and pricing that are scoped differently from Hedgehog's. The UI must show the viewer's scope ("Visible to: Hedgehog + Partner X") on each project. Q-UX-1: what may a partner see or edit?
 - **Later consumers:** designer and approver (J3/I3), procurement (P7), installer (P3), OPS (R06). They see later stages, not first-BOM prerequisites.
 
-## 4. Readiness and state language (proposal H; input to D01)
+## 4. Readiness and state language (proposal H; reconciled with D01 draft)
 
-The sponsor separates **conditional estimates**, **exact qualified quantities** and **procurement-ready packages** (S). This draft does **not** reuse R01's S3 label, and it does not put a full installation gate on the first output. Following R05 §6, each BOM line carries a scoped readiness level. Package readiness follows R06 C4.
+The sponsor separates **conditional estimates**, **exact qualified quantities** and **procurement-ready packages** (S). This draft does **not** reuse R01's S3 label or put a full installation gate on the first output. Terms follow D01's draft ([PR #23 @ `3d313fe`](https://github.com/afewell-hh/hh-aid/blob/3d313fe53bf8d3060751694e6c7185803c316a66/docs/design/domain-model.md) §3–§4; [model's reply on #8](https://github.com/afewell-hh/hh-aid/issues/8#issuecomment-6715165096)). Both drafts are under review.
 
-### 4.1 Line readiness (what the quantity on this line is good for)
+### 4.1 What each BOM line shows
 
-| Level (working name) | Established | Not established | Permitted use | Line label shown |
-| --- | --- | --- | --- | --- |
-| **L0 Not estimated** | The category is relevant, but there are no inputs | Everything | Prompts a question | "Not estimated — answer Q…" (never "0") |
-| **L1 Conditional estimate** | Count derived under named assumptions; part *class* only | Answers marked assumed; topology choices; hardware | Early sizing; range-style conversation with assumptions listed | "Estimate: 16 (if 1 plane; 32 if 2)" |
-| **L2 Exact quantity** | Topology, rail/plane/group, port and cage allocation and assembly *construction class* fixed by supplied answers. Hard-constraint checks pass at the logical layer (R04 T01–T07). | Part qualification, reach and length, support for the exact hardware | Budgetary BOM; design review | "Exact quantity · parts unqualified" |
-| **L3 Qualified** | L2 plus exact SKU/revision and a recorded compatibility tuple within scope (R05 qualification tuple) | Length or route (for cables), package approval | Line can join a procurement package | "Qualified SKU · length/route open" when applicable |
-| **Orderable** (package level) | All lines in a declared package exact and qualified, with lengths and branch geometry, and approved on the package hash (R06 C4) | Installation state, site binding | Hand to procurement | Package status `procurement-approved` |
+D01 separates **what a quantity is good for** (claim scope) from **how precise it is** (precision). These are distinct predicates, not one ladder. Each BOM line therefore shows four things:
 
-Rules (H):
-- A line's level is the **weakest** of its inputs, rules and evidence. The UI names what is holding it back: "Held at L1 by: plane count (assumed)".
-- **Approval does not raise a level.** Approval is a separate record on an exact revision hash (R01 §5.1; R06 §6.4).
-- **Package readiness** (`not-ready` / `blocked` / `procurement-candidate` / `procurement-approved`, R06 C4) is computed from its lines. It lists included and excluded lines and the blockers (`blocked_by`).
-- A level can **fall**: a changed input, a release update or stale evidence moves dependent lines down, with the reason shown.
-- Wiring and connection-map readiness, and installation (I5–I9), are **separate later tracks**. They are not prerequisites for L1–L3 or for procurement of a package that does not depend on them.
+| Column | Values | Source |
+| --- | --- | --- |
+| **Quantity** | A count, separate alternative totals (never summed), a labelled **lower bound**, or **"Not estimated"** (never 0) | D01 §4 |
+| **Precision** | `exact under stated assumptions` / `bounded` / `unresolved` | D01 §4 |
+| **Claim** | `conditional estimate` or `qualified quantity scope` | D01 §4 table |
+| **Rests on** | The number and names of `assumed` inputs, open conflicts, stale flags, and what is missing for the next claim | D02 (H), from D01 AnswerRecord |
+
+**"Rests on" carries most of the meaning (H).** In D01, a count that is exact under stated assumptions can still be a conditional estimate; that is true of every F1 line. Between the first and the refined BOM, the claim does not change. What changes is that the line rests on fewer assumptions. The UI must make that visible, for example "Exact · conditional estimate · rests on 2 assumptions: leaf profile, spine profile". Otherwise "exact" and "estimate" side by side may confuse users. This is risk HW10, tested by T4.
+
+Claim scopes and what they permit (from D01 §4; display wording is H):
+
+| Claim | Established | Permitted use | Never shown as |
+| --- | --- | --- | --- |
+| **Conditional estimate** | Counts or expressions under explicit assumptions; constraint failures and excluded categories listed | Sizing conversation; budgetary BOM with its assumptions | Qualified, orderable or installable |
+| **Qualified quantity scope** | Exact requirement units, qualification evidence, complete capacity and assembly witness for the scope, target applicability | Basis for a procurement package | Orderable on its own (no SKU length or branch geometry, no approval) |
+| **Procurement-candidate** (package) | Qualified quantities plus exact SKUs, lengths, branch geometry, stock and commitment reconciliation; awaiting the named approver | Approver review | Approved |
+| **Procurement-approved** (package) | A named approver's recorded disposition on the package hash | Hand to procurement under agreed policy (policy is Q) | Proof of installation readiness |
+
+Later, separate predicates (context only, not prerequisites for a useful BOM): **connection-map realization**, then **site binding**, then **installation acceptance** (D01 §4; R06 I5–I9).
+
+Rules (H, consistent with D01):
+- A line names what holds it back: "Rests on: plane count (assumed)".
+- **Approval does not change a claim.** Approval is a separate record on an exact hash. On a new revision it becomes `retained within unchanged scope`, `needs review` or `invalidated` (D01 §3).
+- **A package is not the minimum of its line badges.** It also checks shared dependencies, stock and authority, and lists included and excluded lines with blockers (D01 §4; R06 C4).
+- Claims can be withdrawn. A changed input, target change or stale evidence sets the **stale** flag on dependent results, with the reason (D01 invalidation procedure).
 
 ### 4.2 Answer and evidence states shown in the UI
 
-These are two independent axes (R05 §2). The UI shows both as text plus an icon, never colour alone (§8).
-
-| Axis | Values | Shown as |
+| Axis | Values (D01) | Shown as |
 | --- | --- | --- |
-| Answer provenance | `unknown`, `supplied`, `assumed` (named default + version), `derived`, `conflicting`, `stale` | Chip beside each input and in each trace |
-| Compatibility | `documented compatible within scope`, `documented incompatible`, `unverified`, `disputed` | Chip on part lines and qualification tuples |
-| Lock / commitment | `editable`, `locked` (user), `ordered`, `delivered`, `installed` | Padlock + text; ordered or later means a locked input (R06 §6.4.5) |
-| Release-impact item | `unchanged (rechecked)`, `changed`, `unknown (not checked)`, `blocked` | Release review list (§6) |
-
-These are placeholder names until D01 settles them (§11).
+| Origin | `unknown`, `assumed` (named default + version), `user` (displayed as "supplied"), `derived` | Chip beside each input and in each trace |
+| Flags (independent) | `conflicting`, `stale`. Both can apply to any origin. | Extra chips. A stale user override shows **both** "supplied" and "stale"; it is never collapsed into one state. |
+| Lock | locked / unlocked. Unlocking needs an actor, a rationale and a new revision. | Padlock + text |
+| Compatibility | `compatible within stated scope`, `incompatible`, `unverified`, `disputed` | Chip on part lines and qualification tuples. "Supplied" never means verified. |
+| Commitment (quantities per event) | `proposed`, `ordered`, `delivered`, `installed`. A line can be partly in several. | "8 ordered · 0 delivered". Ordered-or-later quantities are locked. Cancellation, return and substitution are explicit dispositions. |
+| Release impact | `changed`, `unchanged with evidence`, `unknown/uncovered`, plus an independent **blocked** flag | Release review list (§6) |
+| Installation target | A verified target, or `unknown-currentness` | Project header (§6.1) |
 
 ## 5. Primary flow: sparse request to scoped BOM
 
@@ -116,22 +128,22 @@ The walkthrough uses one synthetic fixture, **F1**, with the R04 S03 assumptions
 
 The BOM appears within the same screen. Lines are grouped by **network** (backend, frontend, storage, management) and then by **part role**.
 
-| Line | Quantity | Level | Held at this level by |
-| --- | --- | --- | --- |
-| Backend rail leaf switches (H400-class) | **16** (32 if 2 planes) | L1 | plane count, server profile (assumed) |
-| Backend spine switches (64×800G class) | **8** | L1 | spine failure policy, spine port count (assumed) |
-| Server→leaf logical links (400G) | **1,024** | L1 | rails × rate (assumed) |
-| Leaf endpoint cages in 2×400G mode | **512** | L1 | as above |
-| Leaf→spine logical links (800G) | **512** (4 per leaf–spine pair) | L1 | spine policy |
-| Endpoint cable construction | **either** 512 integrated 2×400G split assemblies **or** 512 twin-port modules + 1,024 single modules + 1,024 fibers | L1 | construction class unknown; R05 §4 C |
-| Leaf–spine cable construction | **either** 512 integrated cables **or** 1,024 modules + 512 fibers | L1 | reach/construction unknown |
-| Switch OOB management ports | **24** needed (16 + 8) | L1, external dependency | OOB design is external (R06 O1; R05 §2) |
-| Frontend, storage, in-band management, BMC | **Not estimated** | L0 | not asked yet (never shown as 0) |
-| Control node, gateways | **Not estimated** | L0 | not asked yet |
+| Line | Quantity | Precision | Claim | Rests on |
+| --- | --- | --- | --- | --- |
+| Backend rail leaf switches (H400-class) | **16** (alternative: 32 if 2 planes) | exact under stated assumptions | conditional estimate | 5 assumptions: server profile, planes, leaf-per-rail policy, leaf profile, D/U policy |
+| Backend spine switches (64×800G class) | **8** | exact under stated assumptions | conditional estimate | spine failure policy, spine ports, uniform-links policy (assumed) |
+| Server→leaf logical links (400G) | **1,024** | exact under stated assumptions | conditional estimate | rails × rate (assumed) |
+| Leaf endpoint cages in 2×400G mode | **512** | exact under stated assumptions | conditional estimate | as above + leaf profile |
+| Leaf→spine logical links (800G) | **512** (4 per leaf–spine pair) | exact under stated assumptions | conditional estimate | spine policy |
+| Endpoint cable construction | **either** 512 integrated 2×400G split assemblies **or** 512 twin-port modules + 1,024 single modules + 1,024 fibers (separate totals, never summed) | exact per alternative | conditional estimate | construction class unknown; R05 §4 C |
+| Leaf–spine cable construction | **either** 512 integrated cables **or** 1,024 modules + 512 fibers | exact per alternative | conditional estimate | reach/construction unknown |
+| Switch OOB management ports | **24** needed (16 + 8) | exact under stated assumptions | conditional estimate; external dependency | OOB design is external (R06 O1; R05 §2) |
+| Frontend, storage, in-band management, BMC | **Not estimated** | unresolved | — | not asked yet (never shown as 0) |
+| Control node, gateways | **Not estimated** | unresolved | — | not asked yet |
 
 Design notes (H):
 - **Alternatives, not averages.** When the construction is unknown, the line shows both constructions with exact conditional counts (R05 invariants). It never shows "~1,000 cables".
-- A **summary strip** sits above the table: "10 lines · 0 exact · 0 qualified · 4 networks not estimated · 7 assumptions · 0 conflicts". It shows "Built from evidence: research snapshot 26.05 (fabric v0.144.1 / fabricator v0.51.4)" and "Installing on: latest release — **not yet verified** (#3 pending)" (S).
+- A **summary strip** sits above the table: "10 lines · 0 qualified · 2 not estimated · 7 assumptions in use · 0 conflicts". It shows "Built from evidence: research snapshot 26.05 (fabric v0.144.1 / fabricator v0.51.4)" and "Installing on: latest release — **currentness unknown** (#3 pending)" (S).
 - The whole BOM carries the scoped label "Conditional estimate — assumptions listed — not a design, not orderable".
 
 ### 5.3 Step 3: "why this number?" (quantity trace)
@@ -139,34 +151,34 @@ Design notes (H):
 Selecting any quantity opens a trace panel. Example for **8 spines**:
 
 ```
-8 spines  [L1 · conditional]
+8 spines  [exact under stated assumptions · conditional estimate]
 = smallest S where 64·S ≥ 512 leaf uplinks AND S divides 32   (rule R04 T07 + uniform-links policy, assumed)
   512 leaf uplinks = 16 leaves × 32 uplink cages              (H400 mode, assumed)
     16 leaves = 2 first-hop groups × 8 rails                   (one leaf per rail per group, assumed)
       2 groups = ceil(128 servers / 64 endpoint slots per leaf) (128 supplied; 64 from H400, assumed)
   64 ports per spine                                           (hypothetical spine, assumed)
-Counts planning identities: spine role/plane/slot IDs SP-0…SP-7 (stable, R06 §6.1)
+Counts: spine requirement (stable aggregate demand ID; D01 §4–§5), not yet expanded to instances
 Catalog: hypothetical-H400@fixture-1 · Rules: R04@49e6079
 What would change it: spine failure policy (Q3) · spine port count · leaf uplink split
 ```
 
 Requirements (H):
 - The trace is a **tree** with the state of every input. Every assumed leaf node has an inline "Change" action.
-- The trace names the **planning identities** counted, or "N links of class K in group G" when per-link IDs do not exist yet (Q for D01, #8 item 7). This lets the later connection map reconcile with the BOM line by line.
+- The trace names the **stable demand or requirement IDs** counted. A line may reference one aggregate demand such as "N links of class K in group G" without per-link IDs (D01 §4, confirmed on #8 item 7). Later component instances discharge these requirements, which is how the connection map reconciles with the BOM line by line (D01 §5).
 - "What would change it" lists the unanswered inputs that feed the number. This is the bridge to the next question.
 - Copyable as text, for pasting into an email to the customer, with its assumptions included.
 
 ### 5.4 Step 4: next useful question
 
-A ranked question queue sits beside the BOM (H). The rank is the estimated **quantity swing** plus whether the answer **unblocks a level**. Example for F1:
+A ranked question queue sits beside the BOM (H). The rank is the estimated **quantity swing** plus whether the answer **removes an assumption the line rests on, or unblocks a claim**. D01 notes this order is a hypothesis for D02 to test with users (D01 §3); T3 tests it. Example for F1:
 
 | Rank | Question | Why now (shown to user) | Effect if answered |
 | --- | --- | --- | --- |
 | 1 | Exact server and NIC configuration? (B200 1×400G vs B300-style 2×400G) | Could double backend leaves (16 ↔ 32) and links | Fixes rails, rate and plane basis |
 | 2 | One plane or two? | Same; also sets failure-set policy (R04 S05) | Leaves/spines ×2 or ×1 |
 | 3 | What must survive one spine failure? | Sets spine count; may be impossible (§5.6) | Fixes spine line |
-| 4 | Include frontend, storage, management networks? | Four networks currently "not estimated" | Adds lines L0 → L1 |
-| 5 | Cable construction and placement | Decides part classes; needed for qualified/orderable lines | Moves cable lines toward L2/L3 |
+| 4 | Include frontend, storage, management networks? | Four networks currently "not estimated" | Adds lines: "not estimated" → conditional estimate |
+| 5 | Cable construction and placement | Decides part classes; needed for qualified/orderable lines | Removes the construction alternative; a prerequisite for qualified quantity scope |
 
 - Answering is **inline**. Each answer shows a preview diff before it is applied: "Leaves 16 → 16, spines 8 → 16, links 512 → 512". The SE can apply or discard it.
 - "Skip" and "I don't know" are first-class. A skipped question keeps its default and its rank, and is not re-asked until something it depends on changes.
@@ -174,7 +186,7 @@ A ranked question queue sits beside the BOM (H). The rank is the estimated **qua
 
 ### 5.5 Step 5: refined, scoped BOM
 
-The SE supplies: B200 per sponsor profile, 1 plane, accept D/U ≤ 8/7 after one spine loss. The backend switch and link lines move to **L2 Exact quantity**. Cable lines stay at L1 until construction is chosen. Part lines remain "parts unqualified", because H400 is hypothetical. R05 §3 shows `celestica-ds5000` as a **static** mode and budget match; the UI shows it as "candidate profile — static match only, not qualified".
+The SE supplies: B200 per sponsor profile, 1 plane, accept D/U ≤ 8/7 after one spine loss. The backend switch and link lines keep the same claim (conditional estimate) but now **rest only on the leaf and spine profile assumptions** (both hypothetical), instead of up to 5 assumptions per line. Cable lines still carry construction alternatives. Part lines remain "parts unqualified", because H400 is hypothetical. R05 §3 shows `celestica-ds5000` as a **static** mode and budget match; the UI shows it as "candidate profile — static match only, not qualified".
 
 Scoped label (H): "Backend switch and link quantities exact for this revision · parts unqualified · cables by construction class · 4 networks not estimated".
 
@@ -187,7 +199,7 @@ Cannot satisfy: "keep D/U ≤ 1 after one spine failure"   [hard, supplied]
 Because: each leaf has D = 64 × 400G = 25.6 Tb/s and U = 32 × 800G = 25.6 Tb/s (H400 32/32 split, assumed).
   Losing 1 of S spines leaves U·(S−1)/S < D for every S. Routing cannot add missing cut capacity (R04 T06, N04).
 Conflicting inputs: failure policy (supplied) · H400 cage split (assumed) · 64 endpoints per leaf (derived)
-Ways forward (each shows its own preview):
+Candidate relaxations (each shows its own preview; minimality not checked):
   A. Accept D/U ≤ S/(S−1) after a spine loss: 8 spines → 8/7; 16 spines → 16/15 (2 links per pair)
   B. Fewer endpoint cages per leaf (changes group size and leaf count — recompute)
   C. A leaf profile with more uplink capacity (needs catalog evidence)
@@ -198,7 +210,8 @@ On screen, D/U is defined inline: a leaf's server-facing bandwidth divided by it
 
 Requirements (H):
 - Show **which hard constraints conflict**, with IDs and the inputs feeding them. Distinguish supplied answers from assumed defaults: an assumed default is the first suggested thing to change.
-- Offer **minimal ways forward**, each with a preview. Never relax silently (R04 constraint register; AGENTS.md).
+- Offer **candidate relaxations**, each with a preview and impact. Do not call them minimal unless minimality was checked (D01 ConflictRecord). Never relax silently (R04 constraint register; AGENTS.md).
+- Distinguish **demonstrated infeasible** (an arithmetic or allocation witness exists, as here) from **not proven feasible** (evidence or search incomplete). The headline wording differs: "Cannot satisfy" versus "Not shown to be possible".
 - Unaffected lines keep their values, so the BOM stays useful while the conflict is open.
 - The same pattern covers R04 N01 (33 nodes, two rails per leaf, four leaves) and N08 (NVL72 four leaves with two disjoint planes).
 
@@ -217,7 +230,7 @@ Requirements (H):
 | New leaf endpoint cages | +32 | 4 per new leaf |
 | **Conflict: spine ports** | locked 8 spines = 512 ports, all used by the existing 16 leaves | the 8 new leaves need ≥ 32 spine ports for D/U ≤ 1 (4 × 800G each). No free locked ports. |
 
-Conflict ways forward (each with preview and impact):
+Candidate relaxations (each with preview and impact):
 - **A.** Add spine capacity and rebalance existing leaf–spine links. This changes approved and possibly installed cabling: R06 class T2.
 - **B.** Take 2 uplinks from each existing leaf. Their normal D/U becomes 16/15, which breaks the supplied D/U ≤ 1 policy.
 - **C.** A different packing policy for the small group. This changes failure domains (R04 P02 note).
@@ -239,7 +252,7 @@ Diff presentation (H):
 
 ### 6.1 What the user always sees
 
-- Project header: **"Installing on: <TARGET release, from #3>"**, or **"latest release — not yet verified"** when the evidence is missing.
+- Project header: **"Installing on: <TARGET release, from #3>"**, or **"latest release — currentness unknown"** (D01 `unknown-currentness`) when the evidence is missing.
 - Revision header: **"Built from evidence: <snapshot ID> — release <X>, fabric <ver>, fabricator <ver>, rules <rev>, catalog <rev>"**.
 - When they differ: a persistent banner, **"This revision was built from older evidence than the installation target. Review release impact."** It must never read "current" without evidence (S).
 
@@ -247,17 +260,17 @@ Diff presentation (H):
 
 When a new target is recorded, hh-aid offers a review instead of a restart:
 
-1. **Impact summary**, grouped by compat's screen areas (#3): connection and domain semantics; switch roles, modes and profile budgets; validation, config and import contract; operational constraints; plus hh-aid catalog and compatibility evidence. Each item is `unchanged (rechecked)`, `changed`, `unknown (not checked)` or `blocked`, with the affected BOM lines and planning IDs listed.
-2. **Unchanged-rechecked items** are carried forward with a single acknowledgement. They are listed for inspection, not hidden.
-3. **Changed and unknown items** need individual review. Each one shows the affected lines and whether their level falls (for example, "L3 → L2: compatibility evidence not re-qualified for <target>").
-4. **Revalidate** runs the checks against the target evidence and produces **revision N+1**. The diff (§5.7) shows quantity changes, level changes and invalidated approvals.
+1. **Impact summary**, grouped by compat's screen areas (#3): connection and domain semantics; switch roles, modes and profile budgets; validation, config and import contract; operational constraints; plus hh-aid catalog and compatibility evidence. Each item is `changed`, `unchanged with evidence` or `unknown/uncovered`, with an independent **blocked** flag (a changed item can also be blocked). The affected BOM lines and requirement IDs are listed with the exact comparison scope (D01 §6).
+2. **Unchanged-with-evidence items** are carried forward with a single acknowledgement. They are listed for inspection, not hidden.
+3. **Changed and unknown items** need individual review. Each one shows the affected lines and whether a claim is withdrawn, for example "qualified quantity scope → stale: compatibility evidence not re-qualified for <target>".
+4. **Revalidate** runs the checks against the target evidence and produces **revision N+1**. The diff (§5.7) shows quantity changes, claim changes and each approval's status (`retained within unchanged scope`, `needs review`, `invalidated`).
 5. **Locked and ordered lines** are carried as-is. If the target makes one incompatible or unsupported, that is a **conflict**, not a substitution.
 6. Revision N stays available and reproducible. The project's target is N+1's target.
 
 **Avoiding the burden (H):**
 - Releases are reviewed as **deltas**. Work already accepted is not repeated.
 - Rechecks run in the background. The user sees one summary ("3 changed, 41 unchanged, 2 unknown").
-- A project can stay on "review pending" without blocking other work. Its BOM levels are honestly reduced where evidence is missing.
+- A project can stay on "review pending" without blocking other work. Its BOM claims are marked stale where evidence is missing.
 
 Placeholders used until #3 reports: `<TARGET>`, `<snapshot-target>`, and illustrative impact rows marked "example only — not a real release finding".
 
@@ -267,10 +280,10 @@ The R04 scale fixtures are 1,024 links for F1 and 8,192 endpoint edges for B300-
 
 | Need | Pattern |
 | --- | --- |
-| "Is it right overall?" | **Summary cards** per network, group and plane: counts, D/U normal and after failure, conflicts, level distribution |
+| "Is it right overall?" | **Summary cards** per network, group and plane: counts, D/U normal and after failure, conflicts, claim and assumption counts |
 | "What's wrong?" | **Exceptions first**: conflicts, unknown or stale inputs, unqualified lines, unused intentional ports (labelled, not hidden) |
 | "Where is server X / leaf Y?" | **Search** by planning ID, name, rail, group, plane, cage; results deep-link into the trace |
-| "Show me a slice" | **Facets**: network, group, rail, plane, switch, readiness level, answer state, changed-in-revision |
+| "Show me a slice" | **Facets**: network, group, rail, plane, switch, claim, precision, answer origin and flags, changed-in-revision |
 | Reviewing links | **Pattern rows**: one row per link *pattern* ("group A, rail r → leaf A-r, 64 links, cages 1–32 lanes 1–2") that expands to per-link rows on demand. Virtualised tables. CSV export of any filtered view. |
 | Structure | A **small schematic** per pattern (groups → rail leaves → spines), not a full graph. The full connection map comes later (S). |
 | Changes | Diff views filtered to "changed only", with counts per pattern |
@@ -279,7 +292,7 @@ The BOM line, link pattern and planning identities form one hierarchy. Every BOM
 
 ## 8. Accessibility requirements (H; target WCAG 2.2 AA)
 
-1. **State is never colour alone.** Every level, answer state, lock and impact state has a text label and a distinct icon shape. Contrast is ≥ 4.5:1 for text and ≥ 3:1 for icons and focus rings.
+1. **State is never colour alone.** Every claim, precision, origin, flag, lock and impact state has a text label and a distinct icon shape. Contrast is ≥ 4.5:1 for text and ≥ 3:1 for icons and focus rings.
 2. **Full keyboard operation.** BOM table, trace, question queue, diff and conflict panels all work by keyboard, with a visible focus indicator. The trace uses native disclosure (`details`/`summary`) or a fully implemented ARIA tree pattern. Never put a partial `role="tree"` or interactive controls inside `summary`.
 3. **Real tables.** Data tables use native table markup with header associations. Sortable columns announce their sort state. Virtualised tables keep row and column counts (`aria-rowcount`) and a reachable "export this view" alternative.
 4. **Announcements.** Regeneration, release-review results and conflicts are announced through a polite live region in one sentence ("Revision 4 created: 3 lines changed, 1 conflict").
@@ -295,9 +308,9 @@ The BOM line, link pattern and planning identities form one hierarchy. Every BOM
 | --- | --- |
 | Wrong answer entered | Undo per answer. History shows every answer change with its time. Preview before apply. |
 | Regeneration fails or times out | Keep the last good revision visible and labelled. Show the failure with a retry. Never show partial numbers as complete. |
-| Impossible constraints | Conflict panel (§5.6): affected lines suspended, others kept, ways forward previewed, nothing relaxed automatically |
+| Impossible constraints | Conflict panel (§5.6): affected lines suspended, others kept, candidate relaxations previewed, nothing relaxed automatically |
 | Upstream validation fails (later tracks) | Show it as a blocked check. Diagnostics may be first-error-only and in unstable order (R03 §3.1), so label any "all problems" list advisory. |
-| Stale evidence or release change | Lines fall in level with reasons. Project shows "review pending" and is never shown as current. |
+| Stale evidence or release change | Dependent claims flagged stale with reasons. Project shows "review pending" and is never shown as current. |
 | Conflict with a locked or ordered line | Never auto-resolve. Show the options with procurement impact. Record the chosen disposition and approver. |
 | Accidental unlock or override removal | Requires confirmation naming the affected lines. Reversible through history. |
 | Lost work | Draft answers auto-save per project. Revisions are immutable. |
@@ -322,7 +335,7 @@ The BOM line, link pattern and planning identities form one hierarchy. Every BOM
 | T1 | "A customer emailed '128 B200 HGX servers'. Get a first estimate you could discuss on a call." | F1 §5.2 table | Time; whether every assumption is noticed |
 | T2 | "Why 8 spines? What would make it change?" | §5.3 trace | Correctness of explanation; what was opened |
 | T3 | "What would you ask the customer next, and why?" | §5.4 ranks 1–3 | Chosen question vs expected set |
-| T4 | "For each line, can you put this number in a quote? Order it? Install from it?" | §4.1 levels | Readiness comprehension (SM9); critical misreads |
+| T4 | "For each line, can you put this number in a quote? Order it? Install from it?" | §4.1 claims | Readiness comprehension (SM9); critical misreads |
 | T5 | "The customer insists the fabric keeps full bandwidth if a spine fails." | §5.6 | Recognises infeasibility; picks a way forward without blaming routing |
 | T6 | "16 leaves and 8 spines are already ordered. The customer now wants 136 servers." | §5.7 | Finds the conflict; does not assume ordered parts change |
 | T7 | "A new Hedgehog release is out. Is this design still good to install on it?" | §6 placeholders | Distinguishes evidence version from target; finds changed and unknown items |
@@ -332,7 +345,7 @@ The BOM line, link pattern and planning identities form one hierarchy. Every BOM
 
 | Goal | Measure | Target for proceeding |
 | --- | --- | --- |
-| UG1 Readiness comprehension (R01 SM9) | T4 per-line answers vs expected | **No critical misread**: treating L1/L2 as orderable, or the BOM as installable |
+| UG1 Readiness comprehension (R01 SM9) | T4 per-line answers vs expected | **No critical misread**: treating a conditional estimate (even an exact one) as orderable, or the BOM as installable |
 | UG2 Assumption visibility (R01 SM2) | Share of displayed quantities whose source is classified correctly | Reported per participant; ≥ 90% is a heuristic, not a pass mark |
 | UG3 Trace usefulness | T2 explanation correct without facilitator help | Every participant, or analysed |
 | UG4 Next-question fit | T3 choice within the pre-written top-3 | Reported per participant with reasons |
@@ -360,37 +373,39 @@ Findings and their disposition in this revision:
 | HW7 | "Class T2" in a way-forward option was unexplained jargon | §8.7 | Minor | Fixed. Plain-language consequence plus the reference. |
 | HW8 | Long version identifiers overflowed at narrow widths | §8.6 reflow | Minor | Fixed. Text wraps; checked at 500 px. 320 px **not verified**, because headless Chrome would not render below about 500 px. |
 | HW9 | The evidence/target banner appears on every screen | Aesthetic and minimalist design | Open risk | Kept deliberately (S requirement). Banner blindness is tested by T7 / UG6. |
-| HW10 | Readiness wording ("estimate", "exact quantity", "qualified") is untested with SEs. The doc-only codes L0–L3 are not shown in the UI. | Match with real world | Open risk (critical if misread) | Tested by T4 / UG1. A critical misread blocks acceptance of the readiness design. |
+| HW10 | Readiness wording is untested with SEs. After D01 reconciliation, "exact" (precision) appears next to "conditional estimate" (claim), which may read as a contradiction. | Match with real world | Open risk (critical if misread) | Tested by T4 / UG1. A critical misread blocks acceptance of the readiness design. |
 | HW11 | Only the spine quantity is clickable in the mock, so traceability looks optional | Consistency | Minor (mock limitation) | Inert in the mock. The requirement is stated in §5.3. |
 
 **Critical trust/comprehension failures (criterion 4).** This pass found no failure that it could rate critical against real users, because it involved no users. The two highest risks remain open until real SEs test them: HW10 (readiness misread) and HW9 (version confusion). An independent heuristic pass by t2 / scout or t9 / ops, and the sponsor walkthrough (Q-UX-4), are requested.
 
 ## 11. Vocabulary reconciliation with D01 (required before acceptance)
 
-Questions were posted to model at [#8 comment 6715125093](https://github.com/afewell-hh/hh-aid/issues/8#issuecomment-6715125093). Status: **awaiting D01**. D02 terms are placeholders.
+I asked questions at [#8 6715125093](https://github.com/afewell-hh/hh-aid/issues/8#issuecomment-6715125093). Model answered at [6715165096](https://github.com/afewell-hh/hh-aid/issues/8#issuecomment-6715165096) and [6715157886](https://github.com/afewell-hh/hh-aid/issues/8#issuecomment-6715157886), with draft [PR #23 @ `3d313fe`](https://github.com/afewell-hh/hh-aid/blob/3d313fe53bf8d3060751694e6c7185803c316a66/docs/design/domain-model.md). This revision adopts D01's terms. **Both drafts are under independent review, so this alignment is between drafts, not accepted contracts.**
 
-| D02 placeholder | Meaning here | D01 term | Status |
-| --- | --- | --- | --- |
-| Line readiness L0–L3 | §4.1 | ? | Pending |
-| Package readiness | R06 C4 values | ? | Pending |
-| Answer provenance states | R05 axis | ? | Pending |
-| Compatibility states | R05 axis | ? | Pending |
-| Lock / commitment states | `locked`, `ordered`, `delivered`, `installed` | ? | Pending |
-| Evidence snapshot vs installation target | §6.1 | ? | Pending |
-| Release-impact item states | §6.2 | ? | Pending |
-| Quantity trace and planning identity | §5.3; R06 §6.1 | ? | Pending (#8 item 7) |
-| Conflict / way forward | §5.6 | ? | Pending |
-| Scenario branch | side-by-side alternatives | ? | Pending (#8 item 9) |
+| D02 concept | D01 term adopted | Change made in D02 |
+| --- | --- | --- |
+| Line readiness (was L0–L3) | Claim scope `conditional estimate` / `qualified quantity scope`, plus separate precision `exact under stated assumptions` / `bounded` / `unresolved` | §4.1 rewritten; "Rests on" column added; walkthrough updated |
+| Package readiness | `procurement-candidate` / `procurement-approved` per package; a package is not a roll-up of line badges | §4.1 |
+| Answer states (was one 6-value axis) | Origin `unknown`/`assumed`/`user`/`derived` plus independent `conflicting` and `stale` flags | §4.2; the UI says "supplied" for `user` |
+| Compatibility | R05 axis, unchanged | — |
+| Lock and commitment | Lock separate; commitment quantities per event (`proposed`/`ordered`/`delivered`/`installed`), partial allowed | §4.2, §5.7 |
+| Evidence vs target | `EvidenceSnapshot` (per revision) vs `TargetObservation`; `unknown-currentness` | §6.1, walkthrough header |
+| Release impact | `changed` / `unchanged with evidence` / `unknown/uncovered`, plus independent `blocked` | §6.2, walkthrough step 8 |
+| Quantity trace | Stable aggregate demand and requirement IDs before port assignment; later instances discharge requirements | §5.3 |
+| Conflict | `ConflictRecord`; "candidate relaxations" (not "minimal"); demonstrated infeasible vs not proven | §5.6, walkthrough step 6 |
+| Scenario | Branch from an immutable revision; alternative totals never summed | §5.2 note; T-scripts unchanged |
+
+**Open UX concern for D01 review (not a conflict):** exactness and claim are separate in D01, so "exact" can appear next to "conditional estimate". D02 mitigates this with the "Rests on" column (§4.1). T4/UG1 must test whether SEs read it correctly. If they don't, the display wording needs to change; the model does not.
 
 ## 12. Decisions and questions
 
 | ID | Question | Owner | Safe interim treatment |
 | --- | --- | --- | --- |
 | Q-UX-1 | What may partner SEs see or edit (catalog, pricing, other projects)? | Sponsor | Show scope; confirm before share |
-| Q-UX-2 | Which readiness level must the first slice reach for its BOM lines: L1, L2 or L3, or orderable packages? | Sponsor + D06 (product-context leaves this open) | Design supports all; nothing implies orderable |
+| Q-UX-2 | Which claim must the first slice reach for its BOM lines: conditional estimate, qualified quantity scope, or procurement packages? | Sponsor + D06 (product-context leaves this open) | Design supports all; nothing implies orderable |
 | Q-UX-3 | Which scenario anchors the first evaluation sessions (F1 B200 128, NVL72 eight racks, other)? | Sponsor | F1 used as a synthetic fixture only |
 | Q-UX-4 | May the sponsor do a moderated walkthrough of `walkthrough.html` (about 30 minutes) and introduce 3–4 SEs per R01 §9 screening? | Sponsor | Heuristic evidence only until then |
-| Q-UX-5 | Does release review need an explicit approver, or is revalidation enough when only `unchanged (rechecked)` items exist? | Sponsor + ops | Show review pending; do not auto-approve |
+| Q-UX-5 | Does release review need an explicit approver, or is revalidation enough when only `unchanged with evidence` items exist? | Sponsor + ops | Show review pending; do not auto-approve |
 | Q-UX-6 | Should customers ever receive the trace text directly, or only the SE's summary? | Sponsor | Copyable text with assumptions included |
 
 ## 13. Acceptance criteria and evidence (#9)
@@ -420,4 +435,4 @@ Limitations:
 - Release rows are placeholders until #3 reports.
 - Vocabulary is unreconciled with D01.
 - The walkthrough is static, with no real generation. It was rendered in headless Chrome at 1200 and 500 px only. It has not been tested with a screen reader or at 320 px.
-- The question-ranking and level rules are design proposals for D01/D03, not specified algorithms.
+- The question-ranking and display rules are design proposals for D01/D03, not specified algorithms.

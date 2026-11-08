@@ -73,7 +73,7 @@ input[type=search],select{font:inherit;padding:4px 6px;border:1px solid var(--li
 <div class="wrap">
   <div class="project" aria-label="Project context">
     <div><b>Project:</b> Example-A (synthetic) · <b>Visible to:</b> Hedgehog only <span class="chip">scope</span></div>
-    <div><b>Installing on:</b> latest Hedgehog release — <em>not yet verified</em> (placeholder &lt;TARGET&gt;, pending #3)</div>
+    <div><b>Installing on:</b> latest Hedgehog release — <em>currentness unknown</em> (placeholder &lt;TARGET&gt;, pending #3)</div>
     <div><b>This revision built from evidence:</b> <span id="rev">revision 1</span> · research snapshot 26.05 (fabric v0.144.1, fabricator v0.51.4) · rules R04@49e6079 · catalog hypothetical-H400@fixture-1</div>
     <div class="banner" role="note">This revision was built from older or unverified evidence than the installation target. Review release impact (step 8) before treating it as current.</div>
   </div>
@@ -118,36 +118,35 @@ input[type=search],select{font:inherit;padding:4px 6px;border:1px solid var(--li
     <h2>Step 2 · First useful BOM</h2>
     <div class="label">Conditional estimate — assumptions listed — not a design, not orderable</div>
     <div class="summary" aria-label="BOM summary">
-      <span>10 lines</span><span>0 exact</span><span>0 qualified</span><span>4 networks not estimated</span><span>7 assumptions</span><span>0 conflicts</span>
+      <span>10 lines</span><span>0 qualified</span><span>2 not estimated</span><span>7 assumptions in use</span><span>0 conflicts</span>
     </div>
     <div class="grid">
       <div class="box scroll">
         <table>
           <caption class="sr">Backend BOM lines, revision 1</caption>
-          <thead><tr><th scope="col">Line</th><th scope="col">Quantity</th><th scope="col">Readiness</th><th scope="col">Held by</th></tr></thead>
+          <thead><tr><th scope="col">Line</th><th scope="col">Quantity</th><th scope="col">Precision · claim</th><th scope="col">Rests on</th></tr></thead>
           <tbody>
-            <tr><th scope="row">Backend rail leaf switches (H400-class)</th><td class="num">16 <span class="note">(32 if 2 planes)</span></td><td><span class="chip l1">estimate</span></td><td>plane count, server profile</td></tr>
-            <tr><th scope="row">Backend spine switches (64×800G class)</th><td class="num"><button class="btn" data-go="2" aria-label="8 spines: explain">8</button></td><td><span class="chip l1">estimate</span></td><td>spine failure policy, spine ports</td></tr>
-            <tr><th scope="row">Server→leaf logical links, 400G</th><td class="num">1,024</td><td><span class="chip l1">estimate</span></td><td>rails × rate</td></tr>
-            <tr><th scope="row">Leaf endpoint cages, 2×400G mode</th><td class="num">512</td><td><span class="chip l1">estimate</span></td><td>as above</td></tr>
-            <tr><th scope="row">Leaf→spine logical links, 800G</th><td class="num">512 <span class="note">(4 per pair)</span></td><td><span class="chip l1">estimate</span></td><td>spine policy</td></tr>
-            <tr><th scope="row">Endpoint cable construction</th><td>either <b>512</b> integrated 2×400G split assemblies<br><i>or</i> <b>512</b> twin-port modules + <b>1,024</b> modules + <b>1,024</b> fibers</td><td><span class="chip l1">estimate</span></td><td>construction unknown</td></tr>
-            <tr><th scope="row">Leaf–spine cable construction</th><td>either <b>512</b> integrated cables<br><i>or</i> <b>1,024</b> modules + <b>512</b> fibers</td><td><span class="chip l1">estimate</span></td><td>reach / construction unknown</td></tr>
-            <tr><th scope="row">Switch OOB management ports</th><td class="num">24 needed</td><td><span class="chip l1">estimate</span> <span class="chip">external</span></td><td>OOB network is an external dependency</td></tr>
-            <tr><th scope="row">Frontend, storage, in-band mgmt, BMC</th><td>Not estimated</td><td><span class="chip l0">not estimated</span></td><td>question 4 not answered</td></tr>
-            <tr><th scope="row">Control node, gateways</th><td>Not estimated</td><td><span class="chip l0">not estimated</span></td><td>not asked yet</td></tr>
+            <tr><th scope="row">Backend rail leaf switches (H400-class)</th><td class="num">16 <span class="note">(alternative: 32 if 2 planes)</span></td><td>exact · <span class="chip l1">conditional estimate</span></td><td>5 assumptions: server profile, planes, leaf-per-rail, leaf profile, D/U policy</td></tr>
+            <tr><th scope="row">Backend spine switches (64×800G class)</th><td class="num"><button class="btn" data-go="2" aria-label="8 spines: explain">8</button></td><td>exact · <span class="chip l1">conditional estimate</span></td><td>3 assumptions: spine failure policy, spine ports, uniform links</td></tr>
+            <tr><th scope="row">Server→leaf logical links, 400G</th><td class="num">1,024</td><td>exact · <span class="chip l1">conditional estimate</span></td><td>rails × rate (assumed)</td></tr>
+            <tr><th scope="row">Leaf endpoint cages, 2×400G mode</th><td class="num">512</td><td>exact · <span class="chip l1">conditional estimate</span></td><td>as above + leaf profile</td></tr>
+            <tr><th scope="row">Leaf→spine logical links, 800G</th><td class="num">512 <span class="note">(4 per pair)</span></td><td>exact · <span class="chip l1">conditional estimate</span></td><td>spine policy</td></tr>
+            <tr><th scope="row">Endpoint cable construction</th><td>either <b>512</b> integrated 2×400G split assemblies<br><i>or</i> <b>512</b> twin-port modules + <b>1,024</b> modules + <b>1,024</b> fibers</td><td>exact per alternative · <span class="chip l1">conditional estimate</span></td><td>construction unknown</td></tr>
+            <tr><th scope="row">Leaf–spine cable construction</th><td>either <b>512</b> integrated cables<br><i>or</i> <b>1,024</b> modules + <b>512</b> fibers</td><td>exact per alternative · <span class="chip l1">conditional estimate</span></td><td>reach / construction unknown</td></tr>
+            <tr><th scope="row">Switch OOB management ports</th><td class="num">24 needed</td><td>exact · <span class="chip l1">conditional estimate</span> <span class="chip">external</span></td><td>OOB network is an external dependency</td></tr>
+            <tr><th scope="row">Frontend, storage, in-band mgmt, BMC</th><td>Not estimated</td><td><span class="chip l0">unresolved</span></td><td>question 4 not answered</td></tr>
+            <tr><th scope="row">Control node, gateways</th><td>Not estimated</td><td><span class="chip l0">unresolved</span></td><td>not asked yet</td></tr>
           </tbody>
         </table>
         <p class="note">Construction alternatives are never summed into one "cables" total. Unestimated categories are never shown as 0.</p>
       </div>
       <div class="box">
-        <h3 style="margin-top:0">Readiness key</h3>
+        <h3 style="margin-top:0">How to read a line</h3>
         <ul>
-          <li><span class="chip l0">not estimated</span>: no inputs yet</li>
-          <li><span class="chip l1">estimate</span>: counts under assumptions; part class only</li>
-          <li><span class="chip l2">exact quantity</span>: topology fixed; parts unqualified</li>
-          <li><span class="chip l3">qualified</span>: exact SKU + compatibility evidence</li>
-          <li>Orderable is a <b>package</b> state, approved on its hash</li>
+          <li><b>Precision</b>: <i>exact</i> under the stated assumptions, <i>bounded</i>, or <span class="chip l0">unresolved</span> (never shown as 0)</li>
+          <li><b>Claim</b>: <span class="chip l1">conditional estimate</span> = counts under assumptions, part class only. <span class="chip l3">qualified quantity scope</span> = exact parts with compatibility evidence.</li>
+          <li><b>Rests on</b>: the assumptions you have not yet confirmed</li>
+          <li>Orderable is a <b>package</b> state (procurement-candidate, then procurement-approved on its hash)</li>
         </ul>
         <button class="btn primary" data-go="3">Next useful question</button>
       </div>
@@ -158,7 +157,7 @@ input[type=search],select{font:inherit;padding:4px 6px;border:1px solid var(--li
   <section class="screen" data-title="3 Why?">
     <h2>Step 3 · Why 8 spines?</h2>
     <div class="box" aria-label="Derivation of 8 spines">
-      <div><b>8 spines</b> <span class="chip l1">estimate</span></div>
+      <div><b>8 spines</b> · exact · <span class="chip l1">conditional estimate</span></div>
       <details open><summary>= smallest S with 64·S ≥ 512 leaf uplinks and S divides 32 <span class="chip">R04 T07 + uniform-links policy</span> <span class="chip assumed">assumed</span></summary>
         <details open><summary>512 leaf uplinks = 16 leaves × 32 uplink cages <span class="chip assumed">H400 mode · assumed</span></summary>
           <button class="btn" aria-label="Change H400 uplink mode">Change</button>
@@ -172,7 +171,7 @@ input[type=search],select{font:inherit;padding:4px 6px;border:1px solid var(--li
         <details open><summary>64 ports per spine <span class="chip assumed">hypothetical spine · assumed</span></summary>
           <button class="btn" aria-label="Change spine port count">Change</button></details>
       </details>
-      <p><b>Counts:</b> planning IDs SP-0 … SP-7 (stable identities). <b>Catalog:</b> hypothetical-H400@fixture-1. <b>Rules:</b> R04@49e6079.</p>
+      <p><b>Counts:</b> spine requirement (stable demand ID), not yet expanded to instances. <b>Catalog:</b> hypothetical-H400@fixture-1. <b>Rules:</b> R04@49e6079.</p>
       <p><b>What would change it:</b> spine failure policy (question 3) · spine port count · leaf uplink split.</p>
       <button class="btn">Copy as text with assumptions</button>
       <button class="btn primary" data-go="3">Back to questions</button>
@@ -194,7 +193,7 @@ input[type=search],select{font:inherit;padding:4px 6px;border:1px solid var(--li
           <tr><td>5</td><td>Cable construction and placement</td><td>Needed for qualified / orderable cable lines</td><td><button class="btn">Skip for now</button></td></tr>
         </tbody>
       </table>
-      <p><b>Preview before apply:</b> <span id="preview">leaves 16 → 16 · spines 8 → 8 · readiness of switch and link lines: estimate → exact quantity</span></p>
+      <p><b>Preview before apply:</b> <span id="preview">leaves 16 → 16 · spines 8 → 8 · switch and link lines then rest only on the hypothetical leaf/spine profiles</span></p>
       <button class="btn primary" id="apply">Apply answers</button>
       <button class="btn">Export open questions for the customer</button>
     </div>
@@ -203,20 +202,20 @@ input[type=search],select{font:inherit;padding:4px 6px;border:1px solid var(--li
   <!-- 5 -->
   <section class="screen" data-title="5 Refined BOM">
     <h2>Step 5 · Refined, scoped BOM (revision 2)</h2>
-    <div class="label">Backend switch and link quantities exact for this revision · parts unqualified · cables by construction class · 4 networks not estimated</div>
+    <div class="label">Conditional estimate · backend switch and link counts exact, resting only on hypothetical leaf and spine profiles · parts unqualified · cables by construction alternative · 2 lines not estimated</div>
     <div class="box scroll">
       <table>
-        <thead><tr><th scope="col">Line</th><th scope="col">Quantity</th><th scope="col">Readiness</th><th scope="col">Held by</th></tr></thead>
+        <thead><tr><th scope="col">Line</th><th scope="col">Quantity</th><th scope="col">Precision · claim</th><th scope="col">Rests on</th></tr></thead>
         <tbody>
-          <tr><th scope="row">Backend rail leaf switches</th><td class="num">16</td><td><span class="chip l2">exact quantity</span></td><td>parts unqualified. Candidate profile <code>celestica-ds5000</code>: static mode/budget match only (R05 §3), not qualified.</td></tr>
-          <tr><th scope="row">Backend spine switches</th><td class="num">8</td><td><span class="chip l2">exact quantity</span></td><td>spine model unqualified</td></tr>
-          <tr><th scope="row">Server→leaf links, 400G</th><td class="num">1,024</td><td><span class="chip l2">exact quantity</span></td><td>—</td></tr>
-          <tr><th scope="row">Leaf→spine links, 800G</th><td class="num">512</td><td><span class="chip l2">exact quantity</span></td><td>—</td></tr>
-          <tr><th scope="row">Endpoint / leaf–spine cables</th><td>by construction (see revision 1)</td><td><span class="chip l1">estimate</span></td><td>construction, reach, placement</td></tr>
-          <tr><th scope="row">Frontend, storage, mgmt, BMC</th><td>Not estimated</td><td><span class="chip l0">not estimated</span></td><td>question 4</td></tr>
+          <tr><th scope="row">Backend rail leaf switches</th><td class="num">16</td><td>exact · <span class="chip l1">conditional estimate</span></td><td>leaf profile (assumed). Candidate <code>celestica-ds5000</code>: static mode/budget match only (R05 §3), not qualified.</td></tr>
+          <tr><th scope="row">Backend spine switches</th><td class="num">8</td><td>exact · <span class="chip l1">conditional estimate</span></td><td>spine profile (assumed)</td></tr>
+          <tr><th scope="row">Server→leaf links, 400G</th><td class="num">1,024</td><td>exact · <span class="chip l1">conditional estimate</span></td><td>leaf profile (assumed)</td></tr>
+          <tr><th scope="row">Leaf→spine links, 800G</th><td class="num">512</td><td>exact · <span class="chip l1">conditional estimate</span></td><td>leaf and spine profiles (assumed)</td></tr>
+          <tr><th scope="row">Endpoint / leaf–spine cables</th><td>by construction alternative (see revision 1)</td><td>exact per alternative · <span class="chip l1">conditional estimate</span></td><td>construction, reach, placement</td></tr>
+          <tr><th scope="row">Frontend, storage, mgmt, BMC</th><td>Not estimated</td><td><span class="chip l0">unresolved</span></td><td>question 4</td></tr>
         </tbody>
       </table>
-      <p class="note">Approval, if recorded, applies to this exact revision hash and does not raise any line's readiness. Wiring/connection map and installation are later tracks (not prerequisites for this BOM).</p>
+      <p class="note">What changed from revision 1: no claim changed; the switch and link lines now rest only on the hypothetical leaf and spine profiles (previously up to 5 assumptions per line). Approval, if recorded, applies to this exact revision hash and does not change any claim. Connection map and installation are later, separate predicates, not prerequisites for this BOM.</p>
     </div>
   </section>
 
@@ -225,11 +224,11 @@ input[type=search],select{font:inherit;padding:4px 6px;border:1px solid var(--li
     <h2>Step 6 · Impossible request explained</h2>
     <p>Answer recorded: question 3 = <b>full remote bandwidth after any one spine failure</b> <span class="chip supplied">supplied · hard</span></p>
     <div class="conflictbox" role="alert" aria-labelledby="c1">
-      <h3 id="c1" style="margin-top:0"><span class="chip conflict">conflict</span> Cannot keep D/U ≤ 1 after one spine failure</h3>
+      <h3 id="c1" style="margin-top:0"><span class="chip conflict">conflict</span> Cannot satisfy: keep D/U ≤ 1 after one spine failure <span class="chip">demonstrated infeasible under these inputs</span></h3>
       <p class="note">D/U = a leaf's server-facing bandwidth (D) divided by its working uplink bandwidth (U). Above 1, servers can send more than the uplinks can carry.</p>
       <p><b>Because:</b> each leaf has D = 64 × 400 Gb/s = 25.6 Tb/s and U = 32 × 800 Gb/s = 25.6 Tb/s (H400 32/32 split, <span class="chip assumed">assumed</span>). Losing 1 of S spines leaves U·(S−1)/S, which is below D for every S. Routing cannot add missing cut capacity (R04 T06, N04).</p>
       <p><b>Conflicting inputs:</b> failure policy <span class="chip supplied">supplied</span> · H400 cage split <span class="chip assumed">assumed</span> · 64 endpoints per leaf <span class="chip derived">derived</span></p>
-      <h3>Ways forward (nothing has been relaxed automatically)</h3>
+      <h3>Candidate relaxations (nothing relaxed automatically; not checked for minimality)</h3>
       <ol>
         <li>Accept D/U ≤ S/(S−1) after a spine loss: 8 spines → 8/7; 16 spines → 16/15 (2 links per pair). <button class="btn">Preview</button></li>
         <li>Fewer endpoint cages per leaf. Changes group size and leaf count; needs recompute. <button class="btn">Preview</button></li>
@@ -243,9 +242,9 @@ input[type=search],select{font:inherit;padding:4px 6px;border:1px solid var(--li
         <tbody>
           <tr><th scope="row">Backend spine switches</th><td>— (suspended)</td><td><span class="chip conflict">conflict</span> resolve above</td></tr>
           <tr><th scope="row">Leaf→spine links, 800G</th><td>— (suspended)</td><td><span class="chip conflict">conflict</span> depends on spine count</td></tr>
-          <tr><th scope="row">Backend rail leaf switches</th><td class="num">16</td><td><span class="chip l2">exact quantity</span> kept</td></tr>
-          <tr><th scope="row">Server→leaf links, 400G</th><td class="num">1,024</td><td><span class="chip l2">exact quantity</span> kept</td></tr>
-          <tr><th scope="row">Switch OOB management ports</th><td>24 or more</td><td><span class="chip l1">estimate</span> lower bound while spine count is open</td></tr>
+          <tr><th scope="row">Backend rail leaf switches</th><td class="num">16</td><td>exact · <span class="chip l1">conditional estimate</span> kept</td></tr>
+          <tr><th scope="row">Server→leaf links, 400G</th><td class="num">1,024</td><td>exact · <span class="chip l1">conditional estimate</span> kept</td></tr>
+          <tr><th scope="row">Switch OOB management ports</th><td>24 or more</td><td>bounded (<b>lower bound</b>) · <span class="chip l1">conditional estimate</span> while spine count is open</td></tr>
         </tbody>
       </table>
     </div>
@@ -254,7 +253,7 @@ input[type=search],select{font:inherit;padding:4px 6px;border:1px solid var(--li
   <!-- 7 -->
   <section class="screen" data-title="7 Change + ordered">
     <h2>Step 7 · Ordered parts, then an input change (revision 3)</h2>
-    <p>Locked: <span class="chip locked">ordered · PO-EX-1</span> 16 rail leaves, 8 spines. Customer changes servers 128 → 136.</p>
+    <p>Locked: <span class="chip locked">16 ordered · 0 delivered</span> rail leaves, <span class="chip locked">8 ordered · 0 delivered</span> spines (synthetic order reference). Customer changes servers 128 → 136.</p>
     <div class="summary"><span>+8 leaves</span><span>+64 links</span><span>+32 cages</span><span class="chip conflict">1 conflict</span><span>1,024 existing links keep their IDs</span></div>
     <div class="box scroll">
       <table>
@@ -270,7 +269,7 @@ input[type=search],select{font:inherit;padding:4px 6px;border:1px solid var(--li
       </table>
     </div>
     <div class="conflictbox" style="margin-top:10px">
-      <b>Ways forward</b> (ordered spines are never removed or re-optimised):
+      <b>Candidate relaxations</b> (ordered spines are never removed or re-optimised; cancelling an order would be an explicit disposition):
       <ol>
         <li>Add spine capacity and rebalance existing leaf–spine links. Changes approved, and possibly installed, cabling, so it needs a design-change approval (R06 class T2).</li>
         <li>Take 2 uplinks from each existing leaf. Their normal D/U becomes 16/15, which breaks your D/U ≤ 1 policy.</li>
@@ -283,21 +282,21 @@ input[type=search],select{font:inherit;padding:4px 6px;border:1px solid var(--li
   <!-- 8 -->
   <section class="screen" data-title="8 Release">
     <h2>Step 8 · Latest-release impact review</h2>
-    <p><b>Installing on:</b> &lt;TARGET&gt; (placeholder, pending #3) · <b>Built from evidence:</b> research snapshot 26.05 · <span class="chip">review pending</span></p>
+    <p><b>Installing on:</b> &lt;TARGET&gt; (placeholder TargetObservation, pending #3) · <b>Built from evidence:</b> research snapshot 26.05 · <span class="chip">review pending</span></p>
     <p class="note"><b>Example rows only — not real release findings.</b></p>
-    <div class="summary"><span class="chip changed">1 changed</span><span class="chip unchanged">3 unchanged (rechecked)</span><span class="chip unknown">1 unknown</span></div>
+    <div class="summary"><span class="chip changed">1 changed</span><span class="chip unchanged">3 unchanged with evidence</span><span class="chip unknown">1 unknown/uncovered</span><span class="chip conflict">1 blocked</span></div>
     <div class="box scroll">
       <table>
         <thead><tr><th scope="col">Area (compat #3 screen)</th><th scope="col">Result</th><th scope="col">Affects</th><th scope="col">Readiness effect</th></tr></thead>
         <tbody>
-          <tr><td>Connection and domain semantics</td><td><span class="chip unchanged">unchanged (rechecked)</span></td><td>—</td><td>none</td></tr>
-          <tr><td>Switch roles, modes, profile budgets</td><td><span class="chip changed">changed (example)</span></td><td>16 rail leaves (candidate profile)</td><td>recheck mode/budget; lines stay exact quantity if passing</td></tr>
-          <tr><td>Validation, config, import contract</td><td><span class="chip unchanged">unchanged (rechecked)</span></td><td>—</td><td>none</td></tr>
-          <tr><td>Operational constraints</td><td><span class="chip unchanged">unchanged (rechecked)</span></td><td>—</td><td>none</td></tr>
-          <tr><td>hh-aid catalog / compatibility evidence</td><td><span class="chip unknown">unknown (not checked)</span></td><td>cable lines</td><td>no line may be shown qualified for &lt;TARGET&gt; until checked</td></tr>
+          <tr><td>Connection and domain semantics</td><td><span class="chip unchanged">unchanged with evidence</span></td><td>—</td><td>none</td></tr>
+          <tr><td>Switch roles, modes, profile budgets</td><td><span class="chip changed">changed (example)</span></td><td>16 rail leaves (candidate profile)</td><td>recheck mode/budget; counts kept if the recheck passes, otherwise flagged stale</td></tr>
+          <tr><td>Validation, config, import contract</td><td><span class="chip unchanged">unchanged with evidence</span></td><td>—</td><td>none</td></tr>
+          <tr><td>Operational constraints</td><td><span class="chip unchanged">unchanged with evidence</span></td><td>—</td><td>none</td></tr>
+          <tr><td>hh-aid catalog / compatibility evidence</td><td><span class="chip unknown">unknown/uncovered</span> <span class="chip conflict">blocked</span></td><td>cable lines</td><td>no line may claim qualified quantity scope for &lt;TARGET&gt; until checked</td></tr>
         </tbody>
       </table>
-      <p><button class="btn">Acknowledge 3 unchanged</button> <button class="btn">Review changed</button> <button class="btn primary">Revalidate into revision 4</button></p>
+      <p><button class="btn">Acknowledge 3 unchanged with evidence</button> <button class="btn">Review changed</button> <button class="btn primary">Revalidate into revision 4</button></p>
       <p class="note">Ordered lines carry forward unchanged. If the target makes one incompatible, it becomes a conflict, not a substitution. Revision 3 remains reproducible.</p>
     </div>
   </section>
@@ -362,8 +361,8 @@ input[type=search],select{font:inherit;padding:4px 6px;border:1px solid var(--li
   var q3=document.getElementById('q3'), pv=document.getElementById('preview');
   q3.onchange=function(){
     pv.textContent = q3.value==='full' ? 'conflict: requirement cannot be met with current assumptions (see step 6)'
-      : q3.value==='dk' ? 'no change; spine line stays an estimate'
-      : 'leaves 16 → 16 · spines 8 → 8 · readiness of switch and link lines: estimate → exact quantity';
+      : q3.value==='dk' ? 'no change; spine line still rests on the assumed failure policy'
+      : 'leaves 16 → 16 · spines 8 → 8 · switch and link lines then rest only on the hypothetical leaf/spine profiles';
   };
   document.getElementById('apply').onclick=function(){show(q3.value==='full'?5:4,true)};
   // Scale review: F1 + 136-server change, R04 S03 allocation formulas.
