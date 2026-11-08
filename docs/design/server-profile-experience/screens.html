@@ -60,7 +60,7 @@ svg .dash{stroke-dasharray:5 4}
 <body>
 <main>
 <h1>Server profile experience: low-fidelity screens</h1>
-<p class="banner"><b>D02 #9 server-class pass, static wireframes.</b> These screens are not a calculator. Every quantity was entered by hand and is checked by <code>bom-arithmetic.py</code>. Every part is a <b>generic placeholder or unverified sponsor shorthand</b>, not a vendor-qualified SKU. Leaf and spine counts are deliberately shown as not estimated. Product terms such as <i>fabric</i> and <i>leaf class</i> are product language only; how they map to upstream Fabric, domain and plane objects is pending compat (#3). Field names are provisional until parts (#6) and model (#8) fixtures land. Rationale: <a href="../server-profile-experience.md">server-profile-experience.md</a>.</p>
+<p class="banner"><b>D02 #9 server-class pass, static wireframes.</b> These screens are not a calculator. Every quantity was entered by hand and is checked by <code>bom-arithmetic.py</code>. Every part is a <b>generic placeholder or unverified sponsor shorthand</b>, not a vendor-qualified SKU. Leaf and spine counts are deliberately shown as not estimated. Product terms such as <i>fabric</i> and <i>leaf class</i> are product language only; they are <b>product intent</b>, kept separate from the upstream Fabric object, domain and installation. The mapping follows bridge's draft source evidence (#3, PR #28 <code>b4329a5</code>, review pending) and is always an explicit choice, never inferred from a network's name. Field names are provisional until parts (#6) and model (#8) fixtures land. Rationale: <a href="../server-profile-experience.md">server-profile-experience.md</a>.</p>
 <p class="note"><i>Server</i> means any non-switch device attached to the fabric, including storage arrays, appliances and other endpoints, following Hedgehog's Server concept. The product UI explains this once, on F1.</p>
 
 <nav class="toc" aria-label="Screens">
@@ -73,6 +73,7 @@ svg .dash{stroke-dasharray:5 4}
 <a href="#f3">F3 Customize DPU variant</a><br>
 <a href="#f4">F4 Assign ports to fabric and leaf class</a><br>
 <a href="#f5">F5 Create leaf class in context</a><br>
+<a href="#f5b">F5b Create fabric intent and leaf class from a port with none</a><br>
 <a href="#f6">F6 Return with edits intact</a><br>
 <a href="#f7">F7 Enter population</a><br>
 <a href="#f8">F8 Expanded BOM</a><br>
@@ -95,7 +96,7 @@ svg .dash{stroke-dasharray:5 4}
 <tr><td><span class="tag t-gen">generic</span></td><td>A generic placeholder component, such as a "400G-class optic".</td><td>Contributes <b>quantity</b>. Not orderable: no SKU or price is implied.</td></tr>
 <tr><td><span class="tag t-unk">unknown</span></td><td>Not answered or not decided. "Not decided yet" records no interview event.</td><td>Dependent lines show what is missing. Never counted as zero, never defaulted silently.</td></tr>
 <tr><td><span class="tag t-out">out of scope</span></td><td>External structured or fiber cabling: jumpers, trunks, panels and RJ45 patch cords.</td><td>Disclosed with the quantity basis (for example "800 optical links need external fiber"). Not part of the BOM.</td></tr>
-<tr><td><span class="tag t-unk">compat: unverified</span> <span class="tag t-ok">documented</span> <span class="tag t-bad">mismatch</span></td><td>Compatibility evidence between two ends. This is a separate axis from origin.</td><td>An override is recorded as an engineer choice. It never becomes "documented" or "supported".</td></tr>
+<tr><td><span class="tag t-unk">compat: unverified</span> <span class="tag t-ok">documented</span> <span class="tag t-bad">mismatch</span></td><td>Compatibility evidence between two ends. This is a separate axis from origin.</td><td>An override is recorded as an engineer choice and keeps the original verdict: unknown stays unknown, mismatch stays mismatch (parts CF6). It never becomes "documented" or "supported".</td></tr>
 </table></div></div>
 
 <!-- ============================================================ -->
@@ -109,7 +110,7 @@ svg .dash{stroke-dasharray:5 4}
 <tr class="child"><td>port 1 (rail 1 … rail 8)</td><td class="n">1 each</td><td>—</td><td>—</td><td>same as parent</td></tr>
 <tr><td>▸ DPU, dual-port <span class="tag t-unk">unverified</span></td><td class="n">1</td><td>2×200G?</td><td>DAC <span class="tag t-gen">generic</span></td><td>frontend · <span class="tag t-unk">not chosen</span></td></tr>
 <tr><td>▸ Storage NIC, dual-port</td><td class="n">1</td><td>2×200G</td><td><span class="tag t-unk">unknown</span></td><td>storage · <span class="tag t-unk">not chosen</span></td></tr>
-<tr><td>▸ Onboard (in-band, BMC)</td><td class="n">1</td><td>RJ45</td><td>integrated</td><td>mgmt networks (external)</td></tr>
+<tr><td>▸ Onboard (in-band, BMC)</td><td class="n">1</td><td>RJ45</td><td>integrated</td><td>mgmt networks (external: fixture scope)</td></tr>
 </table></div>
 <div class="pane"><h4>Details: backend NIC</h4><p>Ports: 1. Cage: <span class="field">OSFP?</span><br>Configured mode: 1×400G<br>Rail mapping: NIC n → rail n<br>Medium: optic, generic 400G-class<br>Per-unit lines: none<br><span class="btn">Compare ends…</span></p></div>
 </div>
@@ -143,7 +144,7 @@ svg .dash{stroke-dasharray:5 4}
 <rect class="bx" x="10" y="92" width="240" height="24"/><text x="16" y="109">1 × storage NIC · 2 ports</text><circle cx="530" cy="104" r="7" fill="none" stroke="currentColor" stroke-width="2"/><path class="ln dash" d="M250 104 H523"/>
 <rect class="bx" x="10" y="124" width="240" height="22"/><text x="16" y="140">Onboard · in-band + BMC</text><rect x="598" y="128" width="14" height="14" fill="currentColor"/><path class="ln" d="M250 135 H598"/>
 </svg>
-<p class="note">Solid dot: fabric and leaf class chosen. Hollow dot and dashed line: fabric chosen, leaf class unknown (a valid state). Square: external management network, outside the fabric. Selecting a row or dot selects the same rows in the table below.</p>
+<p class="note">Solid dot: fabric and leaf class chosen. Hollow dot and dashed line: fabric chosen, leaf class unknown (a valid state). Square: management network shown outside the fabric. That is <b>this fixture's scope</b> (server BMC/OOB is outside Hedgehog wiring per #28 §2.1), not a product rule: another class may attach in-band management to a fabric. Selecting a row or dot selects the same rows in the table below.</p>
 <h4>Hardware and ports</h4><p class="note">(the same table as A)</p></div>
 <div class="pane"><h4>Details</h4><p>The selected item's fields, both-ends comparison, per-unit lines and provenance.</p></div></div>
 <p class="ann">The recommendation is a hypothesis to test with review tasks RT1–RT10. The map earns its place only if reviewers find mixed fabrics faster with it than in A. If not, drop it and ship A.</p></div>
@@ -175,16 +176,16 @@ svg .dash{stroke-dasharray:5 4}
 <div class="frame"><div class="cap"><b>F2</b><span>Room to see the whole network profile of one server. Desktop ≥ 1,280 px; narrow widths stack the panes.</span></div>
 <div class="app"><div class="pane"><h4>Project</h4><ul class="tree"><li>Server classes<ul><li class="sel">HGX 8-GPU (B200-class)<br><span class="note">project copy of class r1 · count: <span class="tag t-unk">not entered</span></span></li></ul></li><li>Fabrics (suggested from profile)<ul><li>backend <span class="tag t-cls">suggested</span></li><li>frontend <span class="tag t-cls">suggested</span></li><li>storage <span class="tag t-cls">suggested</span></li></ul></li><li>Leaf classes (none)</li><li>BOM <span class="btn">Generate</span></li></ul></div>
 <div class="pane scroll">
-<div class="strip"><span><b>Per server:</b> 12 fabric ports in 3 attachments</span><span>3 management ports (in-band, host BMC, DPU management; external networks)</span><span>Per-unit lines: 3</span><span>Unknown: 4 <a href="#">show</a></span></div>
+<div class="strip"><span><b>Per server:</b> 12 fabric ports in 3 attachments</span><span>3 management ports (in-band, host BMC, DPU management; external in this fixture)</span><span>Per-unit lines: 3</span><span>Unknown: 4 <a href="#">show</a></span></div>
 <h4>Hardware and ports (treegrid: ←/→ collapses/expands, ↑/↓ moves between rows)</h4>
 <table>
 <tr><th>Item / port</th><th>Qty / server</th><th>Identity</th><th>Cage · mode</th><th>Medium (server end)</th><th>Fabric · leaf class</th><th>Rail · plane</th></tr>
 <tr><td>▾ Backend NIC</td><td class="n">8 <span class="tag t-cls">r1</span></td><td>generic 400G-class <span class="tag t-gen">generic</span></td><td>OSFP? · 1×400G <span class="tag t-unk">cage unverified</span></td><td>optic, 400G-class <span class="tag t-gen">generic</span></td><td>backend · <span class="tag t-unk">leaf class not chosen</span></td><td>rail = NIC index · plane <span class="tag t-unk">unknown</span></td></tr>
 <tr class="child"><td>be1 … be8 (8 ports, collapsed; <a href="#">expand all 8</a>)</td><td class="n">1 per NIC</td><td></td><td>same</td><td>same</td><td>same</td><td>rails 1–8</td></tr>
 <tr><td>▸ DPU (sponsor "BF3" shorthand)</td><td class="n">1</td><td>dual-port <span class="tag t-unk">unverified</span></td><td>? · 2×200G? <span class="tag t-unk">unverified</span></td><td>DAC <span class="tag t-gen">generic</span></td><td>frontend · <span class="tag t-unk">not chosen</span></td><td>—</td></tr>
-<tr class="child"><td>DPU management port (one per physical DPU)</td><td class="n">1</td><td>integrated</td><td>RJ45</td><td>integrated PHY</td><td>BMC/OOB (external)</td><td>—</td></tr>
+<tr class="child"><td>DPU management port (one per physical DPU)</td><td class="n">1</td><td>integrated</td><td>RJ45</td><td>integrated PHY</td><td>BMC/OOB (external: fixture scope)</td><td>—</td></tr>
 <tr><td>▸ Storage NIC</td><td class="n">1</td><td>generic 200G-class <span class="tag t-gen">generic</span></td><td>? · 2×200G</td><td><span class="tag t-unk">not decided yet</span></td><td>storage · <span class="tag t-unk">not chosen</span></td><td>—</td></tr>
-<tr><td>▸ Onboard</td><td class="n">1</td><td>included in server</td><td>RJ45 ×2</td><td>integrated PHY</td><td>in-band mgmt · BMC/OOB (external)</td><td>—</td></tr>
+<tr><td>▸ Onboard</td><td class="n">1</td><td>included in server</td><td>RJ45 ×2</td><td>integrated PHY</td><td>in-band mgmt · BMC/OOB (external: fixture scope)</td><td>—</td></tr>
 </table>
 <h4>Per-unit BOM lines (any item, including ones outside the topology)</h4>
 <table><tr><th>Line</th><th>Qty / server</th><th>Purchase</th><th>Affects topology?</th></tr>
@@ -230,12 +231,40 @@ Fabric <span class="field">backend (existing) ▾</span><br>
 <p>Switch model <span class="field">Not chosen yet ▾</span></p>
 <table><tr><th>Model option</th><th>Source</th><th>Support</th></tr>
 <tr><td>Not chosen yet</td><td>—</td><td>—</td></tr>
-<tr><td>Source-derived profile, e.g. <code>celestica-ds5000</code></td><td>imported, Fabric profile at a pinned release</td><td><span class="tag t-unk">pending compat #3</span></td></tr>
-<tr><td>Manual model…</td><td>local, engineer-described</td><td>not established by entry</td></tr>
-<tr><td>Placeholder ("800G-class leaf")</td><td>placeholder</td><td>none</td></tr></table>
+<tr><td>Source-derived profile, e.g. <code>celestica-ds5000</code></td><td>compiled SwitchProfile, release 26.05</td><td><span class="tag t-unk">documented-supported for the listed roles; this role and features still checked</span></td></tr>
+<tr><td>Gated profile (behind a config flag)</td><td>compiled, not default</td><td><span class="tag t-unk">catalog-gated</span></td></tr>
+<tr><td>Manual model…</td><td>local, engineer-described</td><td><span class="tag t-unk">manual · support: unverified</span></td></tr>
+<tr><td>Placeholder ("800G-class leaf")</td><td>placeholder, no profile</td><td><span class="tag t-unk">placeholder</span></td></tr></table>
+<p class="note">Support values use bridge's proposed vocabulary (#28 §4.3; draft, review pending). A profile's presence proves representability only; a manual model never becomes installation-ready without a recorded authority decision. A leaf class resolves to exactly one upstream Fabric (a Switch has one <code>topology.fabric</code>); it is not a <code>SwitchGroup</code>.</p>
 <p>Per-unit lines for this leaf class: <span class="btn">+ Add</span></p>
 <p><span class="btn p">Create and assign to 8 ports</span> <span class="btn">Discard draft</span></p>
-<p class="note">After Create, focus returns to the leaf-class cell of be1. A profile's presence in source is not support proof; support status is a separate column.</p></div></div></div>
+<p class="note">After Create, focus returns to the leaf-class cell of be1. Support status is a separate column from source. This case starts in an <i>existing</i> fabric intent; F5b shows the case where the port has none yet.</p></div></div></div>
+
+<h2 id="f5b">F5b Create fabric intent and its leaf class from a port with none</h2>
+<div class="frame"><div class="cap"><b>F5b</b><span>Same non-modal panel, two sections, not a wizard. Alternate start, not a continuation of F5: the project began from "No separate storage network" (F1), so it has fabric intents backend and frontend only; the engineer then adds a storage NIC and selects st1–st2. The unsaved DPU customization from F3 is intact.</span></div>
+<div class="app side"><div class="pane scroll"><p class="note">(the editor stays visible; st1–st2 are highlighted)</p>
+<table><tr><th>Port</th><th>Fabric</th><th>Leaf class</th></tr>
+<tr class="sel"><td>st1–st2</td><td><span class="field">— none — ▾</span></td><td><span class="tag t-unk">not chosen</span></td></tr></table>
+<p><b>Fabric menu:</b> <span class="field">— none (valid) —</span> · <span class="field">existing: backend, frontend</span> · <span class="field">+ New fabric intent…</span></p>
+<p class="note">Choosing "+ New fabric intent…" opens the panel. The leaf-class menu stays usable but lists nothing until a fabric intent exists.</p></div>
+<div class="pane panel"><h4>1. Fabric intent (product)</h4>
+<p>Name <span class="field">storage</span> <span class="note">No existing intent matches. A name matching an existing one asks "Use existing frontend?"; nothing is merged by name.</span></p>
+<p>Upstream mapping <span class="field">Not decided yet ▾</span></p>
+<table><tr><th>Upstream mapping option</th><th>Meaning (#28 draft)</th></tr>
+<tr><td>Not decided yet (valid)</td><td>Product intent only; no export until decided</td></tr>
+<tr><td>Its own Fabric in installation <i>main</i></td><td>New upstream Fabric object, same controller</td></tr>
+<tr><td>A domain of an existing Fabric…</td><td>Plane-style split inside one Fabric</td></tr>
+<tr><td>A separate installation…</td><td>Another controller; the server gets a second upstream Server object (hh-aid keeps one physical identity)</td></tr></table>
+<p class="note">There is no default. The purpose ("storage") never selects a Fabric, domain or installation on its own.</p>
+<h4>2. Leaf class (optional now)</h4>
+<p>Name <span class="field">storage-leaf</span> · Switch model <span class="field">Not chosen yet ▾</span> · <a href="#">Skip: create fabric intent only</a></p>
+<p><span class="btn p">Create and assign to st1–st2</span> <span class="btn">Cancel</span></p>
+<table><tr><th>What happens</th><th>Identity result</th></tr>
+<tr><td>Create</td><td>Draft IDs become one fabric intent and one leaf class; st1–st2 reference them; focus returns to st1's leaf-class cell</td></tr>
+<tr><td>Create pressed twice, or retried after a network error</td><td>The same draft IDs are reused, so there is no second "storage"</td></tr>
+<tr><td>Cancel before Create</td><td>Nothing is created; st1–st2 stay "none (valid)"; the draft is kept for retry until discarded</td></tr>
+<tr><td>Skip leaf class</td><td>Fabric intent created; st1–st2 get fabric "storage", leaf class unresolved (hollow on the map)</td></tr>
+<tr><td>Later discard of the fabric intent</td><td>Allowed only after listing every port and class that references it; no dangling references</td></tr></table></div></div></div>
 
 <h2 id="f6">F6 Return with edits intact</h2>
 <div class="frame"><div class="cap"><b>F6</b><span>Back in the editor, with a change summary</span></div>
@@ -288,25 +317,34 @@ How many servers of this class? <span class="field">100</span> <span class="note
 <tr><td>Storage NIC, 200G-class <span class="tag t-gen">generic</span></td><td class="n">1</td><td><span class="field">storage (existing) ▾</span> · <span class="tag t-unk">not chosen</span></td></tr>
 <tr class="child"><td>st1, st2</td><td class="n">2 ports</td><td>same</td></tr>
 <tr><td>Drive, generic</td><td class="n">24</td><td>— (not topology)</td></tr>
-<tr><td>Onboard in-band + BMC</td><td class="n">1</td><td>mgmt (external)</td></tr></table>
+<tr><td>Onboard in-band + BMC</td><td class="n">1</td><td>mgmt (external: fixture scope)</td></tr></table>
 <p>Fabric menu order: <b>existing fabrics first</b> (backend, frontend, storage), then "+ Create fabric…". Typing "storage" offers the existing fabric instead of creating "storage-2".</p>
 <div class="bar">BOM after regenerating: storage-fabric links 200 + 24 = 224 · drives 24 × 12 = 288 · servers 100 + 12 = 112 in two populations</div></div></div></div>
 
 <!-- ============================================================ -->
 <h2 id="e1">E1 Both-ends comparison with explainable filters</h2>
-<div class="frame"><div class="cap"><b>E1</b><span>Backend port (be1–be8, same pattern) ↔ backend-leaf port. Opened from the details panel with "Compare ends".</span></div>
+<div class="frame"><div class="cap"><b>E1</b><span>Backend port (be1–be8, same pattern) ↔ backend-leaf port. Opened from the details panel with "Compare ends". The engineer is choosing the <b>module for End B</b>.</span></div>
 <div class="app one"><div class="pane scroll">
-<p>Filters: <span class="btn">☑ Same cage family</span> <span class="btn">☑ Same lane rate × lanes</span> <span class="btn">☐ Documented pairs only</span> <span class="btn">☑ Show unknown</span> <span class="btn">☐ Show mismatches</span> <a href="#">Why is an option hidden?</a></p>
-<table class="cmp"><tr><th>Attribute</th><th>End A: server be1</th><th>End B: backend-leaf port</th><th>Status</th><th>Evidence / action</th></tr>
-<tr><td>Cage / form factor</td><td>OSFP? <span class="tag t-unk">unverified</span></td><td><span class="tag t-unk">leaf model not chosen</span></td><td><span class="tag t-unk">unknown</span></td><td>Choose a leaf model, or supply the NIC cage source</td></tr>
-<tr><td>Configured mode · electrical lanes</td><td>1×400G · 4×100G? </td><td>—</td><td><span class="tag t-unk">unknown</span></td><td>Mode names do not prove lane signalling</td></tr>
-<tr><td>Medium</td><td>optic, generic 400G-class</td><td>optic, generic 400G-class</td><td><span class="tag t-unk">compat: unverified</span></td><td>Generic placeholders contribute quantity only</td></tr>
-<tr><td>Optical PMD · reach class</td><td><span class="field">DR4? ▾</span></td><td><span class="field">DR4? ▾</span></td><td><span class="tag t-unk">unverified</span></td><td>The names match; that is not compatibility evidence</td></tr>
-<tr><td>Connector · fiber · polarity</td><td>MPO-12? SMF</td><td>MPO-12? SMF</td><td><span class="tag t-unk">unverified</span></td><td>Polarity relates to external cabling (out of scope, requirement kept)</td></tr>
-<tr><td>Assembly ends</td><td colspan="2">Separate optics: 1 module per end, plus external fiber (out of scope)</td><td>—</td><td>Integrated DAC/AEC/AOC: 1 assembly, both ends</td></tr>
-<tr><td>Override</td><td colspan="2"><span class="field">Engineer choice: use DR4 at both ends</span> by user, reason required</td><td><span class="tag t-cust">override</span></td><td>Recorded. Compatibility stays "unverified"; it never becomes "documented" or "supported".</td></tr>
+<p><b>Filtering:</b> candidate modules or assembly ends for <b>End B, the backend-leaf port</b> (host: leaf switch, model not chosen).</p>
+<p>Filters: <span class="btn">☑ Fits End B's own host cage</span> <span class="btn">☑ Fits End B's own host mode and electrical lanes</span> <span class="btn">☑ Optical interface matches End A's module (PMD, reach, connector)</span> <span class="btn">☐ Documented pairs only</span> <span class="btn">☑ Show unknown</span> <span class="btn">☐ Show mismatches</span> <a href="#">Why is an option hidden?</a></p>
+<p class="note">Each filter names the component it tests and what it is tested against. Host fit is checked <b>per end, against that end's own host</b>: the End B module must fit the leaf port, and the End A module must fit the server NIC. End B is <b>not</b> required to share End A's cage form factor or electrical lane count just because it is the other end. Only the link-side attributes (optical PMD, reach, connector and fiber, or one integrated assembly) are compared across the two ends. With the leaf model not chosen, the host-fit filters for End B hide nothing and every option shows <span class="tag t-unk">unknown</span> for host fit: "Hidden: 0 for End B host fit (leaf model not chosen) · Hidden: 3 with a different optical interface from End A's module (source: class r1 PMD field)".</p>
+<table class="cmp"><tr><th>Attribute</th><th>Checked against</th><th>End A: module in server be1</th><th>End B: module in backend-leaf port</th><th>Status</th><th>Evidence / action</th></tr>
+<tr><td>Host cage fit</td><td>each end's own host</td><td>OSFP? in NIC cage OSFP? <span class="tag t-unk">unverified</span></td><td><span class="tag t-unk">leaf model not chosen</span></td><td>A <span class="tag t-unk">unverified</span> · B <span class="tag t-unk">unknown</span></td><td>Choose a leaf model, or supply the NIC cage source</td></tr>
+<tr><td>Host mode · electrical lanes</td><td>each end's own host</td><td>1×400G · 4×100G? </td><td>—</td><td>A <span class="tag t-unk">unverified</span> · B <span class="tag t-unk">unknown</span></td><td>Mode names do not prove lane signalling. The two ends' electrical lanes may differ</td></tr>
+<tr><td>Medium</td><td>link</td><td>optic, generic 400G-class</td><td>optic, generic 400G-class</td><td><span class="tag t-unk">compat: unverified</span></td><td>Generic placeholders contribute quantity only</td></tr>
+<tr><td>Optical PMD · reach class</td><td>link (A module ↔ B module)</td><td><span class="field">DR4? ▾</span></td><td><span class="field">DR4? ▾</span></td><td><span class="tag t-unk">unverified</span></td><td>The names match; that is not compatibility evidence</td></tr>
+<tr><td>Connector · fiber · polarity</td><td>link</td><td>MPO-12? SMF</td><td>MPO-12? SMF</td><td><span class="tag t-unk">unverified</span></td><td>Polarity relates to external cabling (out of scope, requirement kept)</td></tr>
+<tr><td>Assembly ends</td><td>each end's own host</td><td colspan="2">Separate optics: 1 module per end, plus external fiber (out of scope). Integrated DAC/AEC/AOC: 1 purchase identity whose two ends each fit their own host; the ends may have different form factors</td><td>—</td><td>Unequal-host example requested from parts #6 (pending)</td></tr>
 </table>
-<p class="note">Filter rules explain themselves. For example: "Hidden: 3 options with a different cage family from end A (source: class r1 cage field)". Unknown is shown unless the engineer filters it out, and the count of hidden options is always visible. A known mismatch is hidden from the compatible list but stays inspectable under "Show mismatches", with both values kept. It is never auto-corrected. Parts' SU-COMPARE-1 (DR4 at one end, FR4 at the other: same 400G, different optical interfaces) is the reference mismatch case. Rule IDs follow parts CF1–CF7.</p></div></div></div>
+<h4>Unequal host form factors (pattern; sourced example pending parts #6)</h4>
+<table><tr><th>End A host</th><th>End A module or assembly end</th><th>Link side</th><th>End B module or assembly end</th><th>End B host</th><th>Result</th></tr>
+<tr><td>cage family X</td><td>fits X</td><td>same PMD, reach and connector class</td><td>fits Y</td><td>cage family Y ≠ X</td><td>Not a mismatch by itself. The status comes from evidence for each host fit plus the link side</td></tr></table>
+<p class="note">The letters X and Y are placeholders. No real module, cage pair or electrical presentation is claimed here; lead asked parts for one bounded, primary-source example (6727963231).</p>
+<h4>Overrides keep the original verdict (parts CF6)</h4>
+<table><tr><th>Case</th><th>Verdict before</th><th>Engineer override</th><th>Verdict after</th><th>Shown in BOM and outputs</th></tr>
+<tr><td>Unknown: DR4? at both ends, no evidence</td><td><span class="tag t-unk">unknown</span></td><td><span class="field">Use DR4 at both ends</span> · by user, time, reason required</td><td><span class="tag t-unk">unknown</span> + <span class="tag t-cust">override</span></td><td>"unknown · overridden by engineer"; never "documented" or "supported"</td></tr>
+<tr><td>Mismatch: SU-COMPARE-1, DR4 at End A, FR4 at End B (same 400G, different optical interfaces)</td><td><span class="tag t-bad">mismatch</span> (source: parts SU-COMPARE-1)</td><td><span class="field">Keep DR4 ↔ FR4</span> · by user, time, reason required</td><td><span class="tag t-bad">mismatch</span> + <span class="tag t-cust">override</span></td><td>"mismatch · overridden by engineer", with both values; flagged on every BOM and export line until resolved</td></tr></table>
+<p class="note">Unknown and evidence-backed mismatch are different states and are never merged. An override records an engineer decision; it does not change the verdict and is not qualification. A known mismatch is hidden from the compatible list but stays inspectable under "Show mismatches", with both values kept. It is never auto-corrected. Rule IDs follow parts CF1–CF7.</p></div></div></div>
 
 <!-- ============================================================ -->
 <h2 id="l1">L1 Edit scope: this project versus the class</h2>
@@ -350,9 +388,10 @@ How many servers of this class? <span class="field">100</span> <span class="note
 <tr><td>RT5 Leave the storage medium undecided and generate</td><td>F2, F8</td><td>Is "media not counted; not zero" clear?</td></tr>
 <tr><td>RT6 Find why there are 800 backend NICs</td><td>F8 trace</td><td>Is per-unit × count visible without help?</td></tr>
 <tr><td>RT7 Add a storage-server class that reuses the storage fabric</td><td>F9</td><td>Is the existing fabric chosen rather than a new one created?</td></tr>
-<tr><td>RT8 Compare both ends of a backend link; record an override</td><td>E1</td><td>Is it understood that the override is not qualification?</td></tr>
+<tr><td>RT8 Compare both ends of a backend link; record an override on an unknown and on a known mismatch</td><td>E1</td><td>Does each filter say which end it tests? Is it understood that the override keeps "unknown" or "mismatch" and is not qualification?</td></tr>
 <tr><td>RT9 Change one value for this project only, then adopt class r2</td><td>L1, L2</td><td>Is the scope choice understood? Does the customization survive?</td></tr>
 <tr><td>RT10 Say what the BOM does not include</td><td>F8 excluded, K</td><td>External cabling disclosed; generic parts not orderable</td></tr>
+<tr><td>RT11 From storage ports with no fabric, create the storage fabric intent and its leaf class; cancel once, then retry</td><td>F5b</td><td>Edits intact? One "storage" after retry? Is "upstream mapping: not decided" understood as valid, not defaulted?</td></tr>
 </table>
 <h3>Sponsor feedback (main 4449d14) → screens</h3>
 <table><tr><th>Feedback point</th><th>Screens</th></tr>
@@ -364,7 +403,7 @@ How many servers of this class? <span class="field">100</span> <span class="note
 <tr><td>Arbitrary per-unit lines, ×100 expansion, bundled versus separate, shared assemblies counted once</td><td>F2, F8</td></tr>
 <tr><td>Physical detail at both ends; filters; unknowns and overrides visible</td><td>E1, K</td></tr>
 <tr><td>Port → fabric and leaf class; leaf class resolves fabric; partial intent valid</td><td>F4, F5</td></tr>
-<tr><td>Create or reuse a fabric or leaf class in context, without duplicates</td><td>F5, F9</td></tr>
+<tr><td>Create or reuse a fabric or leaf class in context, without duplicates</td><td>F5, F5b, F9</td></tr>
 <tr><td>Source-derived, manual and placeholder switch models with support status</td><td>F5</td></tr>
 <tr><td>External cabling excluded and disclosed; transceivers and assemblies included</td><td>F8, K, E1</td></tr>
 <tr><td>Compare interaction styles; canvas optional</td><td>A, B, C</td></tr>

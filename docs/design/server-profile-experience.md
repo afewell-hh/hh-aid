@@ -1,6 +1,6 @@
 # D02 addendum: server-class-first profile experience
 
-**Status:** draft for review (issue #9, lead assignment [6726546239](https://github.com/afewell-hh/hh-aid/issues/9#issuecomment-6726546239)). It is not approved and not a production design. No SE sessions or interviews have taken place, and none are claimed.
+**Status:** draft for review (issue #9, lead assignment [6726546239](https://github.com/afewell-hh/hh-aid/issues/9#issuecomment-6726546239)). It is not approved and not a production design. This revision applies lead's four bounded corrections ([6727963025](https://github.com/afewell-hh/hh-aid/issues/9#issuecomment-6727963025)) to `8c3e325`: E1 filter scope, override verdicts, fabric creation from a port with none (F5b), and #28 mapping evidence. No SE sessions or interviews have taken place, and none are claimed.
 **Author:** t5 / ux. **Baseline:** main `4449d14` (sponsor feedback dated 2026-11-08).
 **Previous checkpoint:** D02 revision 3.1 (PR #24 at `7da2b0c`) is unchanged. It remains the reference for the persistent workspace, regeneration, stale/diff, conditional alternatives and starter-library views. This addendum replaces only its from-scratch *endpoint/links-per-endpoint* interaction.
 
@@ -17,7 +17,7 @@
 - parts' field/fixture matrix (#6, `docs/research/server-unit-bom.md`);
 - model's contract fixture (#8, `docs/design/server-class-contract.md`).
 
-Product words such as *fabric* and *leaf class* are product language. How they map to upstream Fabric, domain and plane objects is owned by compat (#3, `docs/research/fabric-profile-contract.md`). No such mapping is assumed here.
+Product words such as *fabric* and *leaf class* are product intent. Their mapping to the upstream Fabric object, domain and installation now uses bridge's draft source evidence: #3, PR #28 at [`b4329a5`](https://github.com/afewell-hh/hh-aid/blob/b4329a5f8107ef8bf64ede045992187461f552da/docs/research/fabric-profile-contract.md), author bridge, independent review pending. §3.1 lists what this pass adopts from it and what stays open.
 
 ## 1. What the sponsor asked for, and what this pass changes
 
@@ -59,7 +59,7 @@ Reused from appendix A: GOV.UK Check answers (review before regenerating) and NN
 
 No new survey was done. These sources inform layout and keyboard choices only. They do not establish which alternative SEs will perform best with. That is what the review tasks in §10 are for.
 
-## 3. Vocabulary (product language; upstream mapping pending compat #3)
+## 3. Vocabulary (product intent; upstream terms per draft #28, review pending)
 
 | Term | Meaning in this design | Not the same as |
 | --- | --- | --- |
@@ -70,11 +70,26 @@ No new survey was done. These sources inform layout and keyboard choices only. T
 | **Population** | The count (or range) of physical servers of one project copy | A per-fabric endpoint count |
 | **Hardware item** | A NIC, DPU, storage controller or onboard interface, with a quantity per server | — |
 | **Port** | A logical port on a hardware item, with cage, configured mode and server-end medium | A link |
-| **Attachment** | The port's fabric and leaf class, plus its rail and plane tags | An upstream Connection object |
-| **Fabric** (product) | A named network the engineer is designing, such as backend, frontend or storage | Upstream `Fabric`, domain or plane (pending #3) |
-| **Leaf class** | A switch role and model choice inside one fabric. The model may be "not chosen yet" | A switch instance |
+| **Attachment** | The port's fabric intent and leaf class, plus its rail and plane tags | An upstream Connection (each Connection belongs to exactly one upstream Fabric, #28) |
+| **Fabric intent** (product; "fabric" in the screens) | The network purpose a server port is meant to join, such as backend, frontend or storage. Bridge's glossary calls this a *network* | The upstream Fabric object, a domain or an installation |
+| **Upstream mapping** | An explicit, per-fabric-intent choice: not decided yet (valid), its own Fabric in an installation, a domain of an existing Fabric, or a separate installation. Never defaulted from the purpose name | — |
+| **Upstream Fabric** (#28) | One spine-leaf topology inside one installation | Older docs' use of "fabric" for a whole installation |
+| **Domain** (#28) | A spine set inside one Fabric; a plane may map to one domain | A rail, a redundancy group or a VPC |
+| **Installation** (#28) | One controller plus its `fab.yaml`; it can hold several Fabrics since 26.05 | A Fabric |
+| **Leaf class** | A switch role and model choice inside one fabric intent. The model may be "not chosen yet". It resolves to exactly one upstream Fabric once mapped (#28 §2.1) | A switch instance; upstream `SwitchGroup` |
 | **Per-unit line** | Any BOM item with quantity per server (or per switch), including items outside the topology | — |
 | **Assembly** | DAC/AEC/AOC/breakout: one item spanning two or more ends, counted once per instance (R05 §4) | Two transceivers |
+
+### 3.1 What this pass adopts from #28 (draft evidence, review pending)
+
+- **One physical server, one population.** Upstream `Server` has no fabric or domain field, and one server may have Connections into several Fabrics of one installation (#28 §1, executed). The screens keep one population per class across every attachment.
+- **Separate installations.** Ports that attach to a separate installation need a second upstream `Server` object there, so hh-aid owns the physical-server identity (#28 §2.1, inference; Q-FP-1 open). F5b shows this only as an upstream-mapping option.
+- **No default mapping.** Whether a fabric intent becomes its own Fabric or a domain of a shared Fabric is an open D01/D02 choice (#28 handoff). The screens make it an explicit field whose valid default is "not decided yet"; they never infer it from a name such as "storage".
+- **Bundles stay within one Fabric.** An ESLAG or bundled Connection cannot span Fabrics (#28, executed N1/N2). The F4 conflict rule already prevents a silent move; a cross-Fabric bundle would be a visible conflict.
+- **Switch-model support vocabulary.** F5 uses #28 §4.3: `documented-supported`, `catalog-gated`, `virtual-only`, `api-accepted-not-documented`, `manual` (support: unverified) and `placeholder`. A profile's presence proves representability only.
+- **Management networks.** #28 §2.1 places server BMC/OOB outside Hedgehog wiring (citing R06 O1). In this fixture in-band management and all BMC/DPU management ports are shown as external networks. That is **this fixture's scope**, not a product rule: another server class may attach in-band management to a fabric intent.
+
+Still open from #28: Q-FP-1 (one server across two installations), Q-FP-6 (criteria for several Fabrics versus separate installations), and topo's independent review.
 
 ## 4. Tasks and criteria used to compare interactions
 
@@ -138,9 +153,13 @@ Each step is optional except where noted. There is no forced sequence: the proje
    - Rails are never renumbered by a batch action.
 5. **F5 Create a leaf class in context.** A non-modal side panel (P2, P6) keeps the table and any unsaved edits (the F3 customization) intact.
    - Duplicate prevention: an existing fabric "backend" is reused, and the name check stops a second "backend-leaf".
-   - Switch model may be **Not chosen yet**, a source-derived profile (status pending compat #3), a manual model or a placeholder. Source and support are separate columns: a profile's presence in the source is not support proof, and manual entry does not establish deployability.
+   - Switch model may be **Not chosen yet**, a source-derived profile, a gated profile, a manual model or a placeholder. Source and support are separate columns, and support uses #28 §4.3's vocabulary (§3.1). A profile's presence in the source is not support proof; a manual model shows `manual · support: unverified` and is never installation-ready without a recorded authority decision.
    - The leaf class can carry its own per-unit lines.
    - Create assigns the leaf class to the selected ports and returns focus to the originating cell. Closing the panel keeps it as a draft until it is discarded.
+   - **F5b, a port with no fabric intent yet.** An alternate start: the project began from "No separate storage network", so only backend and frontend intents exist, and the engineer adds a storage NIC. From st1–st2, "+ New fabric intent…" opens the same non-modal panel with two sections, not a wizard:
+     1. Fabric intent: name, with an explicit "use existing?" prompt on a matching name, and an upstream mapping that defaults to "not decided yet" (§3.1).
+     2. Leaf class: optional now; "Skip" creates the fabric intent only, leaving the leaf class unresolved.
+   - Cancel and retry keep identity. Cancel before Create creates nothing and keeps the draft for retry. Create pressed twice or retried reuses the same draft IDs, so there is never a second "storage". A fabric intent can be discarded only after listing everything that references it. The F3 customization stays intact throughout.
 6. **F6 Return with edits intact.** A strip lists the changes since the last generate (customization, assignment, new leaf class), with undo. The customized row shows both values: "2 × single-port (class: 1 × dual-port)".
 7. **F7 Enter the population.** "How many servers of this class?" is answered once, on the class: 100 (ranges allowed).
    - There is no per-fabric server count.
@@ -199,9 +218,9 @@ Parts posted [server-unit-bom.md at 0230cd8](https://github.com/afewell-hh/hh-ai
 - An edit can be scoped to split a population ("only some servers", with occurrence IDs kept). An edit to a shared customization lists every affected population (L1).
 - Known mismatches are hidden from the compatible list but stay inspectable; the filter rules follow CF1–CF7. SU-COMPARE-1 (DR4 versus FR4) is the reference mismatch (E1).
 
-**UX questions back to them** (not blockers):
-- Parts and model differ on whether NICs and DPUs are bundled in the server. Should the UI's default for an unknown inclusion be "unresolved" (as in the screens), or should a family default be allowed to assume it?
-- Should the server-end and far-end optic of one link show as one requirement row with two ends, or as two rows that reference one requirement? The screens use two rows under connection media.
+**UX questions back to them, answered by lead** ([6727963025](https://github.com/afewell-hh/hh-aid/issues/9#issuecomment-6727963025)):
+- Unknown bundle inclusion stays unresolved unless a visible sourced or assumed configuration supplies it; it is never zero by default. The screens already do this (F8).
+- Two optic BOM rows are acceptable if both link to the same connection requirement with distinct component identities; an integrated assembly keeps one purchase identity. The screens already use two rows under connection media.
 
 ## 7. Nested hardware, ports and both ends
 
@@ -228,21 +247,30 @@ Generic parts contribute quantity but are never shown as orderable. Unknown neve
 
 ### 7.3 Both-ends comparison (E1)
 
-The view has one row per attribute: cage, mode and lanes, medium, PMD and reach, connector/fiber/polarity, and assembly ends. It has an End A column, an End B column, a status and an evidence/action column.
+The view has one row per attribute: host cage fit, host mode and electrical lanes, medium, PMD and reach, connector/fiber/polarity, and assembly ends. Columns are the attribute, **what it is checked against**, End A, End B, status, and evidence/action.
 
-**Filters:**
-- same cage family;
-- same lane rate × lanes;
+**What is compared with what.** In the first draft, filters such as "same cage family" and "same lane rate × lanes" mixed up a module fitting its own host with the two ends interoperating. They are replaced:
+- **Host fit is per end.** Each selected module or assembly end must fit its *own* host: End A against the server NIC cage and mode, End B against the leaf port. End B is not required to share End A's cage form factor or electrical lane count.
+- **Link-side attributes are compared across ends:** optical PMD, reach, connector and fiber, or a single integrated assembly.
+
+**Filters**, each naming the component under selection (the screen shows End B, the backend-leaf port):
+- fits End B's own host cage;
+- fits End B's own host mode and electrical lanes;
+- optical interface matches End A's module (PMD, reach, connector);
 - documented pairs only (off by default);
-- show unknown (on by default).
+- show unknown (on by default);
+- show mismatches (off by default).
 
-Each filter states its source, and the count of hidden options is always visible ("Hidden: 3 options with a different cage family from end A (source: class r1)").
+Each filter states its source, and the count of hidden options is always visible. With the leaf model not chosen, the End B host-fit filters hide nothing and show host fit as unknown.
+
+**Unequal host form factors.** E1 shows the pattern with placeholder cage families X ≠ Y: each end fits its own host and the link side agrees, so the inequality is not a mismatch by itself. No real cage pair, module or electrical presentation is claimed. Lead asked parts for a bounded primary-source example with the right PMD/assembly checks ([6727963231](https://github.com/afewell-hh/hh-aid/issues/6#issuecomment-6727963231)); it will replace X/Y when it lands.
 
 **Other rules:**
 - Matching names (for example DR4 at both ends) is never shown as compatibility evidence.
+- Unknown and evidence-backed mismatch are distinct states and are never merged.
 - A mismatch keeps both values and is never auto-corrected.
-- An override records the engineer, a reason and the time. Its compatibility stays "unverified", never "documented" or "supported".
-- Connector and polarity requirements stay visible even though external fiber is out of scope. They are the interface requirements the sponsor asked us to keep.
+- **An override preserves the original verdict (parts CF6).** It records the engineer, a reason and the time. A known mismatch stays *mismatch + override*; an unknown stays *unknown + override*. Neither becomes "documented" or "supported", and outputs carry the flag until resolved. E1 shows both cases; the mismatch case is parts' SU-COMPARE-1 (DR4 versus FR4).
+- Connector and polarity requirements stay visible even though external fiber is out of scope. They are the interface requirements the sponsor asked us to keep, and excluding the cabling from the BOM does not mean it is unnecessary.
 
 ## 8. Lifecycle: class revision versus project customization (L1–L3)
 
@@ -265,6 +293,7 @@ Each filter states its source, and the count of hidden options is always visible
 - **In scope:** server and switch lines, per-unit lines, NIC/DPU quantities, transceivers at each end of an optical link, and integrated DAC/AEC/AOC and breakout assemblies (counted per assembly instance).
 - **Outside scope, disclosed:** external structured or fiber cabling (jumpers, trunks, panels, polarity components) and RJ45 patch cords. Each is shown with its quantity basis and with the interface requirements kept.
 - **Not estimated in these screens:** leaf and spine counts, which need a chosen leaf model and the planning engine. No solver was built, per lead's instruction.
+- **Management networks:** shown as external in this fixture only (§3.1); not a universal product rule.
 - **Unverified throughout:** every NIC/DPU cage, mode and port count; the sponsor's "BF3" variants; the HGX B200-class profile; bundling (included in server SKU or not). The screens label these, and parts' primary-source evidence would replace them.
 
 ## 10. Review tasks and feedback-to-screen map
@@ -277,24 +306,25 @@ Screen M lists RT1–RT10, with the screens and what to look for in each:
 - RT5 undecided storage medium;
 - RT6 trace 800 NICs;
 - RT7 second class reusing the storage fabric;
-- RT8 both-ends comparison and override;
+- RT8 both-ends comparison, with an override on an unknown and on a known mismatch;
 - RT9 project versus class scope and adopting r2;
-- RT10 what the BOM excludes.
+- RT10 what the BOM excludes;
+- RT11 create a fabric intent and its leaf class from a port with none, cancelling once and retrying.
 
 Screen M also maps every sponsor feedback point to its screens.
 
 Suggested reviewers:
-- lead and sponsor for interaction (RT1–RT5, RT7, RT9);
+- lead and sponsor for interaction (RT1–RT5, RT7, RT9, RT11);
 - parts for RT6, RT8 and RT10 field semantics;
-- model for RT3, RT4 and RT9 identity and count rules.
+- model for RT3, RT4, RT9 and RT11 identity and count rules.
 
 ## 11. Open items by owner
 
 | Owner | Needed from them | Used in |
 | --- | --- | --- |
-| parts #6 | Drafted (SU-FIELDS, SU-COMPARE, CF1–CF7; §6.1). Still open: evidence for real NIC/DPU cages and modes; bundle contents; the two UX questions in §6.1 | F2, E1, F8 columns |
+| parts #6 | Drafted (SU-FIELDS, SU-COMPARE, CF1–CF7; §6.1). Still open: evidence for real NIC/DPU cages and modes; bundle contents; the unequal-host-form-factor example (§7.3). Review of #27 in progress | F2, E1, F8 columns |
 | model #8 | Drafted (identity, edit scope, in-context creation, counting; §6.1). Still open: final IDs after parts/compat review; the presentation rule for population split | F3, F6, L1–L3, F8 |
-| compat #3 | How the product terms fabric and leaf class map to upstream Fabric, domain and plane; whether one Server may attach to multiple Fabrics or domains; source switch-profile discovery and support status; the manual-model boundary | F4, F5 model picker, glossary |
+| bridge #3 (PR #28, draft; topo review pending) | Drafted and adopted as draft evidence (§3.1). Still open: Q-FP-1, Q-FP-6, review outcome; final support vocabulary | §3, F5, F5b, map note |
 | sponsor / lead | Whether to keep the map (C) or ship A; whether project-only is the right default scope; the family list for a first library | §5, L1, F1 |
 
 ## 12. Acceptance self-check (to be verified by reviewers, not self-approved)
@@ -304,7 +334,7 @@ Suggested reviewers:
 | Enough space to inspect a whole server network profile | F2: tree, summary, map, treegrid, per-unit lines and details panel on one desktop screen |
 | No duplicate population per fabric | F7 and the script assertion: 100 servers regardless of attachments; F9 shows two populations, 112 servers |
 | Per-unit BOM multiplication visible | F8 columns and trace; worked arithmetic table |
-| Contextual fabric creation preserves work | F5 non-modal panel, draft kept, focus return; F6 change strip |
+| Contextual fabric creation preserves work | F5 (leaf class in an existing fabric intent) and F5b (new fabric intent and leaf class from a port with none, cancel/retry identity); non-modal panel, draft kept, focus return; F6 change strip |
 | Alternatives compared fairly | §5 table, fairness notes and decision rule; screens A/B/C |
 
 ### Checks run
