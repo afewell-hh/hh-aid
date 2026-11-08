@@ -6,6 +6,18 @@ hh-aid should help an engineer move from an early request such as “eight NVL72
 
 The application must eventually cover exactly the topology space supported by a specified Hedgehog Fabric release and its compatible hardware/software. A capability inventory and a coverage ledger are required before anyone claims completeness. A limited first release is a delivery sequence, not a redefinition of the ultimate scope.
 
+## Sponsor decisions: audience, delivery order and release currency
+
+Confirmed by the sponsor in this conversation after the R01–R06 research reviews:
+
+- **Initial audience:** Hedgehog SEs, with possible access for selected partner SEs. Public self-service is not the initial target.
+- **Primary outputs and delivery order:** a BOM first, then a connection map. Both are required ultimately. BOM generation is useful in its own right and is the first delivery priority; a complete connection-map export must not be a prerequisite for the first useful BOM.
+- **Installation target:** Hedgehog installs the latest release. hh-aid must be optimized to keep design assets current with that release, rather than keeping a project indefinitely on its original software version. The sponsor reports that changes between releases are usually modest and that 26.05 was unusually extensive; this is operating context, not a guarantee about future compatibility.
+
+Design implications to carry into D01–D06: retain exact release, source, rule and catalog versions for reproducibility of each generated revision, while separately tracking the current installation target. Offer release-change detection, impact review, revalidation and regeneration into a new revision; preserve previous approvals, user overrides, ordered parts and meaningful diffs. A version recorded in an artifact is evidence provenance, not a policy to install that old version. If latest-release evidence is missing or validation fails, show the affected assets as needing review rather than claiming they are current. Research pins for 26.05 remain historical evidence; verify the actual latest supported release composition before a current-release claim. Decide release-channel selection and update mechanics through design, not by assuming latest component tags form a supported bundle.
+
+The first BOM still needs enough topology/rail/plane/port/assembly reasoning to justify its quantities and detect impossible requests. Detailed port-to-port assignment may follow later. Clearly distinguish conditional estimates, exact qualified quantities and procurement-ready packages; BOM-first does not itself decide which readiness level ships first. The sponsor has not selected a first hardware tuple or the previously proposed 32–64-node HGX scenario. Keep those as candidate examples, not accepted scope.
+
 ## Authoritative starting points
 
 | Source | Why agents should inspect it |
@@ -53,4 +65,4 @@ Preserve distinctions between server, GPU, tray, rack, rail, first-hop rail doma
 
 ## Unresolved product decisions
 
-Research must establish target users and workflows, initial release boundary, deployment model, import/export and round-trip needs, supported release policy, topology family coverage, algorithm objectives, collaboration/security needs, performance targets, and lifecycle ownership. Confirm how existing Hedgehog planning tools overlap before proposing duplicate functionality. No application stack or solver has been selected.
+The initial audience, BOM-before-connection-map delivery order and latest-release installation direction are settled above. Design must establish detailed workflows, first BOM readiness/scenario, deployment model, import/export and round-trip needs, release-update mechanics, topology family coverage, algorithm objectives, collaboration/security needs, performance targets, and lifecycle ownership. Confirm how existing Hedgehog planning tools overlap before proposing duplicate functionality. No application stack or solver has been selected.

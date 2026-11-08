@@ -12,7 +12,7 @@ The same agent may fill different roles sequentially, but an artifact's independ
 
 ## Lasting role nicknames
 
-Names belong to roles; an ephemeral replacement resumes the same nickname. Nine sessions are established: t1–t9 below. Parts (t8) and ops (t9) confirmed kickoff in #6 and #7. Roles with a dash have not been instantiated; do not send the sponsor instructions as though they already exist. Always address dispatch messages to `tN / nickname` and state explicitly if a new agent session is needed. A role's review assignment may begin before its downstream design ticket is Ready; that does not unlock dependent design work.
+Names belong to roles; an ephemeral replacement resumes the same nickname. Nine sessions are established: t1–t9 below. Parts (t8) and ops (t9) confirmed kickoff in #6 and #7. Next dispatch reserves t10 / model for a NEW sponsor-created session; its startup is not confirmed. Roles with a dash have not been instantiated; do not send the sponsor instructions as though they already exist. Always address dispatch messages to `tN / nickname` and state explicitly if a new agent session is needed. A role's review assignment may begin before its downstream design ticket is Ready; that does not unlock dependent design work.
 
 | Nickname | Session alias | Purpose | Assignments |
 | --- | --- | --- | --- |
@@ -23,7 +23,7 @@ Names belong to roles; an ephemeral replacement resumes the same nickname. Nine 
 | topo | t6 | Network topology and rail/domain constraints | Review R02 (#3); R04 (#5) |
 | parts | t8 | Hardware profiles, physical links and BOM | R05 |
 | ops | t9 | Installation and lifecycle handoff | R06 |
-| model | — | Domain model and progressive input contracts | D01 |
+| model | t10 (new session requested) | Domain model and progressive input contracts | D01 |
 | ux | t5 | User research and interaction design | Review R01 (#2); D02 (#9) |
 | solver | — | Allocation and constraint algorithms | D03 |
 | check | — | Independent correctness verification | D04, S02 |
