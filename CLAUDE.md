@@ -17,4 +17,6 @@ This is the research/design phase. Role nicknames persist across sessions: lead=
 
 ## Confirmed product direction
 
-Initial audience: Hedgehog SEs and possibly selected partner SEs. Deliver a BOM first, then a connection map; both are eventual primary outputs. Optimize design assets for installation on the latest Hedgehog release. Preserve exact revision/evidence versions while enabling release-impact review and revalidation; 26.05 is a research baseline, not a permanent delivery restriction. First BOM readiness and hardware scenario remain undecided. Read docs/product-context.md. New session requested: t10 / model; do not assume it has started.
+Initial audience: Hedgehog SEs and possibly selected partner SEs. Deliver a BOM first, then a connection map; both are eventual primary outputs. Optimize design assets for installation on the latest Hedgehog release. Preserve exact revision/evidence versions while enabling release-impact review and revalidation; 26.05 is a research baseline, not a permanent delivery restriction. First BOM readiness and hardware scenario remain undecided. Read docs/product-context.md. Also established: t10 / model, with kickoff confirmed in #8.
+
+Sponsor walkthrough feedback: B200 is one scenario, not the product template. Use a minimal starter flow only if needed, then a persistent questionnaire/details panel supporting repeated partial input, asset generation, later refinement and regeneration. No full-questionnaire completion requirement. See docs/product-context.md.
