@@ -175,13 +175,14 @@ svg .dash{stroke-dasharray:5 4}
 <div class="frame"><div class="cap"><b>F2</b><span>Room to see the whole network profile of one server. Desktop ≥ 1,280 px; narrow widths stack the panes.</span></div>
 <div class="app"><div class="pane"><h4>Project</h4><ul class="tree"><li>Server classes<ul><li class="sel">HGX 8-GPU (B200-class)<br><span class="note">project copy of class r1 · count: <span class="tag t-unk">not entered</span></span></li></ul></li><li>Fabrics (suggested from profile)<ul><li>backend <span class="tag t-cls">suggested</span></li><li>frontend <span class="tag t-cls">suggested</span></li><li>storage <span class="tag t-cls">suggested</span></li></ul></li><li>Leaf classes (none)</li><li>BOM <span class="btn">Generate</span></li></ul></div>
 <div class="pane scroll">
-<div class="strip"><span><b>Per server:</b> 12 fabric ports in 3 attachments</span><span>2 management ports (external networks)</span><span>Per-unit lines: 3</span><span>Unknown: 4 <a href="#">show</a></span></div>
+<div class="strip"><span><b>Per server:</b> 12 fabric ports in 3 attachments</span><span>3 management ports (in-band, host BMC, DPU management; external networks)</span><span>Per-unit lines: 3</span><span>Unknown: 4 <a href="#">show</a></span></div>
 <h4>Hardware and ports (treegrid: ←/→ collapses/expands, ↑/↓ moves between rows)</h4>
 <table>
 <tr><th>Item / port</th><th>Qty / server</th><th>Identity</th><th>Cage · mode</th><th>Medium (server end)</th><th>Fabric · leaf class</th><th>Rail · plane</th></tr>
 <tr><td>▾ Backend NIC</td><td class="n">8 <span class="tag t-cls">r1</span></td><td>generic 400G-class <span class="tag t-gen">generic</span></td><td>OSFP? · 1×400G <span class="tag t-unk">cage unverified</span></td><td>optic, 400G-class <span class="tag t-gen">generic</span></td><td>backend · <span class="tag t-unk">leaf class not chosen</span></td><td>rail = NIC index · plane <span class="tag t-unk">unknown</span></td></tr>
 <tr class="child"><td>be1 … be8 (8 ports, collapsed; <a href="#">expand all 8</a>)</td><td class="n">1 per NIC</td><td></td><td>same</td><td>same</td><td>same</td><td>rails 1–8</td></tr>
 <tr><td>▸ DPU (sponsor "BF3" shorthand)</td><td class="n">1</td><td>dual-port <span class="tag t-unk">unverified</span></td><td>? · 2×200G? <span class="tag t-unk">unverified</span></td><td>DAC <span class="tag t-gen">generic</span></td><td>frontend · <span class="tag t-unk">not chosen</span></td><td>—</td></tr>
+<tr class="child"><td>DPU management port (one per physical DPU)</td><td class="n">1</td><td>integrated</td><td>RJ45</td><td>integrated PHY</td><td>BMC/OOB (external)</td><td>—</td></tr>
 <tr><td>▸ Storage NIC</td><td class="n">1</td><td>generic 200G-class <span class="tag t-gen">generic</span></td><td>? · 2×200G</td><td><span class="tag t-unk">not decided yet</span></td><td>storage · <span class="tag t-unk">not chosen</span></td><td>—</td></tr>
 <tr><td>▸ Onboard</td><td class="n">1</td><td>included in server</td><td>RJ45 ×2</td><td>integrated PHY</td><td>in-band mgmt · BMC/OOB (external)</td><td>—</td></tr>
 </table>
@@ -202,7 +203,7 @@ svg .dash{stroke-dasharray:5 4}
 <div class="app one"><div class="pane scroll">
 <table><tr><th>Item</th><th>Qty / server</th><th>Ports</th><th>Fabric</th></tr>
 <tr class="sel"><td>▾ DPU variant: <span class="field">◉ 1 × dual-port ○ 2 × single-port ○ Not decided yet</span></td><td class="n">1</td><td>fe1, fe2</td><td>frontend</td></tr></table>
-<div class="bar"><b>Preview: 2 × single-port</b><br>DPUs per server 1 → 2 (×100 servers: 100 → 200) · frontend ports unchanged (2) · frontend links unchanged (200) · DAC assemblies unchanged (200)<br>
+<div class="bar"><b>Preview: 2 × single-port</b><br>DPUs per server 1 → 2 (×100 servers: 100 → 200) · <b>DPU management ports 1 → 2 per server (out-of-band demands 300 → 400)</b> · frontend data ports unchanged (2) · frontend links unchanged (200) · DAC assemblies unchanged (200)<br>
 Not evaluated: whether two cards change failure independence or the PCIe/slot fit. <span class="tag t-unk">unverified</span><br>
 Apply to: <span class="field">◉ This project only (customization)</span> <span class="field">○ Save as a new class revision…</span> <span class="btn p">Apply</span> <span class="btn">Cancel</span></div>
 <p class="note">"Not decided yet" keeps both variants as explicit alternatives in the BOM (the D01 conditional-alternative contract). Equal totals are not shown as equivalent designs.</p></div></div></div>
@@ -216,7 +217,7 @@ Apply to: <span class="field">◉ This project only (customization)</span> <span
 <tr class="sel"><td>☑</td><td>…</td><td>…</td><td>backend</td><td>…</td></tr>
 <tr class="sel"><td>☑</td><td>be8</td><td>8</td><td>backend</td><td>…</td></tr></table>
 <p><b>Leaf class menu:</b> <span class="field">— not chosen (valid) —</span> · <span class="field">existing: none in fabric "backend"</span> · <span class="field">+ Create leaf class in fabric "backend"…</span></p>
-<p class="note">Picking a leaf class sets its fabric. Fabric intent without a leaf class stays valid and is shown hollow on the map. Rails stay attached to ports; the batch never re-numbers them.</p></div></div></div>
+<p class="note">Picking a leaf class sets its fabric. Fabric intent without a leaf class stays valid and is shown hollow on the map. If a port already has a <i>different</i> fabric, both values are kept and shown as a conflict with three choices: pick another leaf class, change the port's fabric, or create a leaf class in the intended fabric. Nothing moves silently (model §4). Rails stay attached to ports; the batch never re-numbers them.</p></div></div></div>
 
 <h2 id="f5">F5 Create a leaf class in context (non-modal side panel)</h2>
 <div class="frame"><div class="cap"><b>F5</b><span>The editor stays visible and editable. The panel draft is kept if the engineer clicks elsewhere.</span></div>
@@ -225,7 +226,7 @@ Apply to: <span class="field">◉ This project only (customization)</span> <span
 <div class="pane panel"><h4>New leaf class</h4>
 <p>Name <span class="field">backend-leaf</span><br>
 Fabric <span class="field">backend (existing) ▾</span><br>
-<span class="note">Name check: no other leaf class is named "backend-leaf". A fabric named "backend" already exists, so it is reused, not duplicated.</span></p>
+<span class="note">Fabric is an explicit choice from the existing list, preselected from the ports' fabric. Typing a new name that matches "backend" asks "Use the existing fabric backend?" and never merges by name (model §4). Pressing Create twice does not create two classes. Cancel leaves the ports with an unresolved leaf class, not a dangling reference.</span></p>
 <p>Switch model <span class="field">Not chosen yet ▾</span></p>
 <table><tr><th>Model option</th><th>Source</th><th>Support</th></tr>
 <tr><td>Not chosen yet</td><td>—</td><td>—</td></tr>
@@ -254,6 +255,7 @@ How many servers of this class? <span class="field">100</span> <span class="note
 <h2 id="f8">F8 Expanded BOM</h2>
 <div class="frame"><div class="cap"><b>F8</b><span>Generate → BOM, grouped by owner, with per-unit multiplication visible. Every number opens its trace.</span></div>
 <div class="app one"><div class="pane scroll">
+<p>View: <span class="btn p">Installed</span> <span class="btn">Purchase</span> <span class="note">Installed counts everything present. Purchase suppresses only children an explicit bundle covers; unknown inclusion leaves the purchase total unresolved, never zero (parts SF03, model §5).</span></p>
 <table>
 <tr><th>Line</th><th>Per unit</th><th>× units</th><th>= Total</th><th>Purchase</th><th>Identity</th></tr>
 <tr><th colspan="6">Servers</th></tr>
@@ -274,7 +276,7 @@ How many servers of this class? <span class="field">100</span> <span class="note
 <tr><td>backend-leaf</td><td colspan="5"><span class="tag t-unk">not estimated: leaf model not chosen</span> · needs ≥ 800 server-facing ports in fabric "backend"</td></tr>
 <tr><td>frontend and storage leaves</td><td colspan="5"><span class="tag t-unk">not estimated: no leaf class</span></td></tr>
 <tr><th colspan="6">Outside scope (disclosed, not part of the BOM)</th></tr>
-<tr><td colspan="6"><span class="tag t-out">out of scope</span> External fiber for 800 backend optical links · RJ45 cords for 200 management links (in-band + BMC) · structured cabling and panels. Interface requirements stay visible in E1.</td></tr>
+<tr><td colspan="6"><span class="tag t-out">out of scope</span> External fiber for 800 backend optical links · RJ45 cords for 400 management links (per server: in-band, host BMC, 2 DPU management ports) · structured cabling and panels. Interface requirements stay visible in E1.</td></tr>
 </table>
 <div class="bar"><b>Trace for "800" (backend NIC):</b> 8 per server (class r1, unchanged) × 100 servers (supplied) = 800. The 8 NICs are one hardware row, not 8 separately counted populations. Bundling is unknown, so the line may move into the server SKU once parts evidence lands.</div>
 <p class="note">Totals are checked by <code>bom-arithmetic.py</code> (variant: 2 × single-port DPU; the default dual-port variant gives 100 DPUs and otherwise identical lines).</p></div></div></div>
@@ -294,7 +296,7 @@ How many servers of this class? <span class="field">100</span> <span class="note
 <h2 id="e1">E1 Both-ends comparison with explainable filters</h2>
 <div class="frame"><div class="cap"><b>E1</b><span>Backend port (be1–be8, same pattern) ↔ backend-leaf port. Opened from the details panel with "Compare ends".</span></div>
 <div class="app one"><div class="pane scroll">
-<p>Filters: <span class="btn">☑ Same cage family</span> <span class="btn">☑ Same lane rate × lanes</span> <span class="btn">☐ Documented pairs only</span> <span class="btn">☑ Show unknown</span> <a href="#">Why is an option hidden?</a></p>
+<p>Filters: <span class="btn">☑ Same cage family</span> <span class="btn">☑ Same lane rate × lanes</span> <span class="btn">☐ Documented pairs only</span> <span class="btn">☑ Show unknown</span> <span class="btn">☐ Show mismatches</span> <a href="#">Why is an option hidden?</a></p>
 <table class="cmp"><tr><th>Attribute</th><th>End A: server be1</th><th>End B: backend-leaf port</th><th>Status</th><th>Evidence / action</th></tr>
 <tr><td>Cage / form factor</td><td>OSFP? <span class="tag t-unk">unverified</span></td><td><span class="tag t-unk">leaf model not chosen</span></td><td><span class="tag t-unk">unknown</span></td><td>Choose a leaf model, or supply the NIC cage source</td></tr>
 <tr><td>Configured mode · electrical lanes</td><td>1×400G · 4×100G? </td><td>—</td><td><span class="tag t-unk">unknown</span></td><td>Mode names do not prove lane signalling</td></tr>
@@ -304,7 +306,7 @@ How many servers of this class? <span class="field">100</span> <span class="note
 <tr><td>Assembly ends</td><td colspan="2">Separate optics: 1 module per end, plus external fiber (out of scope)</td><td>—</td><td>Integrated DAC/AEC/AOC: 1 assembly, both ends</td></tr>
 <tr><td>Override</td><td colspan="2"><span class="field">Engineer choice: use DR4 at both ends</span> by user, reason required</td><td><span class="tag t-cust">override</span></td><td>Recorded. Compatibility stays "unverified"; it never becomes "documented" or "supported".</td></tr>
 </table>
-<p class="note">Filter rules explain themselves. For example: "Hidden: 3 options with a different cage family from end A (source: class r1 cage field)". Unknown is shown unless the engineer filters it out, and the count of hidden options is always visible. A mismatch (for example SR at one end and DR at the other) is red, with both values kept; it is never auto-corrected.</p></div></div></div>
+<p class="note">Filter rules explain themselves. For example: "Hidden: 3 options with a different cage family from end A (source: class r1 cage field)". Unknown is shown unless the engineer filters it out, and the count of hidden options is always visible. A known mismatch is hidden from the compatible list but stays inspectable under "Show mismatches", with both values kept. It is never auto-corrected. Parts' SU-COMPARE-1 (DR4 at one end, FR4 at the other: same 400G, different optical interfaces) is the reference mismatch case. Rule IDs follow parts CF1–CF7.</p></div></div></div>
 
 <!-- ============================================================ -->
 <h2 id="l1">L1 Edit scope: this project versus the class</h2>
@@ -315,7 +317,7 @@ How many servers of this class? <span class="field">100</span> <span class="note
 <tr><td>Server class revision (r1, r2…)</td><td>An immutable, reusable profile. Projects pin one revision.</td><td>New revision only; existing projects are unaffected until they adopt it (L2)</td></tr>
 <tr><td>Project copy plus customizations</td><td>The pinned revision with project-only overrides, each marked</td><td>This project only</td></tr>
 <tr><td>Population</td><td>A count (or range) of physical servers of that copy</td><td>This project only. Not part of the class.</td></tr></table>
-<div class="bar">Changing "Storage NIC" medium → DAC. Apply to: ◉ This project only · ○ Save as class r2 (the library starter is authored with the same tools; publishing follows library rules) · ○ Save as a new class (fork) <span class="btn p">Apply</span></div></div></div></div>
+<div class="bar">Changing "Storage NIC" medium → DAC. Apply to: ◉ This project only · ○ Save as class r2 (the library starter is authored with the same tools; publishing follows library rules) · ○ Save as a new class (fork) · ○ Only some servers: split the population (for example 60 / 40; occurrence IDs kept, total unchanged) <span class="btn p">Apply</span><br><span class="note">If several populations share this customization, the choice lists each affected population and the summed server count before applying (model §2).</span></div></div></div></div>
 
 <h2 id="l2">L2 A new class revision is available</h2>
 <div class="frame"><div class="cap"><b>L2</b><span>Notice on the class header. Nothing changes until the engineer adopts.</span></div>

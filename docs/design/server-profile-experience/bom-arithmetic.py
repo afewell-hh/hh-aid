@@ -34,6 +34,9 @@ def hgx_profile(dpu_variant="dual", storage=True):
                   ("st2", "ST-NIC", "storage", "unknown", None)]
     ports += [("ib1", "ONBOARD", "in-band mgmt", "rj45", None),
               ("bmc", "ONBOARD", "bmc/oob", "rj45", None)]
+    # One management interface per *physical* DPU (parts SU-A-PORTS, model SCX-ATT).
+    n_dpu = 1 if dpu_variant == "dual" else 2
+    ports += [(f"dpu{k}-bmc", "FE-DPU", "bmc/oob", "rj45", None) for k in range(n_dpu)]
     extra = [("power cord", 4, "unknown"),          # included vs purchased unknown
              ("rail kit", 1, "included"),
              ("support contract (per server)", 1, "purchased")]
@@ -79,7 +82,8 @@ h1 = expand(hgx_profile(), 1)
 assert h1["BE-NIC"] == 8 and h1["FE-DPU2"] == 1 and h1["ST-NIC"] == 1
 assert h1["fabric links"] == 12               # 8 backend + 2 frontend + 2 storage
 assert h1["server-end optics"] == 8 and h1["integrated assemblies"] == 2
-assert h1["links, media unknown"] == 2 and h1["rj45 links (cords excluded)"] == 2
+assert h1["links, media unknown"] == 2
+assert h1["rj45 links (cords excluded)"] == 3   # in-band + host BMC + 1 DPU mgmt
 assert rails(hgx_profile()) == list(range(1, 9))
 
 h100 = expand(hgx_profile(), 100)
@@ -97,8 +101,12 @@ assert h100["links, media unknown"] == 200    # quantity shown, media not claime
 v2 = expand(hgx_profile(dpu_variant="single"), 100)
 assert v2["FE-DPU1"] == 200 and "FE-DPU2" not in v2
 assert v2["links:frontend"] == 200 and v2["integrated assemblies"] == 200
-assert {k: v for k, v in v2.items() if not k.startswith("FE-")} == \
-       {k: v for k, v in h100.items() if not k.startswith("FE-")}
+# Two physical DPUs bring a second DPU management interface per server.
+assert h100["rj45 links (cords excluded)"] == 300
+assert v2["rj45 links (cords excluded)"] == 400
+same = lambda d: {k: v for k, v in d.items()
+                  if not k.startswith("FE-") and not k.startswith("rj45")}
+assert same(v2) == same(h100)
 
 # --- Variant: no separate storage NIC ---------------------------------------
 ns = expand(hgx_profile(storage=False), 100)

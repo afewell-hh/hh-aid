@@ -121,14 +121,14 @@ Each step is optional except where noted. There is no forced sequence: the proje
    - Selecting a family offers 2–3 common configurations, including "Not sure yet: start from default and mark undecided parts".
    - The sponsor's HGX variants appear as **configurations or fields**, not separate catalog rows: optional separate storage, and one dual-port versus two single-port DPUs.
 2. **F2 Inspect the default profile.** The whole network profile of one server is visible at desktop width:
-   - a summary strip (12 fabric ports in 3 attachments, 2 management ports, 4 unknowns);
+   - a summary strip (12 fabric ports in 3 attachments, 3 management ports, 4 unknowns);
    - the attachment map;
    - the hardware treegrid;
    - per-unit lines;
    - the details panel.
    Values are tagged by origin (K legend). Rails stay on ports (rail = NIC index, a class assumption). Plane is "unknown" until supplied.
 3. **F3 Customize a variant.** On the DPU row, "Change variant" offers 1 × dual-port, 2 × single-port or Not decided yet.
-   - A preview shows the deltas. DPUs per server go from 1 to 2 (×100 = 200); ports, links and DACs are unchanged.
+   - A preview shows the deltas. DPUs per server go from 1 to 2 (×100 = 200), and so do **DPU management ports**, because each physical DPU has one (parts SU-A-PORTS, model SCX-ATT): out-of-band demands go from 300 to 400. Frontend data ports, links and DACs are unchanged.
    - It also shows what is **not evaluated**: failure independence and PCIe/slot fit.
    - Apply asks for scope (§8): **this project only** (default) or a new class revision.
    - "Not decided yet" produces conditional alternatives in the BOM, per the D01 contract.
@@ -151,7 +151,8 @@ Each step is optional except where noted. There is no forced sequence: the proje
    - DAC assemblies are counted **once per link**.
    - Storage links with an undecided medium show "200 links; media not counted; not zero".
    - Switch lines say "not estimated: leaf model not chosen" and state the requirement (≥ 800 server-facing ports in fabric backend).
-   - External fiber and RJ45 cords are disclosed with their basis (800 optical links; 200 management links).
+   - External fiber and RJ45 cords are disclosed with their basis (800 optical links; 400 management links in the two-DPU variant shown).
+   - An **Installed / Purchase** view switch follows parts SF03 and model §5. Installed counts everything present. Purchase suppresses only children an explicit bundle covers, and unknown inclusion leaves the purchase total unresolved rather than zero.
 9. **F9 Add a second server class.** Add server class → Storage 2U (generic) × 12.
    - Its fabric menu lists **existing fabrics first**, and typing "storage" offers the existing fabric instead of creating "storage-2".
    - After regenerating, storage-fabric links are 200 + 24 = 224, drives are 24 × 12 = 288, and servers are 112 in two populations.
@@ -168,10 +169,39 @@ Each step is optional except where noted. There is no forced sequence: the proje
 | Optics, both ends of backend links | 16 | 1,600 | 1,600 | 1,600 |
 | DAC assemblies (frontend, one per link) | 2 | 200 | 200 | 200 |
 | Storage links, medium undecided | 2 | 200 | 200 | 0 |
-| RJ45 management links (cords out of scope) | 2 | 200 | 200 | 200 |
+| RJ45 management links: in-band, host BMC, one per physical DPU (cords out of scope) | 3 | 300 | **400** | 300 |
 | Power cords (4/server, bundling unknown) | 4 | 400 | 400 | 400 |
 
 Adding the storage class (12 servers × 2 storage ports) gives 224 storage-fabric links. The script also asserts that the number of attachments never changes the server count.
+
+### 6.1 Reconciliation with parts (#6) and model (#8) fixtures
+
+Parts posted [server-unit-bom.md at 0230cd8](https://github.com/afewell-hh/hh-aid/blob/0230cd8690c3eb43454424a70d95611e44ada35d/docs/research/server-unit-bom.md) (PR #26). Model posted [server-class-contract.md at fb06179](https://github.com/afewell-hh/hh-aid/blob/fb06179f3a0ce6515256eb28ec30d4084e3c7ec0/docs/design/server-class-contract.md) (PR #25). Both were read after this pass's first commit.
+
+**Screen fixture IDs mapped to theirs.** The three fixtures are illustrative and deliberately not identical; this mapping is correspondence, not numeric equality.
+
+| This pass (screens) | Parts | Model | Difference kept on purpose |
+| --- | --- | --- | --- |
+| HGX 8-GPU (B200-class) class r1 | SU-A (`F-ACC8`, `C-A@1`, `PC-A@1`, `POP-A`) | SC-A r1, P-A | — |
+| DPU 1 × dual-port / 2 × single-port / Not decided yet | FE=DUAL / FE=SPLIT | FE-1D / FE-2S | The screens add "Not decided yet" to show conditional alternatives |
+| Storage NIC (dual-port), medium **undecided** | S=0/1 storage DPU, AEC | ST-on DPU, optical | The screens keep one undecided medium, to show "links counted, media not counted, not zero" |
+| Backend 8 × 1-port NIC, optic each end | SU-A backend, optic each end | SC-A backend, integrated assemblies | Model uses assemblies; parts and screens use optics. The two-axis count rule is the same |
+| Frontend 2 × DAC per server | 2 × DAC | 2 optical links | — |
+| In-band 1 + host BMC 1 + 1 per DPU | in-band 2 + BMC 1 + 1 per DPU | in-band 2 + BMC + 1 per DPU | The screens show one in-band port in use |
+| Storage 2U × 12 (second class) | SU-B appliance (25G AOC) | SC-B storage appliance | Each shows a different second class |
+| Per-unit lines: power cord, rail kit, support contract | A05–A07 | cords, licence, rail kit | — |
+
+**Rules adopted from their drafts into the screens:**
+- One management port per physical DPU (F2, F3, F8, arithmetic).
+- Installed versus purchase views; unknown bundle inclusion leaves the purchase total unresolved (F8).
+- A leaf class whose fabric conflicts with the port's existing fabric is a visible conflict, never a silent move (F4).
+- Reuse is an explicit identity choice, never a name merge. A repeated Create does not duplicate. Cancel leaves an unresolved selection, not a dangling ID (F5).
+- An edit can be scoped to split a population ("only some servers", with occurrence IDs kept). An edit to a shared customization lists every affected population (L1).
+- Known mismatches are hidden from the compatible list but stay inspectable; the filter rules follow CF1–CF7. SU-COMPARE-1 (DR4 versus FR4) is the reference mismatch (E1).
+
+**UX questions back to them** (not blockers):
+- Parts and model differ on whether NICs and DPUs are bundled in the server. Should the UI's default for an unknown inclusion be "unresolved" (as in the screens), or should a family default be allowed to assume it?
+- Should the server-end and far-end optic of one link show as one requirement row with two ends, or as two rows that reference one requirement? The screens use two rows under connection media.
 
 ## 7. Nested hardware, ports and both ends
 
@@ -262,8 +292,8 @@ Suggested reviewers:
 
 | Owner | Needed from them | Used in |
 | --- | --- | --- |
-| parts #6 | Field matrix (cage/form factor, electrical lanes and rates, PMD/lanes/reach, connector/fiber/polarity, assembly ends, per-unit qty, included versus separate, real versus generic provenance); real-model examples with primary evidence; the dual- versus single-port DPU evidence status | F2, E1, F8 columns |
-| model #8 | Identities and IDs for family, class revision, project customization and population; override, reset and adopt semantics; attachment record; per-unit line and assembly-ownership counting; conditional alternatives for undecided variants | F3, F6, L1–L3, F8 |
+| parts #6 | Drafted (SU-FIELDS, SU-COMPARE, CF1–CF7; §6.1). Still open: evidence for real NIC/DPU cages and modes; bundle contents; the two UX questions in §6.1 | F2, E1, F8 columns |
+| model #8 | Drafted (identity, edit scope, in-context creation, counting; §6.1). Still open: final IDs after parts/compat review; the presentation rule for population split | F3, F6, L1–L3, F8 |
 | compat #3 | How the product terms fabric and leaf class map to upstream Fabric, domain and plane; whether one Server may attach to multiple Fabrics or domains; source switch-profile discovery and support status; the manual-model boundary | F4, F5 model picker, glossary |
 | sponsor / lead | Whether to keep the map (C) or ship A; whether project-only is the right default scope; the family list for a first library | §5, L1, F1 |
 
