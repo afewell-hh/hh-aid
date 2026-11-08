@@ -5,7 +5,7 @@
 | Issue | [#9 D02](https://github.com/afewell-hh/hh-aid/issues/9). Assignments: [6715064986](https://github.com/afewell-hh/hh-aid/issues/9#issuecomment-6715064986) (BOM-first design), [6717783503](https://github.com/afewell-hh/hh-aid/issues/9#issuecomment-6717783503) (workspace revision), [6718215963](https://github.com/afewell-hh/hh-aid/issues/9#issuecomment-6718215963) (starter research and library) |
 | Author | **t5 / ux** (AI agent). Not self-approved. |
 | Reviewers | t2 / scout, t9 / ops, sponsor, once lead dispatches them. Vocabulary reconciliation with D01 (t10 / model) is required before acceptance (§16). |
-| Status | **Revision 3.** It responds to actual sponsor feedback on revisions 1 and 2 (§2). Revision 3 adds a bounded starter-UX evidence pass, a question protocol and a comparison of two alternatives ([appendix A](experience-design/starter-evidence.md)). It replaces the single-choice starter with independent questions and keeps the home categories as views of a starter library. **No SE usability testing has taken place**, and revision 3 has not been shown to the sponsor. |
+| Status | **Revision 3.1** applies lead's bounded corrections [6718550559](https://github.com/afewell-hh/hh-aid/issues/9#issuecomment-6718550559) (§2.1) to revision 3. Revision 3 responded to actual sponsor feedback on revisions 1 and 2 (§2). Revision 3 adds a bounded starter-UX evidence pass, a question protocol and a comparison of two alternatives ([appendix A](experience-design/starter-evidence.md)). It replaces the single-choice starter with independent questions and keeps the home categories as views of a starter library. **No SE usability testing has taken place**, and revision 3 has not been shown to the sponsor. |
 | Companion artifacts | [walkthrough.html](experience-design/walkthrough.html): a self-contained, clickable, low-fidelity workspace prototype on synthetic data. [fixture-check.py](experience-design/fixture-check.py): an independent check of the fixture arithmetic. [prototype-check.html](experience-design/prototype-check.html): an automated interaction check of the prototype. [starter-evidence.md](experience-design/starter-evidence.md): appendix A (evidence-to-decision table, question protocol, alternatives, library). |
 
 ## 1. Scope, inputs and labels
@@ -84,10 +84,21 @@ All hardware in the fixtures is **hypothetical**: R04's H400 leaf, a 64-port 800
 | Single-choice classification bundles independent facts | Removed. Each dimension is its own question per endpoint group: count, endpoint type, network, rail preference, redundancy, racks, endpoints per rack and leaf placement. Planning policy follows from the answers, not from an entry category. | §6.1, §6.7; appendix A §A2 |
 | Research first; compare alternatives | Six sources in an evidence-to-decision table. Grouped essentials in the workspace (A) compared with progressively revealed groups (B); **A recommended**, with a stated switch condition. | Appendix A §A1, §A3 |
 | Minimum useful input, encourage detail | The minimum is defined per attainable output: an endpoint count and type give link counts, leaf counts and a first BOM. Optional questions sit beside their effect (“Affects: …”). | §6.1; appendix A §A2 |
-| Unknown is not false | Yes/no questions have no default. Unanswered stays “not answered”. “Customer hasn't decided (asked)” is distinct, and a **Clear answer** action exists. Undecided choices produce labelled **alternatives**, collapsed when every alternative gives the same number. Count ranges produce bounded lines. | §6.3, §7 |
+| Unknown is not false | Yes/no questions have no default. Unanswered stays “not answered”. a neutral “Not decided yet” is distinct, and a **Clear answer** action exists. Undecided choices produce labelled **alternatives**, collapsed when every alternative gives the same number. Count ranges produce bounded lines. | §6.3, §7 |
 | Keep and value the home categories | “Start from a design” keeps endpoint count, rack count, topology and network purpose as **views** over one placeholder library. A starter appears once per view with “also listed under …”, and the selection survives view changes. | §6.8 |
 | Starters customised in the same tooling | Choosing a starter copies its answers into a new project as **assumptions from starter S2 v0**, computed by the same planning policies and edited in the same details panel. | §6.8 |
 | Placeholders, not a catalog | Every starter is labelled “placeholder v0 — synthetic, not supported”. The earlier rail/rack/mesh fixtures now live as placeholders S1–S4 and test fixtures. | §6.8, §7 |
+
+### 2.1 Lead's corrections to revision 3 (revision 3.1)
+
+| Finding (lead, [6718550559](https://github.com/afewell-hh/hh-aid/issues/9#issuecomment-6718550559)) | Change | Where |
+| --- | --- | --- |
+| 1. Count and endpoint type were not visible together on first entry | The essentials now sit together in one block at the top of the first endpoint group, and the guidance is cut to one line. The group name moves to an optional sub-group, and the “details recorded” tally and search move below the groups. If the essentials would fall below the fold (narrow screens), first entry scrolls to the details heading. Checked at 1,400 × 1,000 (no scroll needed; header, hint and both essentials visible) and 390 × 844 (hint and both essentials visible). On return, the outputs heading and Generate are in view at both sizes. | §6.1; walkthrough |
+| 2. Alternative B was a wizard, not progressive disclosure; E2 and E5 were over-applied | B is now “optional groups collapsed to headings” **in the same workspace**, with no sequence. Both A and B are implemented behind a view switch for a fair comparison. A stays the default as a **hypothesis**. E2 is limited to radio conditional reveals; E5 no longer justifies discouraging unknowns. The wording is now “Not decided yet” and “Not answered yet”. | Appendix A §A1, §A3; §6.3 |
+| 3. Capacity was treated as occupancy | Separate questions: **populated endpoints per rack** (actual; derives a count) and **maximum endpoints per rack** (capacity; profile default). A count from racks × capacity appears only as an explicit assumption (“assumes every rack is full”), flagged on the output line and listed in its “rests on”. Partly filled racks show unused positions. A count that disagrees with racks × populated, beyond a partly filled last rack, is a mismatch with both answers kept. | Appendix A Q9a/Q9b; §7.1 |
+| 4. Undecided networks were pooled | Two or more groups with undecided networks are never combined silently. “Kept separate” and “sharing switches (conditional)” are shown as alternatives, and lines that exist only under one say “not applicable under this alternative”. Negative case tested: 8 + 4 spines separate versus 16 shared. | Appendix A Q4; §6.7; §7.1 |
+| 5. Scope language | Rail plus dual-homing is **not modelled**, not a contradiction. Identical results are “the same under every alternative this prototype evaluated”. The two-answer minimum yields a **conditional estimate** under the named profile and default assumptions. | Appendix A Q7, §A2; §6.1, §6.7, §7 |
+| D01 coordination | Model's answers ([6718064248](https://github.com/afewell-hh/hh-aid/issues/8#issuecomment-6718064248), [6718326881](https://github.com/afewell-hh/hh-aid/issues/8#issuecomment-6718326881)), acknowledged by lead, are incorporated; they are no longer reported as open. | §16 |
 
 ## 3. Design principles (H, derived from S/F)
 
@@ -166,22 +177,24 @@ The home screen offers two distinct paths:
 
 They lead to the same workspace and the same details. The evidence, question protocol and alternatives are in [appendix A](experience-design/starter-evidence.md).
 
-**From scratch (alternative A, recommended; appendix A §A3).** There is no separate starter screen.
-- “Start from scratch” opens the workspace with focus on **How many endpoints?** and a getting-started note: *“For a first BOM, answer How many endpoints? and What kind of endpoint?… Everything else is optional.”*
+**From scratch (alternative A by default, as a hypothesis; appendix A §A3).** There is no separate starter screen.
+- “Start from scratch” opens the workspace with focus on **How many endpoints?** and a one-line hint: *“First BOM: enter how many endpoints and what kind. Everything else is optional; leave anything you don't know.”*
 - The first endpoint group is expanded and shows:
-  - **What and how many** (needed for a first BOM): count, which may be a range; endpoint type; links; rate;
+  - the **essentials together at the top**: count (a number or a range) and endpoint type;
+  - links and rate (defaults from the type);
   - **How they connect** (optional): network, rail preference, redundancy;
-  - **Where they sit** (optional): racks, endpoints per rack, leaf placement;
-  - **Leaf switch** (optional).
+  - **Where they sit** (optional): racks, populated endpoints per rack, rack capacity, leaf placement;
+  - **Group name and leaf switch** (optional).
+- A view switch, “Optional questions: Show all / Collapse to headings”, offers alternative B in the same workspace.
 - Each question shows **what it affects**.
 - The outputs area lists **what each output needs** and which outputs are available now.
 
 **Minimum per attainable output** (appendix A §A2):
-- an endpoint count, or racks × endpoints per rack, plus an endpoint type gives link and port counts, leaf counts (with alternatives for undecided choices), spine counts and cable totals;
+- an endpoint count (or racks × populated endpoints per rack; or racks × capacity as an explicit full-rack assumption) plus an endpoint type gives a **conditional estimate** under the named profile and default assumptions: link and port counts, leaf counts (with alternatives for undecided choices), spine counts and cable totals;
 - rack-aware placement additionally needs a rack count;
 - packages and the connection map are later stages.
 
-**Not used:** a single-choice “kind of project” question (S `c018fa9`; appendix A E2); a staged wizard (E4); checkboxes for yes/no/unknown dimensions (S; E2).
+**Not used:** a single-choice “kind of project” question (S `c018fa9`; appendix A E2); a staged sequence (E4); checkboxes for yes/no/unknown dimensions (S).
 
 ### 6.2 Workspace layout
 
@@ -206,12 +219,12 @@ On wide screens the details panel scrolls independently, so details and outputs 
   - Installation target and evidence.
 
   There are at most two disclosure levels (appendix A E4).
-- **Yes/no dimensions are radios with no default** (appendix A E2, E5):
-  - options plus “Customer hasn't decided (asked)”;
-  - unanswered stays “not answered” and is never treated as “no”;
+- **Yes/no dimensions are radios with no default** (appendix A E2):
+  - options plus a neutral “Not decided yet”;
+  - unanswered stays “not answered yet” and is never treated as “no”; unknown is easy and legitimate;
   - **Clear answer** returns to not answered.
-- **Applicability-driven.** A field that does not apply shows a one-line reason instead of controls; for example, rail preference for single-link endpoints. No conditional reveals are used (appendix A E2). Earlier answers are kept and return when the field applies again (D01 §3 applicability predicates).
-- **Every field shows its origin.** Fields can be supplied, assumed (with its source), unknown or conflicting. Assumed values offer **Confirm** (creates a supplied answer) and **Don't assume** (an explicit unknown). Supplied and asked-undecided values offer **Clear answer**.
+- **Applicability-driven.** A field that does not apply shows a one-line reason instead of controls; for example, rail preference for single-link endpoints. Inapplicable questions are not hidden and revealed (appendix A E2). Earlier answers are kept and return when the field applies again (D01 §3 applicability predicates).
+- **Every field shows its origin.** Fields can be supplied, assumed (with its source), unknown or conflicting. Assumed values offer **Confirm** (creates a supplied answer) and **Don't assume** (an explicit unknown). Supplied and “not decided yet” values offer **Clear answer**.
 - **Find a detail.** One search box covers every field label, help text and section. It lists matches, including inapplicable ones marked as such, and jumps to the field, so users never step through unrelated questions.
 - **Edits save immediately** and create a new details revision. They reach outputs only when the user generates. The UI says so.
 - **Network purpose is two separate questions.** Each endpoint group says which network it serves. Project scope is a yes/no/undecided per network, derived as “in scope” when a group uses it. Unanswered networks are listed “scope not decided”. A network in scope without a group shows “Not estimated”. A group serving an out-of-scope network is a contradiction. None is ever shown as 0.
@@ -251,8 +264,9 @@ Discovery navigation (home categories, library views) never selects a calculatio
 | Rail-optimized = yes | One leaf per rail for each block of up to *slots* endpoints | R04 S02/S03 |
 | Dual-homed = yes, rail-optimized = no | ESLAG leaf pairs; links split evenly across the pair | R02 C03 (conditional) |
 | Both = no | All of an endpoint's links on one leaf | — |
-| Rail and/or redundancy undecided | **Every consistent packing computed and shown as labelled alternatives**; identical results collapse to one number | D01 §4 (alternatives never summed) |
-| Rail = yes and dual-homed = yes | Contradiction explained (needs two links per rail; not modelled) | — |
+| Rail and/or redundancy undecided | **Every packing this prototype models** is computed and shown as labelled alternatives; results identical across them collapse to one number. These are not all possible designs. | D01 §4 (alternatives never summed) |
+| Rail = yes and dual-homed = yes | **Not modelled** here: no quantity, and no claim that it is impossible | — |
+| Two or more groups with undecided network | “Kept separate” and “sharing switches (conditional)” shown as alternatives; never pooled silently | Model overlap rule (#8 6718326881) |
 | Racks known, placement = in each rack | Packing applied per rack (rack-local leaves) | R04 S06-1 |
 | Racks known, placement undecided | Rack-local and shared shown as alternatives | — |
 | No racks | Placement not considered (labelled in the trace) | — |
@@ -288,13 +302,16 @@ All counts are checked by `fixture-check.py` and reproduced by the prototype (`p
 | Details answered | Output (selected lines) | What the UI says |
 | --- | --- | --- |
 | Count 128, type B200 (8 × 400G). Rail preference, redundancy, racks and network **not answered** | Links **1,024**; leaves **16**; cages **512**; spines **8**; leaf-to-spine links **512**; OOB **24** | “Undecided choices shown as alternatives: rail preference / redundancy”. All three packings give the same numbers here, so each line shows one number. Lines are labelled “Network not decided”. |
-| Count → **136** | Links 1,088 and cages 544 under every alternative. **Leaves: rail-optimized 24 · dual-homed pairs 18 · all links on one leaf 17** (separate totals). Leaf-to-spine links 768 · 576 · 544. Spines 16 under all. | Top suggestion: “Should the links be rail-optimized? — deciding could change leaf-to-spine links (544 to 768)”. |
-| Racks **8**, endpoints per rack **16** | **Contradiction:** “136 endpoints cannot fit 8 racks × 16 = 128 positions. Both answers are kept; nothing was changed.” Leaf lines suspended; links kept. | Ways forward with Preview: “the racks are right: use 128 endpoints” or “the count is right: use 9 racks”. |
-| Racks **9** | No contradiction; “8 rack positions unused”. **Placement undecided** adds alternatives: rail-optimized, rack-local → **72 leaves**, whose 2,304 uplinks exceed one spine layer (conflict **only under that alternative**). | Placement shown to matter, not silently chosen |
+| Count → **136** | Links 1,088 and cages 544 under every evaluated alternative. **Leaves: rail-optimized 24 · dual-homed pairs 18 · all links on one leaf 17** (separate totals for the three packings this prototype models). Leaf-to-spine links 768 · 576 · 544. Spines 16 under all. | Top suggestion: “Should the links be rail-optimized? — deciding could change leaf-to-spine links (544 to 768)”. |
+| Racks **8**, **16 populated** per rack | **Mismatch:** “136 endpoints, but 8 racks × 16 populated per rack = 128. Both answers are kept; nothing was changed.” Leaf lines suspended; links kept. | Ways forward with Preview: “the racks are right: use 128 endpoints” or “the count is right: use 9 racks”. |
+| Racks **9** | Consistent: “last rack partly populated: 8 of 16”. **Placement undecided** adds alternatives: rail-optimized, rack-local → **72 leaves**, whose 2,304 uplinks exceed one spine layer (conflict **only under that alternative**). | Placement shown to matter, not silently chosen |
 | Rail-optimized = yes, placement = shared | Leaves **24**, spines **16** | Alternatives resolve; the diff explains it |
 | Count `120-136` (range) instead | Leaves **16–24**, links **960–1,088**, precision “bounded (range)” | A narrower count is suggested |
 | Second endpoint group: 40 general servers (2 × 25G), storage network, dual-homed | Storage: 2 leaves, 2 spines (100G family); backend unchanged; OOB **28** | Separate switches per network. Storage scope is derived as “in”; other networks are listed “scope not decided”. |
-| Racks only (4 NVL72-style racks, 18 per rack by profile default) | Count **derived** = 72; tray links **288** | Count shown as derived, not supplied |
+| Racks only (4 NVL72-style racks; capacity 18 by profile default; populated not answered) | Count 72 as an **explicit assumption**; tray links **288** | “assumes every rack is full (racks × capacity) — confirm, or enter populated endpoints per rack”. The links line carries the flag and lists the count under “rests on”. |
+| Same, with **10 populated** per rack | Count **derived** = 40; links 160 | “32 rack positions unused (40 populated of 72 capacity)” |
+| Supplied count 60 in those 4 racks; then 80 | 60: partly filled, “12 rack positions unused”. 80: “More endpoints than rack positions” (over capacity) | Both answers kept |
+| Two groups (128 and 64 rail-optimized B200), **both networks not answered** | Alternatives: kept separate, 8 + 4 spines; or sharing switches (conditional), 16 spines | Neither pooled nor split silently; each line says “not applicable under this alternative” where it does not exist |
 
 ### 7.2 Placeholder starters (same policies, same workspace)
 
@@ -312,7 +329,7 @@ Views: S1 is under “65–256 endpoints”, “No rack information”, “Leaf-
 - With the count blank, links, leaves and spines say “Not estimated — needs endpoint count”.
 - A custom endpoint without a link count is not estimated.
 - “Other leaf profile” makes dependent lines need catalog evidence.
-- Rail-optimized plus dual-homed for the same links is explained as a contradiction.
+- Rail-optimized plus dual-homed for the same links is marked “not modelled here”: no quantity, and no claim that it is impossible.
 
 ## 8. "Why this number?" (quantity trace)
 
@@ -365,8 +382,8 @@ Demo for the moderated walkthrough (the order is a facilitator script, not produ
 | Session | User action | System response |
 | --- | --- | --- |
 | 1 | Start from scratch. Count 128, type B200; nothing else. Generate (revision 1). Opens a trace. Save and close. | First BOM (§7.1, row 1). Project listed with “latest output revision 1”. |
-| 2 | Resume. Count → 136; racks 8 × 16 (the “Where they sit” sub-group of the same section). Generate (revision 2). | Resume banner. The edits mark only dependent lines stale. Revision 2: the rack contradiction is shown with both answers kept; links kept. |
-| 2 | Chooses “the count is right: use 9 racks”; decides rail-optimized, shared placement, backend. Generate (revision 3). | 24 leaves, 16 spines. Changes tab: alternatives resolved, contradiction resolved, detail changes listed. |
+| 2 | Resume. Count → 136; racks 8 × 16 (the “Where they sit” sub-group of the same section). Generate (revision 2). | Resume banner. The edits mark only dependent lines stale. Revision 2: the count / racks × populated mismatch is shown with both answers kept; links kept. |
+| 2 | Chooses “the count is right: use 9 racks”; decides rail-optimized, shared placement, backend. Generate (revision 3). | 24 leaves, 16 spines. Changes tab: alternatives resolved, mismatch resolved, detail changes listed. |
 | 3 | Records orders: 24 leaves, 16 spines. Save and close; resume. Count → 260, racks → 17. | “4 edits since this output … lines marked stale”. |
 | 3 | Generate (revision 4). | Leaves **40 = 24 ordered + 16 proposed**. **Conflict:** “16 ordered spines × 64 = 1,024 ports. With no D/U limit set, every leaf keeps all 32 uplinks: 40 leaves × 32 = 1,280 uplink ports, 256 more than the ordered spines have.” One way forward is “Set a D/U limit: partly filled leaves may then need fewer uplinks” (with D/U ≤ 1 the need is 1,040: still 16 short). |
 
@@ -480,7 +497,7 @@ Each BOM line, its link patterns and the planning identities form one hierarchy.
 | UG1 Readiness comprehension (SM9) | T7 | **No critical misread**: a conditional estimate treated as orderable, the BOM as installable, or “details recorded” as readiness |
 | UG2 Stop and resume | T1, T3 | Stops after the first useful output without believing the project is incomplete; on resume finds the latest output and pending edits unaided |
 | UG3 Extra information placed directly | T2, T4 | Enters each new fact in its own question without opening unrelated sections; record the path |
-| UG4 Unknown is not false | T3, T6 | No participant reads an unanswered rail/redundancy/scope question as “no”, or treats alternatives as a total. Overuse of “hasn't decided” when the brief has the answer is recorded (appendix A E5). |
+| UG4 Unknown is not false | T3, T6 | No participant reads an unanswered rail/redundancy/scope question as “no”, or treats alternatives as a total. Record which states participants use (not answered, not decided yet) and why; there is no target to minimise them. |
 | UG5 Refresh and diff | T2, T5, T9 | Regenerates and explains what changed |
 | UG6 Infeasibility, contradictions and commitments | T2, T4, T9 | No participant believes hh-aid changed an answer, relaxed a constraint or changed an order |
 | UG7 Library discovery | T8 | Finds a fitting starter through at least two views; states it is a placeholder; identifies starter values as assumptions |
@@ -488,7 +505,7 @@ Each BOM line, its link patterns and the planning identities form one hierarchy.
 | UG9 Same-scenario time (SM1) | T1 against the incumbent path | Target set after the baseline |
 | UG10 Trace and scale | T4, T11 | Correct explanation; time and path reported |
 | UG11 Suggestion usefulness | Suggestions used, ignored or hidden, and why | Reported |
-| UG12 Essentials found (alternative A) | T1 | Every participant finds both essential questions unaided. If not, evaluate alternative B (appendix A §A3). |
+| UG12 Essentials and optional detail (A versus B) | T1–T3, half the participants in each view | Every participant finds both essentials unaided in either view. Compare how many optional facts from the brief are recorded in A and in B, and any reports of being overwhelmed. Choose the default view from this (appendix A §A3). |
 
 A critical misread under UG1, UG2, UG4, UG6 or UG8 is a **trust failure**. It must be resolved and retested before the affected flow is accepted.
 
@@ -513,7 +530,7 @@ Revision 2 findings (dispositions updated for revision 3):
 | HW9 | Evidence/target banner on every screen (banner blindness) | Minimalist design | Open risk | Kept (S). T10/UG8. |
 | HW10 | "Exact" beside "conditional estimate" may read as a contradiction | Match with real world | Open risk (critical if misread) | T7/UG1 |
 
-Revision 3 findings:
+Revision 3 and 3.1 findings:
 
 | # | Finding | Heuristic / requirement | Severity | Disposition |
 | --- | --- | --- | --- | --- |
@@ -524,9 +541,11 @@ Revision 3 findings:
 | HW24 | With two undecided dimensions, alternative labels get long (“dual-homed pairs · rack-local leaves / dual-homed pairs · shared leaves”) | Recognition; minimalism | Open risk | Candidate: a small matrix view. T6/UG4. |
 | HW25 | The Links tab shows patterns for the first alternative only | Visibility of status | Minor | Labelled on screen; open. |
 | HW26 | “Not checked: redundancy” remains when rail-optimized is chosen | Match with real world | Minor | Accurate (redundancy still unanswered) but possibly confusing; observe in T3. |
-| HW27 | An endpoint-group section has 11 questions, although only two are needed for a first BOM | Progressive disclosure (appendix A E4) | Open risk (the main risk of alternative A) | Mitigated by sub-headings, “needed for a first BOM” chips, a getting-started note and initial focus. UG12 decides whether to try B. |
+| HW28 | (Lead review) On a 1,400 × 1,000 first entry, count and endpoint type were not visible together beneath the guidance, counters and group metadata | Recognition; visibility | Major | Fixed in revision 3.1 (§2.1, row 1). Measured: both visible with the hint and project header, no scroll at 1,400 × 1,000; at 390 × 844 after an automatic scroll to the details heading. |
+| HW29 | Lines whose numbers were identical across the evaluated alternatives listed rail preference and redundancy as “Not checked” | Match with real world | Minor | Fixed: “Undecided: … (same result under every alternative evaluated here)”. |
+| HW27 | An endpoint-group section has 12 questions, although only two are needed for a first BOM | Progressive disclosure (appendix A E4) | Open risk | Revision 3.1: essentials together at the top, a one-line hint, the tally moved down, conditional first-entry scroll, and alternative B (collapsed optional groups) available in the same workspace. UG12 compares them. |
 
-**Critical trust/comprehension failures (criterion 4).** None can be rated critical without users. Open risks: HW10, HW9, HW13, HW24, HW27. An independent heuristic pass and a sponsor review of revision 3 are requested.
+**Critical trust/comprehension failures (criterion 4).** None can be rated critical without users. Open risks: HW10, HW9, HW13, HW24, HW27. An independent heuristic pass and a sponsor review of revision 3.1 are requested when lead lifts the hold.
 
 ## 16. Vocabulary and contracts with D01
 
@@ -544,16 +563,24 @@ Terms adopted in revision 1 are unchanged (D01 [PR #23 @ `3d313fe`](https://gith
 | Trace | Stable aggregate demand IDs | §8 |
 | Conflict | `ConflictRecord`, candidate relaxations, demonstrated infeasible vs not proven | §9 |
 
-**Possible contract gaps (questions for t10 / model, posted on #8; not conflicts):**
-1. **Details revision.** The workspace cites "output revision N from details rX". Does D01 identify an answer-set revision (a snapshot of current AnswerRecords) that each generated revision references, or should it be derived from supersession links?
-2. **Partial generation.** One generation run yields estimated, not-estimated and conflict-suspended lines together. Is that one candidate revision with per-line results, as D02 assumes?
-3. **Presentation grouping.** Is question-to-section grouping presentation metadata (D02-owned), or part of the question definition?
+**Answered by model and acknowledged by lead (working clarifications, not final D01 approval):**
+1. **DetailsSnapshot** ([6718064248](https://github.com/afewell-hh/hh-aid/issues/8#issuecomment-6718064248), lead [6718071380](https://github.com/afewell-hh/hh-aid/issues/8#issuecomment-6718071380)). The “details rX” label is an immutable, separately identified snapshot that can be partial and saved without generating. Each output binds to its snapshot ID and digest, and a run started on r7 finishes against r7. The prototype's details revision follows this.
+2. **One candidate with mixed per-scope results** (same comment). Estimated, not-estimated and conflict-suspended scopes coexist. Partial subtotals must not look like complete totals, and old outputs stay tied to their revision. D02's BOM summary counts each state separately.
+3. **Presentation grouping is D02-owned metadata** keyed by stable question IDs (same comment). Collapsing or moving sections, including alternative B's collapsed groups, must not erase answers or change applicability or calculation. The prototype's view switch changes presentation only.
+4. **Independent scoped answers, overlap and starters** ([6718326881](https://github.com/afewell-hh/hh-aid/issues/8#issuecomment-6718326881), lead [6718550737](https://github.com/afewell-hh/hh-aid/issues/8#issuecomment-6718550737)):
+   - counts name their scope, and rack information describes the same inventory rather than adding to it;
+   - a profile disagreeing with a supplied answer creates a ConflictRecord;
+   - starters have a stable identity and immutable revisions, with views as many-to-many discovery metadata;
+   - copied starter facts are **inherited assumptions pending confirmation**, with source lineage, never relabelled as supplied;
+   - source approvals and evidence are not inherited.
 
-4. **Starter provenance (revision 3).** Starter values arrive as `assumed` with source “from starter S2 v0”. Is that the right origin, with the starter (ID, version) as the named default? Or does D01 want a distinct provenance reference on the AnswerRecord?
-5. **Undecided versus unanswered.** D02 distinguishes not answered from “customer hasn't decided (asked)”; both are `unknown`. Is “asked” a flag or source detail on the AnswerRecord, or a D02-only presentation state?
-6. **Alternatives from undecided choices.** One generation evaluates every consistent combination of undecided packing and placement choices and shows separate totals. Are these one candidate revision with alternative results (D01 “alternatives have separate totals”), or scenario branches?
+   D02 §6.8 and appendix A §A4 follow this.
 
-D02 does not ask for a D01 rewrite. Model indicated persistent partial state may already cover items 1–3; items 4–6 are posted on #8 with this revision.
+**Still with model** (lead asked for a short clarification in [6718550737](https://github.com/afewell-hh/hh-aid/issues/8#issuecomment-6718550737)):
+- where “not decided yet” (asked) provenance belongs while the value stays unknown;
+- how conditional alternatives in one output keep their own assumptions and validation status without becoming silently selected branches.
+
+D02's current behaviour is presentation-only for both and will follow model's answer.
 
 ## 17. Decisions and questions
 
@@ -565,8 +592,8 @@ D02 does not ask for a D01 rewrite. Model indicated persistent partial state may
 | Q-UX-4 | May the sponsor review revision 3 and introduce 3–4 SEs (R01 §9 screening)? | Sponsor | Heuristic evidence only until then |
 | Q-UX-5 | Does release review need an approver when every item is unchanged with evidence? | Sponsor + ops | Show review pending; no auto-approval |
 | Q-UX-6 | May customers receive trace text directly? | Sponsor | Copyable text with assumptions |
-| Q-UX-7 | Is alternative A (grouped essentials in the workspace) acceptable, given its risk of a long section (HW27)? Should the explicit “Customer hasn't decided” option stay (appendix A E5)? | Sponsor | A, with UG12 as the switch condition to B |
-| Q-UX-8 | Starter library contracts: who curates, how release compatibility and versions are shown, and whether an updated starter is offered to projects started from it (proposed: a reviewable diff, never silent) | Sponsor + model + compat | Placeholders only; no updates propagate |
+| Q-UX-7 | Optional groups shown (A) or collapsed to headings (B)? Both are in the same workspace; decide with SE sessions (UG12). | Sponsor, after sessions | A by default as a hypothesis; B available behind the view switch |
+| Q-UX-8 | Library curation, publishing and update mechanics | Deferred (sponsor decided placeholders now, same-tool authoring later) | Placeholders only; no updates propagate |
 | Q-UX-9 | Which views should the library keep beyond the four current categories (for example vendor, budget band), and when should it move from tabs to multi-select facets? | Sponsor | The four sponsor categories as tabs |
 
 ## 18. Acceptance criteria and evidence (#9)
@@ -594,10 +621,13 @@ open docs/design/experience-design/walkthrough.html          # any modern browse
 **What is real in the prototype:**
 - from-scratch entry (alternative A), saved projects, sessions and the resume summary;
 - the starter library: four views over four placeholder starters, preview, and customise as assumptions;
-- endpoint groups (mixed inventory, up to three), with independent questions; radios with no default, “hasn't decided”, and Clear answer;
+- endpoint groups (mixed inventory, up to three), with independent questions; radios with no default, “Not decided yet”, and Clear answer;
+- the essentials block, and the A/B view switch for optional groups;
 - the details panel with origins, Confirm and Don't assume; applicability reasons; Find a detail;
 - generation by answer-driven packing and placement policies, with alternatives for undecided choices and ranges for count ranges;
-- contradictions (count versus rack capacity, rail versus dual-homing, scope versus use);
+- populated-versus-capacity handling (derived count, explicit full-rack assumption, unused positions, mismatch, over-capacity);
+- network-membership alternatives for groups with undecided networks;
+- contradictions (count versus racks, scope versus use) and “not modelled” combinations (rail with dual-homing);
 - Not-estimated gating and staleness;
 - a trace for every quantity, with copy;
 - conflicts with Preview and Use as my answer;
@@ -614,7 +644,7 @@ open docs/design/experience-design/walkthrough.html          # any modern browse
 - storage is per-browser `localStorage`, and the prototype says when it is unavailable.
 
 **Limitations:**
-- **No SE interviews or usability tests.** Sponsor feedback exists for revisions 1 and 2 only; revision 3 is unreviewed.
+- **No SE interviews or usability tests.** Sponsor feedback exists for revisions 1 and 2 only; revisions 3 and 3.1 are unreviewed.
 - The six sources are guidance and adjacent-domain research, not evidence about SEs (appendix A).
 - No screen-reader testing.
 - The 320 px check is an overflow measurement in an iframe, not a device test.

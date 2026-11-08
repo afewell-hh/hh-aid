@@ -158,4 +158,21 @@ assert leaves(260, 8, 64, "rail") == 40
 assert 40 * 32 == 1280 > 16 * 64 == 1024                        # no D/U limit
 assert 32 * 32 + 8 * ceil_div(4 * 400, 800) == 1040 > 1024       # D/U <= 1
 
+
+# --- Revision 3.1 corrections: occupancy vs capacity; unknown networks. ---
+# Capacity is not occupancy: 4 NVL72-style racks of capacity 18 give a
+# full-rack estimate of 72 only as an explicit assumption; 10 populated per
+# rack derive 40 endpoints and leave 32 of 72 positions unused.
+assert (4 * 18, 4 * 10, 4 * 18 - 4 * 10, 4 * 10 * 4) == (72, 40, 32, 160)
+assert 60 <= 4 * 18 and 4 * 18 - 60 == 12 and 80 > 4 * 18     # partly / over
+# 136 vs 8 racks x 16 populated: mismatch (136 > 128); 9 racks consistent
+# because 8 x 16 < 136 <= 9 x 16, with the last rack holding 8 of 16.
+assert 136 > 8 * 16 and 8 * 16 < 136 <= 9 * 16 and 136 - 8 * 16 == 8
+# Two groups with unknown networks (128 and 64 rail-optimized B200): kept
+# separate, 16 + 8 leaves need 8 + 4 spines; if shared (conditional), 24
+# leaves need 16 spines. Both are shown; neither is chosen silently.
+assert (leaves(128, 8, 64, "rail"), leaves(64, 8, 64, "rail")) == (16, 8)
+assert (spines(16, 32, 64, min_s=2), spines(8, 32, 64, min_s=2)) == (8, 4)
+assert spines(24, 32, 64, min_s=2) == 16
+
 print("D02 fixture arithmetic passed")

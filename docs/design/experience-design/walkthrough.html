@@ -97,19 +97,23 @@ details.demo>summary{cursor:pointer;font-size:14px}
 h4{font-size:14px}
 legend.main{padding:0}
 .link{text-align:left}
+.ess{display:flex;flex-wrap:wrap;gap:0 14px;border-bottom:1px solid var(--line);margin-bottom:4px}
+.ess>.field{flex:1 1 170px;border-top:0}
+details.sub{border-top:1px solid var(--line);padding:4px 0}
+details.sub>summary{cursor:pointer;font-weight:600;font-size:14px}
 </style>
 </head>
 <body>
 <header class="top">
   <h1>hh-aid planning workspace — low-fidelity prototype</h1>
-  <p class="note" style="margin:2px 0">D02 #9 revision 3 · synthetic data and <b>hypothetical hardware only</b> · small illustrative planning policies, not a solver · starter designs and release rows are placeholders · not a production UI · saved only in this browser</p>
+  <p class="note" style="margin:2px 0">D02 #9 revision 3.1 · synthetic data and <b>hypothetical hardware only</b> · small illustrative planning policies, not a solver · starter designs and release rows are placeholders · not a production UI · saved only in this browser</p>
   <details class="demo">
     <summary>Facilitator demo script (optional; the workspace has no required order)</summary>
     <div class="note" style="font-size:14px;color:var(--fg)">
       <p>For moderated walkthroughs only. Every section and output is reachable at any time.</p>
       <ol>
         <li><b>Session 1 — from scratch, mixed knowledge.</b> “Start from scratch”. Enter only the endpoint count (128) and type (B200). Leave rail preference, redundancy and racks unanswered. Generate. Lines that are the same under every undecided choice show one number. Open any quantity's explanation. Save and close.</li>
-        <li><b>Session 2 — return, add what you learned.</b> Resume. Change the count to 136: leaves now show separate alternatives by rail preference and redundancy. Add 8 racks with 16 endpoints per rack: the contradiction is explained, with both answers kept. Choose a way forward. Decide rail-optimized, then generate again and open Changes.</li>
+        <li><b>Session 2 — return, add what you learned.</b> Resume. Change the count to 136: leaves now show separate alternatives by rail preference and redundancy. Add 8 racks with 16 populated endpoints per rack: the mismatch is explained, with both answers kept. Choose a way forward. Decide rail-optimized, then generate again and open Changes.</li>
         <li><b>Optional detail.</b> Add a second endpoint group (40 general servers, storage network, dual-homed) to see mixed inventory with separate switches per network.</li>
         <li><b>Start from a design.</b> On the project list, browse the starter library by count, racks, topology or purpose: the same placeholder appears in several views. Customise it; its values arrive as assumptions in the same details panel.</li>
         <li><b>Release.</b> Release tab → record a placeholder target → review → revalidate.</li>
@@ -162,16 +166,17 @@ function GF(g){
   var P=g+'.';
   var multiLink=function(p){var L=eff(p,P+'links').v;return L==null||L>=2};
   return [
-    {id:P+'name',sub:'what',l:'Group name',type:'text',nostate:true,def:function(p){return {v:'Group '+g.slice(1)}}},
-    {id:P+'count',sub:'what',l:'How many endpoints?',sh:'endpoint count',type:'count',need:true,unlock:'endpoint links and ports, then every switch count',h:'A number, or a range such as 120-136. If you only know racks, answer “Where they sit” instead.',def:function(p){var r=eff(p,P+'racks').v,e=eff(p,P+'perRack').v;return r&&e?{v:r*e,o:'derived',src:'derived: racks × endpoints per rack'}:null}},
-    {id:P+'profile',sub:'what',l:'What kind of endpoint?',sh:'endpoint type',type:'sel',need:true,opts:function(){return Object.keys(PROF).map(function(x){return [x,PROF[x].n]})},unlock:'links per endpoint and link rate (defaults you can change)'},
+    {id:P+'name',sub:'switch',l:'Group name',type:'text',nostate:true,def:function(p){return {v:'Group '+g.slice(1)}}},
+    {id:P+'count',sub:'what',l:'How many endpoints?',sh:'endpoint count',type:'count',need:true,h:'A number or a range, e.g. 120-136.',def:function(p){var r=eff(p,P+'racks').v,e=eff(p,P+'perRack').v,c=eff(p,P+'rackCap').v;if(r&&e)return {v:r*e,o:'derived',src:'derived: racks × populated endpoints per rack'};if(r&&c)return {v:r*c,src:'assumes every rack is full (racks × capacity) — confirm, or enter populated endpoints per rack',full:true};return null}},
+    {id:P+'profile',sub:'what',l:'What kind of endpoint?',sh:'endpoint type',type:'sel',need:true,opts:function(){return Object.keys(PROF).map(function(x){return [x,PROF[x].n]})},h:'Sets default links and rate; change them below.'},
     {id:P+'links',sub:'what',l:'Fabric links per endpoint',sh:'links per endpoint',type:'num',min:1,max:16,def:function(p){var pr=PROF[eff(p,P+'profile').v];return pr&&pr.links?{v:pr.links,src:pr.src}:null},unlock:'link and port counts'},
     {id:P+'rate',sub:'what',l:'Link rate',sh:'link rate',type:'sel',opts:rates,def:function(p){var pr=PROF[eff(p,P+'profile').v];return pr&&pr.rate?{v:pr.rate,src:pr.src}:null},unlock:'leaf profile and port modes'},
     {id:P+'net',sub:'how',l:'Which network do these links serve?',sh:'network',type:'radio',opts:function(){return Object.keys(NETS).map(function(x){return [x,NETS[x]]})},unlock:'which fabric these lines belong to; different networks get separate switches'},
     {id:P+'rail',sub:'how',l:'Should the links be rail-optimized?',sh:'rail preference',type:'radio',ap:multiLink,opts:function(){return [['yes','Yes — link n of every endpoint goes to the same leaf set'],['no','No']]},unlock:'how links pack onto leaves; until decided, the BOM shows each option separately'},
     {id:P+'homing',sub:'how',l:'Should each endpoint be dual-homed to a leaf pair (ESLAG)?',sh:'redundancy',type:'radio',ap:multiLink,opts:function(){return [['dual','Yes, dual-homed'],['single','No']]},unlock:'leaf pairs; until decided, shown as alternatives. ESLAG support is conditional (R02 C03)'},
     {id:P+'racks',sub:'where',l:'How many racks hold these endpoints?',sh:'rack count',type:'num',min:1,max:512,unlock:'rack-local leaf placement and a cross-check on the endpoint count'},
-    {id:P+'perRack',sub:'where',l:'Endpoints per rack (capacity)',sh:'endpoints per rack',type:'num',min:1,max:256,def:function(p){return eff(p,P+'profile').v==='nvl72'?{v:18,src:'NVL72-style profile (R04 S06-1)'}:null},unlock:'a derived endpoint count when the count is not known; rack fill'},
+    {id:P+'perRack',sub:'where',l:'Populated endpoints per rack (actual, typical rack)',sh:'populated per rack',type:'num',min:1,max:256,unlock:'a derived endpoint count (racks × populated); rack-local leaf blocks'},
+    {id:P+'rackCap',sub:'where',l:'Maximum endpoints per rack (capacity)',sh:'rack capacity',type:'num',min:1,max:256,def:function(p){return eff(p,P+'profile').v==='nvl72'?{v:18,src:'NVL72-style profile (R04 S06-1)'}:null},unlock:'unused positions and an over-capacity check; a full-rack estimate only as a visible assumption'},
     {id:P+'place',sub:'where',l:'Where should these endpoints’ leaves sit?',sh:'leaf placement',type:'radio',opts:function(){return [['rack','In each rack (rack-local)'],['central','Shared, not per rack']]},unlock:'leaf counts when racks are known; until decided, shown as alternatives'},
     {id:P+'leaf',sub:'switch',l:'Leaf profile',sh:'leaf profile',type:'sel',opts:function(){return Object.keys(LEAF).map(function(x){return [x,LEAF[x].n]})},def:function(p){var r=eff(p,P+'rate').v;return r==null?null:{v:r==='25'?'h48':'h400',src:'hypothetical fixture hardware, chosen by link rate'}},unlock:'endpoint slots and uplinks per leaf'}
   ];
@@ -191,7 +196,7 @@ var PF=[
   {id:'cons',sec:'cabling',l:'Cable construction',sh:'cable construction',type:'sel',opts:function(){return [['int','Integrated cables or split assemblies'],['opt','Optical modules plus fibers']]},h:'Until decided, both constructions are shown as separate totals, never summed.'},
   {id:'reach',sec:'cabling',l:'Placement and reach',sh:'placement and reach',type:'sel',opts:function(){return [['row','Same row, short reach'],['rows','Across rows']]},h:'Needed later for cable lengths and SKUs.'}
 ]);
-var SUBS={what:['What and how many','Needed for a first BOM: a count (or racks × endpoints per rack) and an endpoint type.'],how:['How they connect','Optional. Unanswered choices appear as separate alternatives.'],where:['Where they sit','Optional. Rack information enables placement and cross-checks the count.'],switch:['Leaf switch','Optional. Defaults are hypothetical.']};
+var SUBS={what:['What and how many',''],how:['How they connect','Optional. Unanswered choices appear as separate alternatives.'],where:['Where they sit','Optional. If you only know racks, racks × populated endpoints gives the count.'],switch:['Group name and leaf switch','Optional. Leaf defaults are hypothetical.']};
 var SECS=[{id:'scope',t:'Project and request'},{id:'groups',t:'Endpoint groups'},{id:'nets',t:'Networks in scope'},{id:'switches',t:'Spine and uplink profiles'},{id:'policy',t:'Topology, failure and oversubscription'},{id:'cabling',t:'Cabling'},{id:'target',t:'Installation target and evidence'}];
 function fields(p){var a=[];p.groups.forEach(function(g){GF(g).forEach(function(f){f.sec='grp-'+g;f.g=g;a.push(f)})});return PF.concat(a)}
 var GFCACHE={};
@@ -222,7 +227,8 @@ function optLabel(id,v){var f=fd(id);if(!f)return String(v);if(/profile$/.test(i
 var KEY='hh-aid-d02-workspace-v3',storageOK=true,store={projects:{},order:[]};
 try{var raw=localStorage.getItem(KEY);if(raw)store=JSON.parse(raw)}catch(e){storageOK=false}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(store));storageOK=true}catch(e){storageOK=false}}
-var ui={screen:'home',pid:null,tab:'bom',open:{},trace:null,view:null,cmpA:null,cmpB:null,find:'',hideSug:false,patq:'',patchg:false,patexp:false,srv:'',rail:'0',prev:null,copy:null,lockForm:null,resume:null,errs:{},lib:'count',libSel:null};
+var OPTM='expanded';try{OPTM=localStorage.getItem('hh-aid-d02-optmode')||'expanded'}catch(e){}
+var ui={optMode:OPTM,screen:'home',pid:null,tab:'bom',open:{},trace:null,view:null,cmpA:null,cmpB:null,find:'',hideSug:false,patq:'',patchg:false,patexp:false,srv:'',rail:'0',prev:null,copy:null,lockForm:null,resume:null,errs:{},lib:'count',libSel:null};
 function P(){return store.projects[ui.pid]}
 
 /* ===== answers ===== */
@@ -235,7 +241,7 @@ function eff(p,id){
   if(df&&df.v!=null)return {v:df.v,o:df.o||'assumed',src:df.src};
   return {v:null,o:'unknown'};
 }
-function ORG(e){return e.o==='user'?'supplied':e.o==='assumed'?'assumed':e.o==='derived'?'derived':e.o==='na'?'not applicable':e.marked?'undecided (asked)':'not answered'}
+function ORG(e){return e.o==='user'?'supplied':e.o==='assumed'?'assumed':e.o==='derived'?'derived':e.o==='na'?'not applicable':e.marked?'not decided yet':'not answered yet'}
 function chipE(e){var c=e.o==='unknown'?'unknown':e.o;return '<span class="chip '+c+'">'+ORG(e)+'</span>'}
 function showV(p,id,e){e=e||eff(p,id);if(e.o==='na')return 'not applicable';if(e.v==null)return e.marked?'undecided':'not answered';return optLabel(id,e.v)}
 function snap(p){var i={};fields(p).forEach(function(f){if(f.nostate)return;var e=eff(p,f.id);i[f.id]={v:e.v,o:e.o,m:!!e.marked}});return {i:i,l:clone(p.locks),t:p.target.label,g:p.groups.slice()}}
@@ -305,26 +311,28 @@ function core(p,c,end){
   p.groups.forEach(function(g){
     var Pp=g+'.',nm=gname(p,g),pre=multi?nm+' — ':'';
     var cnt=parseCount(V(Pp+'count')),N=cnt?(end==='hi'?cnt.hi:cnt.lo):null;
-    var L=V(Pp+'links'),R=V(Pp+'rate'),net=V(Pp+'net')||'undecided',lf=LEAF[V(Pp+'leaf')],Rk=V(Pp+'racks'),Er=V(Pp+'perRack');
+    var L=V(Pp+'links'),R=V(Pp+'rate'),net=V(Pp+'net')||'undecided',lf=LEAF[V(Pp+'leaf')],Rk=V(Pp+'racks'),Er=V(Pp+'perRack'),Cp=V(Pp+'rackCap'),cE=E(Pp+'count'),cSup=cE.o==='user'||(cE.o==='assumed'&&cE.starter);
     var eDeps=[Pp+'count',Pp+'links',Pp+'rate'],u=unk(eDeps);
     if(u.length)ne(g+'.eplinks',pre+'Endpoint links',eDeps,u);
-    else add({key:g+'.eplinks',l:pre+'Endpoint links ('+R+'G)',q:N*L,deps:eDeps,tr:T(fmt(N*L)+' links = '+fmt(N)+' endpoints × '+L+' links each',[Pp+'count',Pp+'links'],[T(R+' Gb/s per link',[Pp+'rate'])])});
-    var lDeps=eDeps.concat([Pp+'leaf']),lOpt=[Pp+'rail',Pp+'homing',Pp+'place',Pp+'racks',Pp+'perRack'];
+    else add({key:g+'.eplinks',l:pre+'Endpoint links ('+R+'G)',q:N*L,deps:eDeps,flags:/^assumes every rack/.test(cE.src||'')?['count assumes every rack is full (capacity), not stated occupancy']:[],tr:T(fmt(N*L)+' links = '+fmt(N)+' endpoints × '+L+' links each',[Pp+'count',Pp+'links'],[T(R+' Gb/s per link',[Pp+'rate'])])});
+    var lDeps=eDeps.concat([Pp+'leaf']),lOpt=[Pp+'rail',Pp+'homing',Pp+'place',Pp+'racks',Pp+'perRack',Pp+'rackCap'];
     var LB={leaves:pre+'Leaf switches',cages:pre+'Leaf endpoint ports / cages',epcab:pre+'Endpoint cable construction'};
-    var cf=null,cap=Rk&&Er?Rk*Er:null;
-    if(N!=null&&cap!=null&&E(Pp+'count').o!=='derived'){
-      if(N>cap){cf=g+'.C-rack';var rs={},cs={};rs[Pp+'count']=cap;cs[Pp+'racks']=cdiv(N,Er);
-        o.conf.push({id:cf,kind:'proven',t:pre+'More endpoints than rack positions',because:fmt(N)+' endpoints cannot fit in '+Rk+' racks × '+Er+' endpoints per rack = '+fmt(cap)+' positions. Both answers are kept; nothing was changed.',inputs:[Pp+'count',Pp+'racks',Pp+'perRack'],relax:[{t:'The racks are right: use '+fmt(cap)+' endpoints',set:rs},{t:'The count is right: use '+cdiv(N,Er)+' racks',set:cs},{t:'Endpoints per rack is wrong',go:Pp+'perRack'}],aff:['leaves','cages','cables']})}
-      else if(N<cap)o.exc.push(pre+fmt(cap-N)+' rack positions unused (racks partly filled)');
+    var cf=null,mk=function(id,t,because,inputs,relax){cf=g+'.'+id;o.conf.push({id:cf,kind:'proven',t:pre+t,because:because+' Both answers are kept; nothing was changed.',inputs:inputs,relax:relax,aff:['leaves','cages','cables']})},S1=function(k,v){var x={};x[Pp+k]=v;return x};
+    if(Er&&Cp&&Er>Cp)mk('C-occ','Populated endpoints per rack exceed rack capacity',Er+' populated per rack is more than the '+Cp+'-endpoint capacity.',[Pp+'perRack',Pp+'rackCap'],[{t:'Use '+Cp+' populated per rack',set:S1('perRack',Cp)},{t:'Rack capacity is wrong',go:Pp+'rackCap'}]);
+    else if(N!=null&&cSup&&Rk&&Cp&&N>Rk*Cp)mk('C-rack','More endpoints than rack positions',fmt(N)+' endpoints cannot fit in '+Rk+' racks × '+Cp+' capacity = '+fmt(Rk*Cp)+' positions.',[Pp+'count',Pp+'racks',Pp+'rackCap'],[{t:'The racks are right: use '+fmt(Rk*Cp)+' endpoints',set:S1('count',Rk*Cp)},{t:'The count is right: use '+cdiv(N,Cp)+' racks',set:S1('racks',cdiv(N,Cp))},{t:'Rack capacity is wrong',go:Pp+'rackCap'}]);
+    else if(N!=null&&cSup&&Rk&&Er&&(N>Rk*Er||N<=(Rk-1)*Er))mk('C-occmis','Endpoint count disagrees with racks × populated per rack',fmt(N)+' endpoints, but '+Rk+' racks × '+Er+' populated per rack = '+fmt(Rk*Er)+(N<=(Rk-1)*Er?' (more racks than the count needs, even allowing a partly filled last rack).':'.'),[Pp+'count',Pp+'racks',Pp+'perRack'],[{t:'The racks are right: use '+fmt(Rk*Er)+' endpoints',set:S1('count',Rk*Er)},{t:'The count is right: use '+cdiv(N,Er)+' racks',set:S1('racks',cdiv(N,Er))},{t:'Populated per rack is wrong',go:Pp+'perRack'}]);
+    if(!cf&&N!=null&&Rk){
+      if(Er&&cSup&&N<Rk*Er)o.exc.push(pre+'last rack partly populated: '+fmt(N-(Rk-1)*Er)+' of '+Er);
+      if(Cp){var occ=Er?Math.min(Er,Cp):null,used=N;if(used<Rk*Cp)o.exc.push(pre+fmt(Rk*Cp-used)+' rack positions unused ('+fmt(used)+' populated of '+fmt(Rk*Cp)+' capacity)')}
     }
     var pk=c[g+'.pack']||packings(p,g)[0],pl=c[g+'.place']||placements(p,g)[0];
-    if(pk==='CONFLICT'&&!cf){cf=g+'.C-railpair';var r1={},r2={};r1[Pp+'homing']='single';r2[Pp+'rail']='no';o.conf.push({id:cf,kind:'notshown',t:pre+'Rail-optimized and dual-homed were both chosen for the same links',because:'Rail optimization sends link n of each endpoint to rail n’s leaf; ESLAG bundles links across a leaf pair. Combining them needs two links per rail, which this prototype does not model.',inputs:[Pp+'rail',Pp+'homing'],relax:[{t:'Keep rail optimization; not dual-homed',set:r1},{t:'Keep dual-homing; not rail-optimized',set:r2}],aff:['leaves','cages','cables']})}
+    if(pk==='CONFLICT'&&!cf){cf=g+'.C-railpair';var r1={},r2={};r1[Pp+'homing']='single';r2[Pp+'rail']='no';o.conf.push({id:cf,kind:'notshown',t:pre+'Rail-optimized and dual-homed together: not modelled here',because:'Rail optimization sends link n of each endpoint to rail n’s leaf; ESLAG bundles links across a leaf pair. A design combining them (for example two links per rail) may exist, but this prototype does not model it, so no quantity is shown. This is not a claim that the combination is impossible.',inputs:[Pp+'rail',Pp+'homing'],relax:[{t:'Keep rail optimization; not dual-homed',set:r1},{t:'Keep dual-homing; not rail-optimized',set:r2}],aff:['leaves','cages','cables']})}
     if(cf){['leaves','cages','epcab'].forEach(function(k){add({key:g+'.'+k,l:LB[k],st:'cf',cid:cf,deps:lDeps,opt:lOpt})});leafOK=false;return}
     var need=unk(lDeps),why=null;
     if(!need.length){if(!lf.per||!lf.per[R])why='This leaf profile has no '+R+' Gb/s endpoint mode.';else if(pk==='pair'&&L%2)why='Dual-homing here splits links evenly across a pair; '+L+' links cannot be split evenly.';else if(pl==='rack'&&!Rk)need=[Pp+'racks']}
     if(need.length||why){['leaves','cages','epcab'].forEach(function(k){ne(g+'.'+k,LB[k],lDeps,need,why,{opt:lOpt})});leafOK=false;return}
     var blocks=[];
-    if(pl==='rack'){var perR=Er||cdiv(N,Rk),rem=N,first=0;for(var i=0;i<Rk&&rem>0;i++){var n=Math.min(perR,rem);blocks.push({n:n,name:'rack '+(i+1),first:first});first+=n;rem-=n}}
+    if(pl==='rack'){var perR=Er||cdiv(N,Rk),rem=N,first=0;if(!Er)o.exc.push(pre+'rack-local blocks assume '+cdiv(N,Rk)+' endpoints per rack (spread evenly; populated per rack not answered)');for(var i=0;i<Rk&&rem>0;i++){var n=Math.min(perR,rem);blocks.push({n:n,name:'rack '+(i+1),first:first});first+=n;rem-=n}}
     else blocks.push({n:N,name:'',first:0});
     var res=packLeaves(pk,blocks,L,R,lf);
     if(res.why){['leaves','cages','epcab'].forEach(function(k){ne(g+'.'+k,LB[k],lDeps,[],res.why,{opt:lOpt})});leafOK=false;return}
@@ -342,13 +350,13 @@ function core(p,c,end){
       o.pats.push({key:g+'|'+k,grp:(multi?nm+' ':'')+(x.blk||''),t:(multi?nm+': ':'')+(x.blk?x.blk+', ':'')+'endpoints '+x.first+'–'+(x.first+x.eps-1)+(pk==='rail'?', rail '+x.rail+' → leaf '+tag+'-r'+x.rail:pk==='pair'?' → leaf pair '+tag+' (one side each)':' → leaf '+tag),n:pk==='pair'?2*x.links:x.links,d:pk==='rail'?'cages 1–'+x.cages+(res.per>1?' · lanes 1–'+res.per:''):'ports 1–'+x.cages*res.per,un:lf.cages-x.cages})});
     if(!multi&&pk==='rail'&&pl==='central')o.loc={slots:res.slots,per:res.per,rails:L,N:N,g:g};
     leafTotal+=nL;
-    var fk=net+'|'+lf.ur;if(!fam[fk]){fam[fk]={net:net,ur:lf.ur,lfu:lf.u,D:[],deps:[],locks:[],n:0};famOrder.push(fk)}
+    var fnet=net==='undecided'&&c.netrel==='separate'?'undecided-'+g:net,fk=fnet+'|'+lf.ur;if(!fam[fk]){fam[fk]={net:fnet,ur:lf.ur,lfu:lf.u,D:[],deps:[],locks:[],n:0,gn:nm};famOrder.push(fk)}
     var F=fam[fk];lv.forEach(function(x){F.D.push(x.D)});F.deps=uniq(F.deps.concat(lDeps,lOpt,[Pp+'net']));F.locks.push('lock:'+g+'.leaves');F.n+=nL;
   });
   var famNets={};famOrder.forEach(function(k){famNets[fam[k].net]=(famNets[fam[k].net]||0)+1});
   var spTotal=0,spOK=leafOK;
   famOrder.forEach(function(k){
-    var F=fam[k],NET=(NETS[F.net]||'Network not decided')+(famNets[F.net]>1?' ('+F.ur+'G uplinks)':''),fid='n.'+F.net+'.'+F.ur;
+    var F=fam[k],NET=(NETS[F.net]||(/^undecided-/.test(F.net)?F.gn+' — network not decided':c.netrel==='shared'?'Undecided networks, shared (conditional)':'Network not decided'))+(famNets[F.net]>1?' ('+F.ur+'G uplinks)':''),fid='n.'+F.net+'.'+F.ur;
     var spId='spine'+F.ur,uId='upl'+F.ur,sp=SPN[V(spId)],u=V(uId),topo=V('topo'),du=parseF(V('du')),loss=parseF(V('loss')),minS=V('minsp')||1;
     var sDeps=F.deps.concat([spId,uId]),sOpt=['du','loss','minsp','topo'],locks=F.locks.concat(['lock:'+fid+'.spines']);
     var LB={spines:NET+' — spine switches',links:NET+' — '+(topo==='mesh'?'mesh links':'leaf-to-spine links'),cab:NET+' — inter-switch cable construction'};
@@ -407,7 +415,7 @@ function core(p,c,end){
 /* ===== generation: alternatives for undecided choices, ranges for count ranges ===== */
 function qtext(l){if(!l)return '—';if(l.st==='ne')return 'Not estimated';if(l.st==='cf')return '— suspended (conflict)';if(l.alts)return l.alts.map(function(a){return a.a+': '+a.q}).join(' | ');if(l.qs)return l.qs;return (l.bound?'≥ ':'')+fmt(l.q)}
 function qfull(l){return qtext(l)+(l&&l.lock?' ['+l.lock+']':'')}
-function dimsOf(p){var d=[],multi=p.groups.length>1;p.groups.forEach(function(g){var pk=packings(p,g);if(pk.length>1)d.push({k:g+'.pack',vals:pk,f:[g+'.rail',g+'.homing'],nm:(multi?gname(p,g)+': ':''),names:PACKNAME});var pl=placements(p,g);if(pl.length>1)d.push({k:g+'.place',vals:pl,f:[g+'.place'],nm:(multi?gname(p,g)+': ':''),names:PLACENAME})});return d}
+function dimsOf(p){var d=[],multi=p.groups.length>1;var und=p.groups.filter(function(g){return !eff(p,g+'.net').v});if(und.length>1)d.push({k:'netrel',vals:['separate','shared'],f:und.map(function(g){return g+'.net'}),nm:'',names:{separate:'undecided networks kept separate',shared:'undecided networks share switches (conditional)'}});p.groups.forEach(function(g){var pk=packings(p,g);if(pk.length>1)d.push({k:g+'.pack',vals:pk,f:[g+'.rail',g+'.homing'],nm:(multi?gname(p,g)+': ':''),names:PACKNAME});var pl=placements(p,g);if(pl.length>1)d.push({k:g+'.place',vals:pl,f:[g+'.place'],nm:(multi?gname(p,g)+': ':''),names:PLACENAME})});return d}
 function gen(p){
   var dims=dimsOf(p),combos=[{}];
   dims.forEach(function(d){var nx=[];combos.forEach(function(c){d.vals.forEach(function(v){var x=clone(c);x[d.k]=v;nx.push(x)})});combos=nx});
@@ -421,17 +429,18 @@ function gen(p){
   var comb=function(a,b){if(!b||!a)return qfull(a);var x=qfull(a),y=qfull(b);if(x===y)return x;if(a.q!=null&&b.q!=null&&!a.alts&&!a.lock&&!b.lock)return (a.bound?'≥ ':'')+fmt(a.q)+'–'+fmt(b.q);return x+' … '+y};
   var out={lines:[],conf:[],pats:runs[0].lo.pats,exc:[],loc:runs.length===1&&!hasRange?runs[0].lo.loc:null,dims:dims,runs:runs.length,undecidedNets:runs[0].lo.undecidedNets,outNets:runs[0].lo.outNets,tooMany:tooMany,swing:{}};
   keys.forEach(function(k){
-    var per=runs.map(function(r){var a=find(r.lo,k),b=r.hi?find(r.hi,k):null;return {r:r,a:a,b:b,t:a?comb(a,b):'—'}});
+    var per=runs.map(function(r){var a=find(r.lo,k),b=r.hi?find(r.hi,k):null;return {r:r,a:a,b:b,t:a?comb(a,b):'not applicable under this alternative'}});
     var base=clone((per.filter(function(x){return x.a})[0]).a);
     var deps=[],opt=[],locks=[];per.forEach(function(x){if(x.a){deps=deps.concat(x.a.deps||[]);opt=opt.concat(x.a.opt||[]);locks=locks.concat(x.a.locks||[])}});
     base.deps=uniq(deps);base.opt=uniq(opt);base.locks=uniq(locks);
     var fl=[];per.forEach(function(x){(x.a&&x.a.flags||[]).forEach(function(t){var lbl=runs.length>1&&!per.every(function(y){return y.a&&(y.a.flags||[]).indexOf(t)>=0})?t+' (under: '+x.r.lab+')':t;if(fl.indexOf(lbl)<0)fl.push(lbl)})});base.flags=fl;
     var texts=uniq(per.map(function(x){return x.t}));
+    if(texts.length===1&&runs.length>1){base.und=dimF.filter(function(fid){return base.deps.indexOf(fid)>=0||base.opt.indexOf(fid)>=0});base.sameAll=true}
     if(texts.length===1){var x0=per[0];if(x0.b&&qfull(x0.a)!==x0.t){base.range=true;base.qs=x0.t;base.q=null;base.alts=null;base.lock=null;base.tr=T('Range: the endpoint count is a range, so this line is too',[],[T('low end: '+qfull(x0.a),[],[x0.a.tr]),T('high end: '+qfull(x0.b),[],[x0.b.tr])]);base.rangeLo=x0.a.q;base.rangeHi=x0.b.q}}
     else{
       var by={},ord=[];per.forEach(function(x){if(!by[x.t]){by[x.t]=[];ord.push(x.t)}by[x.t].push(x.r.lab)});
       base.alts=ord.map(function(t){return {a:by[t].join(' / '),q:t}});base.q=null;base.qs=null;base.lock=null;base.st='ok';base.varies=true;base.und=dimF;
-      base.tr=T('Separate alternatives because '+dims.map(function(d){return d.nm+(d.k.indexOf('pack')>0?'rail preference / redundancy':'leaf placement')}).join(' and ')+' '+(dims.length>1?'are':'is')+' not decided. Never summed.',dimF,per.map(function(x){return T(x.r.lab+': '+x.t,[],x.a&&x.a.tr?[x.a.tr]:[])}));
+      base.tr=T('Separate alternatives because '+dims.map(function(d){return d.nm+(d.k==='netrel'?'network membership':d.k.indexOf('pack')>0?'rail preference / redundancy':'leaf placement')}).join(' and ')+' '+(dims.length>1?'are':'is')+' not decided. These are the alternatives this prototype evaluates, not every possible design. Never summed.',dimF,per.map(function(x){return T(x.r.lab+': '+x.t,[],x.a&&x.a.tr?[x.a.tr]:[])}));
       var nums=per.map(function(x){return x.a&&x.a.st!=='cf'&&x.a.st!=='ne'?x.a.q:null}).filter(function(v){return v!=null});
       if(nums.length>1){var sp=Math.max.apply(null,nums)-Math.min.apply(null,nums);if(sp>0)dimF.forEach(function(f){var s=out.swing[f];if(!s||sp>s.sp)out.swing[f]={sp:sp,l:base.l,lo:Math.min.apply(null,nums),hi:Math.max.apply(null,nums)}})}
     }
@@ -448,7 +457,7 @@ function fin(p,o){
   o.lines.forEach(function(l){
     var all=(l.deps||[]).concat(l.opt||[]),und=l.und||[];
     l.rest=uniq(all.filter(function(id){var e=eff(p,id);return fd(id)&&e.o==='assumed'}));
-    l.nchk=uniq((l.opt||[]).filter(function(id){var e=eff(p,id);return fd(id)&&e.o==='unknown'&&und.indexOf(id)<0&&!/\.(racks|perRack|place)$/.test(id)}));
+    l.nchk=uniq((l.opt||[]).filter(function(id){var e=eff(p,id);return fd(id)&&e.o==='unknown'&&und.indexOf(id)<0&&!/\.(racks|perRack|rackCap|place)$/.test(id)}));
     l.need=l.need||[];l.flags=l.flags||[];
     l.prec=l.st==='ne'?'unresolved':l.st==='cf'?'suspended by conflict':l.varies?'alternatives (undecided choices)':l.range?'bounded (range)':l.alts&&l.alts.length>1?'exact per alternative':l.bound?'bounded (lower bound)':'exact under stated assumptions';
     if(p.relBlocked&&/cab$/.test(l.key))l.flags.push('blocked for qualification on <TARGET>: compatibility evidence unknown (example)');
@@ -591,23 +600,28 @@ function renderWS(){
 }
 function renderDetails(p,cur){
   var t=tally(p),h='<h2 id="details-h" tabindex="-1">Project details</h2>';
-  if(!p.revs.length)h+='<div class="sug"><b>Getting started.</b> For a first BOM, answer <b>How many endpoints?</b> and <b>What kind of endpoint?</b> in the endpoint group below. Everything else is optional — answer what you already know. Unanswered choices are shown as alternatives or “not checked”, never guessed.</div>';
-  h+='<p style="font-size:13px"><b>Details recorded:</b> '+t.user+' supplied · '+t.assumed+' assumed · '+t.derived+' derived · '+t.unknown+' open<br><span class="note">A record of what hh-aid knows — not a readiness score. Readiness is shown per output.</span></p>';
+  if(!p.revs.length)h+='<p class="note" style="margin:0 0 6px"><b>First BOM:</b> enter how many endpoints and what kind. Everything else is optional; leave anything you don’t know.</p>';
+  var confIn={};cur.conf.forEach(function(c){c.inputs.forEach(function(id){confIn[id]=1})});
+  p.groups.forEach(function(g,i){var sid='grp-'+g,fs=GF(g),c=counts(p,fs),open=ui.open[sid]!=null?ui.open[sid]:(i===0&&!p.revs.length);
+    h+='<details class="sec" data-sec="'+sid+'"'+(open?' open':'')+'><summary data-fid="sec-'+sid+'">Endpoints — '+esc(gname(p,g))+(c?' <span class="note">— '+c+'</span>':'')+'</summary>';
+    h+='<div class="ess">'+fs.filter(function(f){return f.sub==='what'&&f.need}).map(function(f){f.sec=sid;f.g=g;return fieldHTML(p,f,confIn[f.id])}).join('')+'</div>';
+    fs.filter(function(f){return f.sub==='what'&&!f.need}).forEach(function(f){f.sec=sid;f.g=g;h+=fieldHTML(p,f,confIn[f.id])});
+    ['how','where','switch'].forEach(function(sub){var sf=fs.filter(function(f){return f.sub===sub}),sc=counts(p,sf),body=sf.map(function(f){f.sec=sid;f.g=g;return fieldHTML(p,f,confIn[f.id])}).join(''),key=sid+'-'+sub;
+      if(ui.optMode==='collapsed')h+='<details class="sub" data-sub="'+key+'"'+(ui.open[key]?' open':'')+'><summary data-fid="sub-'+key+'">'+SUBS[sub][0]+' <span class="note">(optional'+(sc?' — '+sc:'')+')</span></summary><div class="note">'+SUBS[sub][1]+'</div>'+body+'</details>';
+      else h+='<h4 style="margin:10px 0 2px">'+SUBS[sub][0]+' <span class="note" style="font-weight:400">(optional)</span></h4><div class="note">'+SUBS[sub][1]+'</div>'+body});
+    if(p.groups.length>1)h+='<p><button class="btn small" data-act="rm-group" data-g="'+g+'">Remove this group…</button></p>';
+    h+='</details>'});
+  if(p.groups.length<3)h+='<p style="margin:4px 0"><button class="btn small" data-act="add-group" data-fid="add-group">+ Add another endpoint group (mixed inventory)</button></p>';
+  h+='<p class="note" style="margin:4px 0">Optional questions: <button class="btn small" data-act="optmode" data-m="expanded" aria-pressed="'+(ui.optMode!=='collapsed')+'" data-fid="om-e">Show all</button><button class="btn small" data-act="optmode" data-m="collapsed" aria-pressed="'+(ui.optMode==='collapsed')+'" data-fid="om-c">Collapse to headings</button></p>';
   h+='<label for="find" style="font-weight:600">Find a detail</label><br><input id="find" type="search" data-fid="find" placeholder="e.g. rack, rail, spine, cable" value="'+esc(ui.find)+'" style="width:100%">';
   if(ui.find.trim()){var q=ui.find.trim().toLowerCase(),res=fields(p).filter(function(f){return (f.l+' '+(f.h||'')+' '+(f.unlock||'')+' '+secTitle(p,f.sec)).toLowerCase().indexOf(q)>=0});
     h+='<ul aria-label="Matching details" style="margin:4px 0;padding-left:18px">'+(res.length?res.map(function(f){var na=f.ap&&!f.ap(p);return '<li><button class="link" data-act="go" data-id="'+f.id+'">'+esc(f.l)+'</button> <span class="note">in '+esc(secTitle(p,f.sec))+(na?' — not applicable yet':'')+'</span></li>'}).join(''):'<li class="note">No matching detail.</li>')+'</ul>'}
   var sg=suggestions(p,cur);
-  if(!ui.hideSug&&sg.length&&p.revs.length){h+='<div class="sug"><b>Suggested questions</b> <span class="note">(optional; skip or ignore freely)</span><ol>'+sg.map(function(s){return '<li><button class="link" data-act="go" data-id="'+s.id+'">'+esc(fd(s.id).l)+'</button>'+(fd(s.id).g&&p.groups.length>1?' <span class="note">('+esc(gname(p,fd(s.id).g))+')</span>':'')+' <span class="note">— '+esc(s.why)+'</span></li>'}).join('')+'</ol><span class="note">Ranked by what an answer would unblock and how far it could move a quantity, using the current alternatives and ranges. A prototype heuristic, not a tested ranking.</span><br><button class="btn small" data-act="hide-sug">Hide suggestions</button> <button class="btn small" data-act="copy-q">Copy open questions for the customer</button></div>'}
+  if(!ui.hideSug&&sg.length&&p.revs.length){h+='<div class="sug"><b>Suggested questions</b> <span class="note">(optional)</span><ol>'+sg.map(function(s){return '<li><button class="link" data-act="go" data-id="'+s.id+'">'+esc(fd(s.id).l)+'</button>'+(fd(s.id).g&&p.groups.length>1?' <span class="note">('+esc(gname(p,fd(s.id).g))+')</span>':'')+' <span class="note">— '+esc(s.why)+'</span></li>'}).join('')+'</ol><button class="btn small" data-act="hide-sug">Hide</button> <button class="btn small" data-act="copy-q">Copy open questions for the customer</button></div>'}
   else if(ui.hideSug)h+='<p><button class="btn small" data-act="show-sug">Show suggested questions</button></p>';
   if(ui.copy&&ui.copy.where==='q')h+='<label class="note" for="copyq">Open questions (select and copy)</label><textarea id="copyq" class="copy" readonly>'+esc(ui.copy.text)+'</textarea>';
-  var confIn={};cur.conf.forEach(function(c){c.inputs.forEach(function(id){confIn[id]=1})});
   SECS.forEach(function(s){
-    if(s.id==='groups'){p.groups.forEach(function(g,i){var sid='grp-'+g,fs=GF(g),c=counts(p,fs),open=ui.open[sid]!=null?ui.open[sid]:(i===0&&!p.revs.length);
-      h+='<details class="sec" data-sec="'+sid+'"'+(open?' open':'')+'><summary data-fid="sec-'+sid+'">Endpoints — '+esc(gname(p,g))+(c?' <span class="note">— '+c+'</span>':'')+'</summary>';
-      ['what','how','where','switch'].forEach(function(sub){h+='<h4 style="margin:10px 0 2px">'+SUBS[sub][0]+'</h4><div class="note">'+SUBS[sub][1]+'</div>';fs.filter(function(f){return f.sub===sub}).forEach(function(f){f.sec=sid;f.g=g;h+=fieldHTML(p,f,confIn[f.id])})});
-      if(p.groups.length>1)h+='<p><button class="btn small" data-act="rm-group" data-g="'+g+'">Remove this group…</button></p>';
-      h+='</details>'});
-      if(p.groups.length<3)h+='<p><button class="btn small" data-act="add-group" data-fid="add-group">+ Add another endpoint group (mixed inventory)</button></p>';return}
+    if(s.id==='groups')return;
     var fs=PF.filter(function(f){return f.sec===s.id}),c=counts(p,fs);
     h+='<details class="sec" data-sec="'+s.id+'"'+(ui.open[s.id]?' open':'')+'><summary data-fid="sec-'+s.id+'">'+esc(s.t)+(c?' <span class="note">— '+c+'</span>':'')+'</summary>';
     if(s.id==='target')h+=targetSec(p);
@@ -615,6 +629,7 @@ function renderDetails(p,cur){
     fs.forEach(function(f){h+=fieldHTML(p,f,confIn[f.id])});
     h+='</details>';
   });
+  h+='<p class="note"><b>Details recorded:</b> '+t.user+' supplied · '+t.assumed+' assumed · '+t.derived+' derived · '+t.unknown+' open — a record of what hh-aid knows, not a readiness score.</p>';
   return h;
 }
 function counts(p,fs){var c={user:0,assumed:0,derived:0,unknown:0};fs.forEach(function(f){if(f.nostate)return;var e=eff(p,f.id);if(c[e.o]!=null)c[e.o]++});return [c.user?c.user+' supplied':'',c.assumed?c.assumed+' assumed':'',c.derived?c.derived+' derived':'',c.unknown?c.unknown+' open':''].filter(Boolean).join(' · ')}
@@ -627,10 +642,10 @@ function fieldHTML(p,f,conf){
   if(f.type==='radio'){
     h+='<fieldset style="border:0;padding:0;margin:0"><legend class="main" style="font-weight:600">'+esc(f.l)+' '+tag+'</legend>';
     f.opts().forEach(function(o){h+='<label style="display:block"><input type="radio" name="r-'+id+'" value="'+o[0]+'" data-in="'+f.id+'" data-fid="'+id+'-'+o[0]+'"'+(String(e.v)===o[0]?' checked':'')+'> '+esc(o[1])+'</label>'});
-    h+='<label style="display:block"><input type="radio" name="r-'+id+'" value="__und" data-in="'+f.id+'" data-fid="'+id+'-und"'+(e.marked?' checked':'')+'> Customer hasn’t decided (asked)</label></fieldset>';
+    h+='<label style="display:block"><input type="radio" name="r-'+id+'" value="__und" data-in="'+f.id+'" data-fid="'+id+'-und"'+(e.marked?' checked':'')+'> Not decided yet</label></fieldset>';
   } else {
     h+='<label class="main" for="'+id+'">'+esc(f.l)+' '+tag+'</label>';
-    if(f.type==='sel'){var opts=f.opts().slice();if(e.v!=null&&!opts.some(function(o){return o[0]===String(e.v)}))opts.push([String(e.v),String(e.v)]);h+='<select id="'+id+'" data-in="'+f.id+'" data-fid="'+id+'"><option value="">'+(e.marked?'Undecided (asked)':'Not answered')+'</option>'+opts.map(function(o){return '<option value="'+o[0]+'"'+(String(e.v)===o[0]?' selected':'')+'>'+esc(o[1])+'</option>'}).join('')+'<option value="__und">Customer hasn’t decided (asked)</option></select>'}
+    if(f.type==='sel'){var opts=f.opts().slice();if(e.v!=null&&!opts.some(function(o){return o[0]===String(e.v)}))opts.push([String(e.v),String(e.v)]);h+='<select id="'+id+'" data-in="'+f.id+'" data-fid="'+id+'"><option value="">'+(e.marked?'Not decided yet':'Not answered yet')+'</option>'+opts.map(function(o){return '<option value="'+o[0]+'"'+(String(e.v)===o[0]?' selected':'')+'>'+esc(o[1])+'</option>'}).join('')+'<option value="__und">Not decided yet</option></select>'}
     else if(f.type==='num')h+='<input id="'+id+'" type="number" min="'+f.min+'" max="'+f.max+'" step="1" data-in="'+f.id+'" data-fid="'+id+'" value="'+(e.v==null?'':e.v)+'">';
     else if(f.type==='count')h+='<input id="'+id+'" type="text" inputmode="numeric" autocomplete="off" data-in="'+f.id+'" data-fid="'+id+'" value="'+esc(e.o==='user'||e.starter?(e.v==null?'':e.v):'')+'" placeholder="'+(e.o==='derived'?esc(e.v)+' (derived from racks)':'e.g. 128 or 120-136')+'" style="width:12em">';
     else h+='<input id="'+id+'" type="text" data-in="'+f.id+'" data-fid="'+id+'" value="'+esc(e.v||'')+'" style="width:100%">';
@@ -671,7 +686,7 @@ function tabBOM(p,r,vr,ch){
   h+='<div class="label">Conditional estimate — assumptions listed — hypothetical hardware — not a design, not orderable</div>';
   var ls=vr.out.lines,ne=ls.filter(function(l){return l.st==='ne'}).length,cf=ls.filter(function(l){return l.st==='cf'}).length,asm=uniq([].concat.apply([],ls.map(function(l){return l.rest})));
   h+='<div class="summary" aria-label="BOM summary"><span>'+ls.length+' lines</span><span>0 qualified</span><span>'+ne+' not estimated</span><span>'+cf+' suspended</span><span>'+ls.filter(function(l){return l.varies}).length+' with alternatives</span><span>'+asm.length+' assumptions in use</span><span>'+plural(vr.out.conf.length,'conflict')+'</span></div>';
-  if(vr.out.dims.length)h+='<p class="note"><b>Undecided choices shown as alternatives:</b> '+vr.out.dims.map(function(d){return esc(d.nm)+d.f.map(function(f){return goBtn(p,f)}).join(' / ')}).join('; ')+'. Lines that are the same under every alternative show one number.</p>';
+  if(vr.out.dims.length)h+='<p class="note"><b>Undecided choices shown as alternatives:</b> '+vr.out.dims.map(function(d){return esc(d.nm)+d.f.map(function(f){return goBtn(p,f)}).join(' / ')}).join('; ')+'. Lines that are the same under every alternative this prototype evaluated show one number; that is not a claim about every possible design.</p>';
   vr.out.conf.forEach(function(c){h+=conflictHTML(p,c,ro)});
   h+='<div class="scroll"><table><caption class="sr">BOM lines, revision '+vr.n+'</caption><thead><tr><th scope="col">Line</th><th scope="col">Quantity (select for why)</th><th scope="col">Precision · claim</th><th scope="col">Rests on / needs</th></tr></thead><tbody>';
   ls.forEach(function(l){
@@ -688,7 +703,7 @@ function tabBOM(p,r,vr,ch){
     if(l.st==='ne')rest=(l.need.length?'<b>Needs:</b> '+l.need.map(function(id){return goBtn(p,id)}).join(', '):'')+(l.reason?'<div>'+esc(l.reason)+'</div>':'');
     else if(l.st==='cf')rest='Resolve <a href="#cf-'+esc(l.cid)+'">the conflict</a>.';
     else{rest=(l.rest.length?'<b>Rests on '+plural(l.rest.length,'assumption')+':</b> '+l.rest.map(function(id){return goBtn(p,id)}).join(', '):'No open assumptions in its inputs (hardware still hypothetical)');
-      if(l.und&&l.und.length)rest+='<div><b>Undecided:</b> '+l.und.map(function(id){return goBtn(p,id)}).join(', ')+' (alternatives shown)</div>';
+      if(l.und&&l.und.length)rest+='<div><b>Undecided:</b> '+l.und.map(function(id){return goBtn(p,id)}).join(', ')+(l.sameAll?' (same result under every alternative evaluated here)':' (alternatives shown)')+'</div>';
       if(l.range)rest+='<div><b>Range</b> from the endpoint count range.</div>';
       if(l.nchk.length)rest+='<div><b>Not checked:</b> '+l.nchk.map(function(id){return goBtn(p,id)}).join(', ')+'</div>'}
     l.flags.forEach(function(f){rest+='<div><span class="chip '+(/^blocked/.test(f)?'blocked':'unverified')+'">'+esc(f)+'</span></div>'});
@@ -782,11 +797,11 @@ function openP(id,newSession,keepResume){
   var p=store.projects[id];if(!p)return;
   if(newSession&&p.closed){var last=p.session;p.session++;ui.resume=resumeInfo(p,last)}else if(!keepResume)ui.resume=null;
   p.closed=false;save();ui.pid=id;ui.screen='ws';ui.tab='bom';ui.view=null;ui.trace=null;ui.prev=null;ui.copy=null;ui.lockForm=null;ui.errs={};ui.find='';ui.open={};
-  render();var hd=p.revs.length?$('#outputs-h'):$('#in-g1-count');if(hd)hd.focus();
+  render();if(p.revs.length){var hd=$('#outputs-h');if(hd)hd.focus()}else{var es=$('.ess'),ci=$('#in-g1-count'),dh=$('#details-h');if(es&&dh&&es.getBoundingClientRect().bottom>window.innerHeight&&dh.scrollIntoView)dh.scrollIntoView({block:'start'});if(ci)ci.focus({preventScroll:true})}
 }
 function goField(id){
   if(/^lock:/.test(id)){ui.tab='bom';ui.lockForm=id.slice(5);render();var b=$('#lk-q');if(b)b.focus();return}
-  var f=fd(id);if(!f)return;ui.open[f.sec||(f.g?'grp-'+f.g:'')]=true;render();
+  var f=fd(id);if(!f)return;ui.open[f.sec||(f.g?'grp-'+f.g:'')]=true;if(f.g&&f.sub&&f.sub!=='what')ui.open['grp-'+f.g+'-'+f.sub]=true;render();
   var fe=$('#f-'+id.replace('.','-')),el=fe&&fe.querySelector('input:checked,input,select,textarea');
   if(fe&&fe.scrollIntoView)fe.scrollIntoView({block:'center'});if(el)el.focus();
   announce('Opened '+f.l+' in '+secTitle(P(),f.sec)+'.');
@@ -814,6 +829,7 @@ document.addEventListener('click',function(ev){
   if(a==='clear'){setAns(p,b.getAttribute('data-id'),null,'answer cleared');render();return}
   if(a==='add-group'){var n=1;while(p.groups.indexOf('g'+n)>=0)n++;setGroups(p,p.groups.concat(['g'+n]),'added endpoint group');ui.open['grp-g'+n]=true;render();var c=$('#in-g'+n+'-count');if(c)c.focus();return}
   if(a==='rm-group'){var g=b.getAttribute('data-g');if(confirm('Remove '+gname(p,g)+'? Its lines leave the next output. Its answers stay in history; Undo restores the group.')){setGroups(p,p.groups.filter(function(x){return x!==g}),'removed '+gname(p,g));render()}return}
+  if(a==='optmode'){ui.optMode=b.getAttribute('data-m');try{localStorage.setItem('hh-aid-d02-optmode',ui.optMode)}catch(e){}render();return}
   if(a==='hide-sug'){ui.hideSug=true;render();return}
   if(a==='show-sug'){ui.hideSug=false;render();return}
   if(a==='copy-q'){var open=fields(p).filter(function(f){if(f.nostate||(f.ap&&!f.ap(p)))return false;var e=eff(p,f.id);return e.o==='unknown'||e.o==='assumed'});ui.copy={where:'q',text:'Open questions for '+eff(p,'name').v+':\n'+open.map(function(f){var e=eff(p,f.id);return '- '+(f.g&&p.groups.length>1?gname(p,f.g)+': ':'')+f.l+(e.o==='assumed'?' (we assumed: '+showV(p,f.id,e)+')':e.marked?' (undecided)':'')}).join('\n')};render();var cq=$('#copyq');if(cq){cq.focus();cq.select()}return}
@@ -849,7 +865,7 @@ document.addEventListener('change',function(ev){
   setAns(p,id,v===''?null:{v:v});render();
 });
 document.addEventListener('input',function(ev){var t=ev.target;if(t.id==='find'){ui.find=t.value;render();return}if(t.id==='patq'){ui.patq=t.value;render();return}if(t.id==='srv'){ui.srv=t.value;render();return}});
-document.addEventListener('toggle',function(ev){var t=ev.target;if(t.classList&&t.classList.contains('sec'))ui.open[t.getAttribute('data-sec')]=t.open},true);
+document.addEventListener('toggle',function(ev){var t=ev.target;if(t.classList&&t.classList.contains('sec'))ui.open[t.getAttribute('data-sec')]=t.open;if(t.classList&&t.classList.contains('sub'))ui.open[t.getAttribute('data-sub')]=t.open},true);
 document.addEventListener('keydown',function(ev){
   var t=ev.target;if(!t.getAttribute||t.getAttribute('role')!=='tab')return;
   var set=t.getAttribute('data-tabset'),list=[].slice.call(document.querySelectorAll('[role=tab][data-tabset="'+set+'"]')),i=list.indexOf(t),n=null;
