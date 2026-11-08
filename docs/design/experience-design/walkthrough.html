@@ -1,0 +1,884 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Planning Workspace Prototype</title>
+<style>
+:root{--bg:#fbfbf9;--fg:#1d1d1b;--muted:#55554f;--line:#c9c8c1;--panel:#ffffff;--accent:#1f5fa8;--warn:#8a4b00;--bad:#9b1c1c;--ok:#26632f;--chip:#efeee8;--focus:#1f5fa8;--stale:#fff4dc}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#171716;--fg:#ecebe6;--muted:#b0afa7;--line:#45443f;--panel:#201f1d;--accent:#8db8ef;--warn:#f0b46a;--bad:#f19a9a;--ok:#8fd19b;--chip:#2c2b28;--focus:#8db8ef;--stale:#3a2f1a}}
+:root[data-theme="dark"]{--bg:#171716;--fg:#ecebe6;--muted:#b0afa7;--line:#45443f;--panel:#201f1d;--accent:#8db8ef;--warn:#f0b46a;--bad:#f19a9a;--ok:#8fd19b;--chip:#2c2b28;--focus:#8db8ef;--stale:#3a2f1a}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}
+a{color:var(--accent)}
+:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+p,li,td,th,summary,label,.note,div{overflow-wrap:anywhere}
+header.top{border-bottom:1px solid var(--line);padding:10px 16px}
+header.top h1{font-size:17px;margin:0}
+.note{color:var(--muted);font-size:13px}
+.wrap{max-width:1400px;margin:0 auto;padding:12px 16px 40px}
+h2{font-size:18px;margin:4px 0 8px}
+h3{font-size:15px;margin:14px 0 6px}
+.panel{border:1px solid var(--line);background:var(--panel);border-radius:6px;padding:12px}
+.ws{display:grid;gap:14px;grid-template-columns:minmax(290px,370px) minmax(0,1fr);align-items:start}
+.dpanel{position:sticky;top:8px;max-height:calc(100vh - 16px);overflow:auto}
+@media (max-width:900px){.ws{grid-template-columns:minmax(0,1fr)}.dpanel{position:static;max-height:none}}
+.ws>*{min-width:0}
+.scroll table{min-width:520px}
+.projhdr{border:1px dashed var(--line);background:var(--panel);padding:8px 12px;margin-bottom:10px;display:grid;gap:2px}
+.banner{border-left:4px solid var(--warn);padding:6px 10px;background:var(--chip);margin:6px 0}
+.banner.info{border-left-color:var(--accent)}
+.btn{font:inherit;font-size:14px;border:1px solid var(--accent);color:var(--accent);background:transparent;padding:3px 10px;border-radius:4px;cursor:pointer;margin:2px 4px 2px 0}
+.btn.primary{background:var(--accent);color:var(--bg)}
+.btn.small{font-size:12px;padding:1px 7px}
+.btn:disabled{opacity:.55;cursor:not-allowed}
+.link{font:inherit;font-size:inherit;background:none;border:0;color:var(--accent);text-decoration:underline;cursor:pointer;padding:0}
+.qty{font:inherit;font-variant-numeric:tabular-nums;background:none;border:1px solid var(--line);border-radius:4px;color:var(--fg);cursor:pointer;padding:1px 6px;text-align:left}
+.qty:hover{border-color:var(--accent)}
+.chip{display:inline-block;border:1px solid var(--line);background:var(--chip);border-radius:3px;padding:0 6px;font-size:12px;margin:1px 2px 1px 0}
+.chip.user::before{content:"✎ "}
+.chip.assumed::before{content:"≈ "}
+.chip.unknown::before{content:"? "}
+.chip.derived::before{content:"ƒ "}
+.chip.na::before{content:"– "}
+.chip.locked::before{content:"🔒 "}
+.chip.conflict,.chip.blocked{border-color:var(--bad);color:var(--bad)}
+.chip.conflict::before{content:"✕ "}
+.chip.blocked::before{content:"⛔ "}
+.chip.stale{border-color:var(--warn);color:var(--warn)}
+.chip.stale::before{content:"⟳ "}
+.chip.changed::before{content:"Δ "}
+.chip.unchanged::before{content:"= "}
+.chip.ce::before{content:"◔ "}
+.chip.ne::before{content:"○ "}
+.chip.unverified::before{content:"? "}
+.summary{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 8px}
+.summary span{border:1px solid var(--line);padding:1px 8px;border-radius:3px;background:var(--panel);font-size:13px}
+.label{font-weight:600;border:2px solid var(--fg);display:inline-block;padding:2px 8px;margin:4px 0 6px;font-size:13px}
+.scroll{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{border-bottom:1px solid var(--line);padding:5px 7px;text-align:left;vertical-align:top}
+thead th{font-weight:600;background:var(--chip)}
+tbody th{font-weight:600}
+td.num{font-variant-numeric:tabular-nums}
+tr.stale>*{background:var(--stale)}
+.field{border-top:1px solid var(--line);padding:8px 0}
+.field:first-child{border-top:0}
+.field label.main{font-weight:600;display:block}
+.field select,.field input[type=number],.field input[type=text],.field textarea,input[type=search],.inl select,.inl input{font:inherit;padding:3px 6px;border:1px solid var(--line);background:var(--panel);color:var(--fg);border-radius:3px;max-width:100%}
+.field select{width:100%}
+.field textarea{width:100%;min-height:52px}
+.meta{margin-top:3px;font-size:13px}
+.err{color:var(--bad);font-size:13px}
+details.sec{border:1px solid var(--line);border-radius:4px;margin:6px 0;padding:0 10px;background:var(--panel)}
+details.sec>summary{cursor:pointer;padding:7px 0;font-weight:600}
+details.sec>summary .note{font-weight:400}
+details.sec[open]>summary{border-bottom:1px solid var(--line);margin-bottom:4px}
+.sug{border:1px solid var(--line);border-left:4px solid var(--accent);padding:6px 10px;margin:8px 0;border-radius:4px}
+.sug ol{margin:4px 0;padding-left:20px}
+[role=tablist]{display:flex;flex-wrap:wrap;gap:4px;border-bottom:1px solid var(--line);margin:10px 0}
+[role=tab]{font:inherit;font-size:14px;border:1px solid var(--line);border-bottom:0;background:var(--chip);color:var(--fg);padding:4px 10px;border-radius:4px 4px 0 0;cursor:pointer}
+[role=tab][aria-selected=true]{background:var(--panel);font-weight:600;box-shadow:inset 0 3px 0 var(--accent)}
+.status{display:grid;gap:4px}
+.conflictbox{border:2px solid var(--bad);padding:8px 12px;border-radius:4px;background:var(--panel);margin:8px 0}
+.trace ul{list-style:none;margin:2px 0 2px 8px;padding-left:12px;border-left:2px solid var(--line)}
+.trace>ul{border-left:0;margin-left:0;padding-left:0}
+.trace li{margin:3px 0}
+textarea.copy{width:100%;min-height:120px;font:13px/1.4 ui-monospace,Menlo,monospace;background:var(--chip);color:var(--fg);border:1px solid var(--line)}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.cards{display:grid;gap:10px;grid-template-columns:repeat(auto-fill,minmax(250px,1fr))}
+.inl{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:6px 0}
+fieldset{border:1px solid var(--line);border-radius:4px;margin:8px 0}
+.later{border-style:dashed}
+.box{border:1px solid var(--line);padding:8px 10px;border-radius:4px}
+details.demo{margin-top:6px}
+details.demo>summary{cursor:pointer;font-size:14px}
+.skip a{margin-right:10px}
+h4{font-size:14px}
+legend.main{padding:0}
+.link{text-align:left}
+.ess{display:flex;flex-wrap:wrap;gap:0 14px;border-bottom:1px solid var(--line);margin-bottom:4px}
+.ess>.field{flex:1 1 170px;border-top:0}
+details.sub{border-top:1px solid var(--line);padding:4px 0}
+details.sub>summary{cursor:pointer;font-weight:600;font-size:14px}
+</style>
+</head>
+<body>
+<header class="top">
+  <h1>hh-aid planning workspace — low-fidelity prototype</h1>
+  <p class="note" style="margin:2px 0">D02 #9 revision 3.1 · synthetic data and <b>hypothetical hardware only</b> · small illustrative planning policies, not a solver · starter designs and release rows are placeholders · not a production UI · saved only in this browser</p>
+  <details class="demo">
+    <summary>Facilitator demo script (optional; the workspace has no required order)</summary>
+    <div class="note" style="font-size:14px;color:var(--fg)">
+      <p>For moderated walkthroughs only. Every section and output is reachable at any time.</p>
+      <ol>
+        <li><b>Session 1 — from scratch, mixed knowledge.</b> “Start from scratch”. Enter only the endpoint count (128) and type (B200). Leave rail preference, redundancy and racks unanswered. Generate. Lines that are the same under every undecided choice show one number. Open any quantity's explanation. Save and close.</li>
+        <li><b>Session 2 — return, add what you learned.</b> Resume. Change the count to 136: leaves now show separate alternatives by rail preference and redundancy. Add 8 racks with 16 populated endpoints per rack: the mismatch is explained, with both answers kept. Choose a way forward. Decide rail-optimized, then generate again and open Changes.</li>
+        <li><b>Optional detail.</b> Add a second endpoint group (40 general servers, storage network, dual-homed) to see mixed inventory with separate switches per network.</li>
+        <li><b>Start from a design.</b> On the project list, browse the starter library by count, racks, topology or purpose: the same placeholder appears in several views. Customise it; its values arrive as assumptions in the same details panel.</li>
+        <li><b>Release.</b> Release tab → record a placeholder target → review → revalidate.</li>
+      </ol>
+      <p>Load a prepared state: <button class="btn small" data-act="preset" data-x="s1">End of session 1</button><button class="btn small" data-act="preset" data-x="s2">Start of session 2</button><button class="btn small" data-act="preset" data-x="s3">Session 3, orders recorded, growth not yet regenerated</button><button class="btn small" data-act="reset">Reset all prototype data</button></p>
+    </div>
+  </details>
+</header>
+<main id="app" class="wrap"></main>
+<div id="live" class="sr" aria-live="polite"></div>
+<script>
+(function(){
+'use strict';
+/* ===== Replaceable data (synthetic; hypothetical hardware) ===== */
+var NETS={backend:'Backend scale-out',frontend:'Frontend',storage:'Storage',mgmt:'In-band management'};
+var PROF={
+  b200:{n:'B200 HGX-class server (sponsor profile: 8 × 400G)',links:8,rate:'400',src:'sponsor B200 profile (product-context)'},
+  nvl72:{n:'NVL72-style compute tray (4 × 400G; tray generation unverified)',links:4,rate:'400',src:'R04 S06-1 assumptions'},
+  gen25:{n:'General server (2 × 25G)',links:2,rate:'25',src:'synthetic fixture profile'},
+  custom:{n:'Custom endpoint (any vendor or type; enter links and rate)',links:null,rate:null,src:'user-defined'}
+};
+var LEAF={
+  h400:{n:'Hypothetical H400 leaf: 32 endpoint cages (2 × 400G or 1 × 800G) + 32 × 800G uplinks',cages:32,u:32,ur:800,per:{'400':2,'800':1}},
+  h48:{n:'Hypothetical H48 leaf: 48 × 25G endpoint ports + 8 × 100G uplinks',cages:48,u:8,ur:100,per:{'25':1}},
+  other:{n:'Other leaf profile (needs catalog evidence)'}
+};
+var SPN={s64:{n:'Hypothetical 64 × 800G spine',ports:64,rate:800},s32:{n:'Hypothetical 32 × 100G spine',ports:32,rate:100},other:{n:'Other spine profile (needs catalog evidence)'}};
+var EV0='research snapshot 26.05 (fabric v0.144.1, fabricator v0.51.4) · rules R04@49e6079 · catalog hypothetical-fixture-3';
+var EVT='<snapshot-target> (placeholder — example only, not from #3)';
+var PACKNAME={rail:'rail-optimized',pair:'dual-homed pairs',same:'all links on one leaf'};
+var PLACENAME={rack:'rack-local leaves',central:'shared leaves'};
+/* Starter library: placeholders, each one design identity; views are derived facets. */
+var STARTERS=[
+  {id:'S1',v:'0',n:'Rail-optimized GPU backend, 128 servers',d:'Server-count backend with one leaf per rail per 64-server block.',ans:{'g1.name':'GPU servers','g1.count':128,'g1.profile':'b200','g1.net':'backend','g1.rail':'yes','g1.homing':'single','net.backend':'in'}},
+  {id:'S2',v:'0',n:'Rack-scale backend, 8 racks, rack-local leaves',d:'NVL72-style trays; four rack-local leaves per rack; 10 active uplinks per leaf (R04 S06-2 style).',ans:{'g1.name':'Compute trays','g1.profile':'nvl72','g1.racks':8,'g1.perRack':18,'g1.place':'rack','g1.net':'backend','g1.rail':'yes','g1.homing':'single','net.backend':'in','upl800':10}},
+  {id:'S3',v:'0',n:'Small dual-homed frontend pair (mesh)',d:'Two leaves, ESLAG dual-homing, direct mesh links; no spines.',ans:{'g1.name':'Frontend servers','g1.count':40,'g1.profile':'gen25','g1.racks':2,'g1.perRack':20,'g1.place':'central','g1.net':'frontend','g1.rail':'no','g1.homing':'dual','net.frontend':'in','topo':'mesh'}},
+  {id:'S4',v:'0',n:'Dual-homed storage leaf-spine',d:'Two ESLAG leaf pairs with a small spine layer.',ans:{'g1.name':'Storage servers','g1.count':96,'g1.profile':'gen25','g1.net':'storage','g1.rail':'no','g1.homing':'dual','net.storage':'in','topo':'ls'}}
+];
+function starterFacts(s){var a=s.ans,c=a['g1.count']||(a['g1.racks']&&a['g1.perRack']?a['g1.racks']*a['g1.perRack']:null);return {count:c,racks:a['g1.racks']||null,topo:a.topo==='mesh'?'Mesh between leaves':(a['g1.rail']==='yes'?'Leaf-spine, rail-optimized':(a['g1.homing']==='dual'?'Leaf-spine, dual-homed endpoints':'Leaf-spine')),net:NETS[a['g1.net']]||'Not decided'}}
+var VIEWS=[
+  {id:'count',t:'By endpoint count',o:['Up to 64 endpoints','65–256 endpoints','More than 256 endpoints','Count not set'],b:function(f){return f.count==null?'Count not set':f.count<=64?'Up to 64 endpoints':f.count<=256?'65–256 endpoints':'More than 256 endpoints'}},
+  {id:'racks',t:'By rack count',o:['1–4 racks','5–16 racks','No rack information'],b:function(f){return f.racks==null?'No rack information':f.racks<=4?'1–4 racks':'5–16 racks'}},
+  {id:'topo',t:'By topology',b:function(f){return f.topo}},
+  {id:'net',t:'By network purpose',b:function(f){return f.net}}
+];
+
+/* ===== Field definitions: question protocol (D02 §6) ===== */
+function rates(){return [['25','25 Gb/s'],['100','100 Gb/s'],['200','200 Gb/s'],['400','400 Gb/s'],['800','800 Gb/s']]}
+function GF(g){
+  var P=g+'.';
+  var multiLink=function(p){var L=eff(p,P+'links').v;return L==null||L>=2};
+  return [
+    {id:P+'name',sub:'switch',l:'Group name',type:'text',nostate:true,def:function(p){return {v:'Group '+g.slice(1)}}},
+    {id:P+'count',sub:'what',l:'How many endpoints?',sh:'endpoint count',type:'count',need:true,h:'A number or a range, e.g. 120-136.',def:function(p){var r=eff(p,P+'racks').v,e=eff(p,P+'perRack').v,c=eff(p,P+'rackCap').v;if(r&&e)return {v:r*e,o:'derived',src:'derived: racks × populated endpoints per rack'};if(r&&c)return {v:r*c,src:'assumes every rack is full (racks × capacity) — confirm, or enter populated endpoints per rack',full:true};return null}},
+    {id:P+'profile',sub:'what',l:'What kind of endpoint?',sh:'endpoint type',type:'sel',need:true,opts:function(){return Object.keys(PROF).map(function(x){return [x,PROF[x].n]})},h:'Sets default links and rate; change them below.'},
+    {id:P+'links',sub:'what',l:'Fabric links per endpoint',sh:'links per endpoint',type:'num',min:1,max:16,def:function(p){var pr=PROF[eff(p,P+'profile').v];return pr&&pr.links?{v:pr.links,src:pr.src}:null},unlock:'link and port counts'},
+    {id:P+'rate',sub:'what',l:'Link rate',sh:'link rate',type:'sel',opts:rates,def:function(p){var pr=PROF[eff(p,P+'profile').v];return pr&&pr.rate?{v:pr.rate,src:pr.src}:null},unlock:'leaf profile and port modes'},
+    {id:P+'net',sub:'how',l:'Which network do these links serve?',sh:'network',type:'radio',opts:function(){return Object.keys(NETS).map(function(x){return [x,NETS[x]]})},unlock:'which fabric these lines belong to; different networks get separate switches'},
+    {id:P+'rail',sub:'how',l:'Should the links be rail-optimized?',sh:'rail preference',type:'radio',ap:multiLink,opts:function(){return [['yes','Yes — link n of every endpoint goes to the same leaf set'],['no','No']]},unlock:'how links pack onto leaves; until decided, the BOM shows each option separately'},
+    {id:P+'homing',sub:'how',l:'Should each endpoint be dual-homed to a leaf pair (ESLAG)?',sh:'redundancy',type:'radio',ap:multiLink,opts:function(){return [['dual','Yes, dual-homed'],['single','No']]},unlock:'leaf pairs; until decided, shown as alternatives. ESLAG support is conditional (R02 C03)'},
+    {id:P+'racks',sub:'where',l:'How many racks hold these endpoints?',sh:'rack count',type:'num',min:1,max:512,unlock:'rack-local leaf placement and a cross-check on the endpoint count'},
+    {id:P+'perRack',sub:'where',l:'Populated endpoints per rack (actual, typical rack)',sh:'populated per rack',type:'num',min:1,max:256,unlock:'a derived endpoint count (racks × populated); rack-local leaf blocks'},
+    {id:P+'rackCap',sub:'where',l:'Maximum endpoints per rack (capacity)',sh:'rack capacity',type:'num',min:1,max:256,def:function(p){return eff(p,P+'profile').v==='nvl72'?{v:18,src:'NVL72-style profile (R04 S06-1)'}:null},unlock:'unused positions and an over-capacity check; a full-rack estimate only as a visible assumption'},
+    {id:P+'place',sub:'where',l:'Where should these endpoints’ leaves sit?',sh:'leaf placement',type:'radio',opts:function(){return [['rack','In each rack (rack-local)'],['central','Shared, not per rack']]},unlock:'leaf counts when racks are known; until decided, shown as alternatives'},
+    {id:P+'leaf',sub:'switch',l:'Leaf profile',sh:'leaf profile',type:'sel',opts:function(){return Object.keys(LEAF).map(function(x){return [x,LEAF[x].n]})},def:function(p){var r=eff(p,P+'rate').v;return r==null?null:{v:r==='25'?'h48':'h400',src:'hypothetical fixture hardware, chosen by link rate'}},unlock:'endpoint slots and uplinks per leaf'}
+  ];
+}
+var PF=[
+  {id:'name',sec:'scope',l:'Project name',type:'text',nostate:true,def:function(){return {v:'Untitled project'}}},
+  {id:'req',sec:'scope',l:'Customer request, as written',type:'text',nostate:true,h:'Kept as the source of supplied answers.'}
+].concat(Object.keys(NETS).map(function(n){return {id:'net.'+n,sec:'nets',l:NETS[n],sh:NETS[n].toLowerCase()+' scope',type:'radio',opts:function(){return [['in','In scope'],['out','Out of scope']]},def:function(p){return p.groups.some(function(g){return eff(p,g+'.net').v===n})?{v:'in',o:'derived',src:'an endpoint group serves this network'}:null},unlock:'whether this network’s lines appear; never shown as 0'}})).concat([
+  {id:'spine800',sec:'switches',l:'Spine profile for 800G-uplink leaves',sh:'800G spine profile',type:'sel',opts:function(){return [['s64',SPN.s64.n],['other',SPN.other.n]]},def:function(){return {v:'s64',src:'hypothetical fixture hardware'}}},
+  {id:'upl800',sec:'switches',l:'Active uplinks per 800G-uplink leaf',sh:'uplinks per 800G leaf',type:'num',min:1,max:32,def:function(){return {v:32,src:'leaf profile maximum'}},h:'Fewer active uplinks leave room for growth but lower uplink capacity.'},
+  {id:'spine100',sec:'switches',l:'Spine profile for 100G-uplink leaves',sh:'100G spine profile',type:'sel',opts:function(){return [['s32',SPN.s32.n],['other',SPN.other.n]]},def:function(){return {v:'s32',src:'hypothetical fixture hardware'}}},
+  {id:'upl100',sec:'switches',l:'Active uplinks per 100G-uplink leaf',sh:'uplinks per 100G leaf',type:'num',min:1,max:8,def:function(){return {v:8,src:'leaf profile maximum'}}},
+  {id:'minsp',sec:'switches',l:'Minimum spines',sh:'minimum spines',type:'num',min:1,max:16,def:function(){return {v:2,src:'synthetic default: no single spine'}}},
+  {id:'topo',sec:'policy',l:'Inter-switch topology',sh:'topology',type:'radio',opts:function(){return [['ls','Leaf-spine'],['mesh','Mesh between leaves (small fabrics only, R02 C07)']]},def:function(){return {v:'ls',src:'common default; mesh is for small fabrics'}}},
+  {id:'du',sec:'policy',l:'Maximum D/U in normal operation',sh:'D/U limit',type:'sel',opts:function(){return [['1','1 (no oversubscription)'],['2','2'],['3','3']]},h:'D/U = a leaf’s endpoint-facing bandwidth divided by its working uplink bandwidth.',unlock:'an oversubscription check; minimum uplinks on partly filled leaves'},
+  {id:'loss',sec:'policy',l:'After one spine failure',sh:'spine-failure policy',type:'sel',opts:function(){return [['none','No requirement'],['8/7','D/U at most 8/7'],['1','Full bandwidth: D/U at most 1']]},unlock:'spine count'},
+  {id:'cons',sec:'cabling',l:'Cable construction',sh:'cable construction',type:'sel',opts:function(){return [['int','Integrated cables or split assemblies'],['opt','Optical modules plus fibers']]},h:'Until decided, both constructions are shown as separate totals, never summed.'},
+  {id:'reach',sec:'cabling',l:'Placement and reach',sh:'placement and reach',type:'sel',opts:function(){return [['row','Same row, short reach'],['rows','Across rows']]},h:'Needed later for cable lengths and SKUs.'}
+]);
+var SUBS={what:['What and how many',''],how:['How they connect','Optional. Unanswered choices appear as separate alternatives.'],where:['Where they sit','Optional. If you only know racks, racks × populated endpoints gives the count.'],switch:['Group name and leaf switch','Optional. Leaf defaults are hypothetical.']};
+var SECS=[{id:'scope',t:'Project and request'},{id:'groups',t:'Endpoint groups'},{id:'nets',t:'Networks in scope'},{id:'switches',t:'Spine and uplink profiles'},{id:'policy',t:'Topology, failure and oversubscription'},{id:'cabling',t:'Cabling'},{id:'target',t:'Installation target and evidence'}];
+function fields(p){var a=[];p.groups.forEach(function(g){GF(g).forEach(function(f){f.sec='grp-'+g;f.g=g;a.push(f)})});return PF.concat(a)}
+var GFCACHE={};
+function fd(id){var m=/^(g\d+)\.(\w+)$/.exec(id);if(m){var k=m[1];if(!GFCACHE[k]){GFCACHE[k]={};GF(k).forEach(function(f){f.sec='grp-'+k;f.g=k;GFCACHE[k][f.id]=f})}return GFCACHE[k][id]||null}for(var i=0;i<PF.length;i++)if(PF[i].id===id)return PF[i];return null}
+
+/* ===== helpers ===== */
+function $(s,r){return (r||document).querySelector(s)}
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+function fmt(n){return Number(n).toLocaleString('en')}
+function cdiv(a,b){return Math.floor((a+b-1)/b)}
+function gcd(a,b){while(b){var t=b;b=a%b;a=t}return a}
+function frac(n,d){var g=gcd(n,d);n/=g;d/=g;return d===1?String(n):n+'/'+d}
+function sum(a){return a.reduce(function(x,y){return x+y},0)}
+function uniq(a){return a.filter(function(x,i){return a.indexOf(x)===i})}
+function clone(x){return JSON.parse(JSON.stringify(x))}
+function parseF(s){if(!s||s==='none')return null;var a=String(s).split('/');return [+a[0],+(a[1]||1)]}
+function plural(n,w,pl){return fmt(n)+' '+(n===1?w:(pl||w+'s'))}
+function parseCount(v){if(v==null||v==='')return null;if(typeof v==='number')return {lo:v,hi:v};var m=/^\s*(\d+)\s*(?:[-–]|to)\s*(\d+)\s*$/.exec(String(v));if(m){var a=+m[1],b=+m[2];return a<=b&&a>0?{lo:a,hi:b}:null}var n=Number(v);return Math.floor(n)===n&&n>0?{lo:n,hi:n}:null}
+function gname(p,g){return eff(p,g+'.name').v||('Group '+g.slice(1))}
+function label(id,p){
+  if(/^lock:/.test(id))return 'order record: '+id.slice(5).replace(/^g\d+\./,function(m){return (p?gname(p,m.slice(0,-1)):m)+' '}).replace(/^n\.(\w+)\.\d+\./,'$1 ');
+  if(id==='target')return 'installation target';if(id==='groups')return 'endpoint groups';
+  var f=fd(id);if(!f)return id;var s=f.sh||f.l.toLowerCase();
+  if(f.g&&p&&p.groups.length>1)s=gname(p,f.g)+': '+s;return s}
+function optLabel(id,v){var f=fd(id);if(!f)return String(v);if(/profile$/.test(id)&&PROF[v])return PROF[v].n;if(/leaf$/.test(id)&&LEAF[v])return LEAF[v].n;if(f.opts){var o=f.opts().filter(function(x){return x[0]===String(v)})[0];if(o)return o[1]}return String(v)}
+
+/* ===== storage ===== */
+var KEY='hh-aid-d02-workspace-v3',storageOK=true,store={projects:{},order:[]};
+try{var raw=localStorage.getItem(KEY);if(raw)store=JSON.parse(raw)}catch(e){storageOK=false}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(store));storageOK=true}catch(e){storageOK=false}}
+var OPTM='expanded';try{OPTM=localStorage.getItem('hh-aid-d02-optmode')||'expanded'}catch(e){}
+var ui={optMode:OPTM,screen:'home',pid:null,tab:'bom',open:{},trace:null,view:null,cmpA:null,cmpB:null,find:'',hideSug:false,patq:'',patchg:false,patexp:false,srv:'',rail:'0',prev:null,copy:null,lockForm:null,resume:null,errs:{},lib:'count',libSel:null};
+function P(){return store.projects[ui.pid]}
+
+/* ===== answers ===== */
+function eff(p,id){
+  var f=fd(id);if(!f)return {v:null,o:'unknown'};
+  if(f.ap&&!f.ap(p))return {v:null,o:'na'};
+  var a=p.ans[id];
+  if(a){if(a.unknown)return {v:null,o:'unknown',marked:true};if(a.from)return {v:a.v,o:'assumed',src:'from starter '+a.from+' (placeholder)',starter:true};return {v:a.v,o:'user'}}
+  var df=f.def?f.def(p):null;
+  if(df&&df.v!=null)return {v:df.v,o:df.o||'assumed',src:df.src};
+  return {v:null,o:'unknown'};
+}
+function ORG(e){return e.o==='user'?'supplied':e.o==='assumed'?'assumed':e.o==='derived'?'derived':e.o==='na'?'not applicable':e.marked?'not decided yet':'not answered yet'}
+function chipE(e){var c=e.o==='unknown'?'unknown':e.o;return '<span class="chip '+c+'">'+ORG(e)+'</span>'}
+function showV(p,id,e){e=e||eff(p,id);if(e.o==='na')return 'not applicable';if(e.v==null)return e.marked?'undecided':'not answered';return optLabel(id,e.v)}
+function snap(p){var i={};fields(p).forEach(function(f){if(f.nostate)return;var e=eff(p,f.id);i[f.id]={v:e.v,o:e.o,m:!!e.marked}});return {i:i,l:clone(p.locks),t:p.target.label,g:p.groups.slice()}}
+function setAns(p,id,a,why){
+  var before=eff(p,id),prev=p.ans[id]?clone(p.ans[id]):null;
+  if(a===null)delete p.ans[id];else p.ans[id]=a;
+  if(JSON.stringify(prev)===JSON.stringify(p.ans[id]||null))return false;
+  var after=eff(p,id);p.inputRev++;
+  p.hist.unshift({r:p.inputRev,s:p.session,id:id,prev:prev,next:p.ans[id]?clone(p.ans[id]):null,bv:showV(p,id,before)+' ('+ORG(before)+')',av:showV(p,id,after)+' ('+ORG(after)+')',why:why||''});
+  save();var f=fd(id);if(f&&!f.nostate)announce(f.l+': '+showV(p,id,after)+'. Saved; not yet in an output.');
+  return true;
+}
+function setLock(p,key,val,why){
+  var prev=p.locks[key]?clone(p.locks[key]):null;if(val)p.locks[key]=val;else delete p.locks[key];
+  p.inputRev++;p.hist.unshift({r:p.inputRev,s:p.session,id:'lock:'+key,lock:key,prev:prev,bv:prev?prev.q+' ordered':'no order record',av:val?val.q+' ordered · '+val.del+' delivered':'no order record',why:why||''});
+  save();announce('Order record '+(val?'saved':'removed')+'. Not yet in an output.');
+}
+function setGroups(p,list,why){var prev=p.groups.slice();p.groups=list;p.inputRev++;p.hist.unshift({r:p.inputRev,s:p.session,id:'groups',grp:prev,bv:prev.length+' group(s)',av:list.length+' group(s)',why:why||''});save()}
+
+/* ===== planning policies: separate from discovery navigation ===== */
+function T(t,ids,kids){return {t:t,ids:ids||[],kids:kids||[]}}
+function packings(p,g){
+  var L=eff(p,g+'.links').v,r=eff(p,g+'.rail').v,h=eff(p,g+'.homing').v;
+  if(L===1)return ['same'];
+  if(r==='yes')return h==='dual'?['CONFLICT']:['rail'];
+  if(r==='no')return h==='dual'?['pair']:h==='single'?['same']:['pair','same'];
+  return h==='dual'?['pair']:h==='single'?['rail','same']:['rail','pair','same'];
+}
+function placements(p,g){var pl=eff(p,g+'.place').v;if(pl)return [pl];return eff(p,g+'.racks').v?['rack','central']:['central']}
+function packLeaves(pk,blocks,L,R,lf){
+  var per=lf.per[R],slots=lf.cages*per,out=[],why=null;
+  blocks.forEach(function(b){
+    var k,m;
+    if(pk==='rail'){for(k=0;k*slots<b.n;k++){m=Math.min(slots,b.n-k*slots);for(var r=0;r<L;r++)out.push({blk:b.name,chunk:k,rail:r,eps:m,links:m,first:b.first+k*slots})}}
+    else if(pk==='pair'){var h=L/2,epp=Math.floor(slots/h);for(k=0;k*epp<b.n;k++){m=Math.min(epp,b.n-k*epp);out.push({blk:b.name,chunk:k,side:'A',eps:m,links:m*h,first:b.first+k*epp});out.push({blk:b.name,chunk:k,side:'B',eps:m,links:m*h,first:b.first+k*epp})}}
+    else{var epl=Math.floor(slots/L);if(!epl){why='One endpoint needs more links than a leaf has endpoint slots.';return}for(k=0;k*epl<b.n;k++){m=Math.min(epl,b.n-k*epl);out.push({blk:b.name,chunk:k,eps:m,links:m*L,first:b.first+k*epl})}}
+  });
+  out.forEach(function(l){l.cages=cdiv(l.links,per);l.D=l.links*(+R)});
+  return {leaves:out,why:why,slots:slots,per:per};
+}
+function solve(leafD,u,ur,ports,minS,du,loss){
+  var U=u*ur,maxD=Math.max.apply(null,leafD),L=leafD.length,portsOK=false;
+  if(du&&maxD*du[1]>du[0]*U)return {fail:'du',U:U,maxD:maxD};
+  for(var s=Math.max(1,minS);s<=u;s++){
+    if(u%s)continue;if(ports*s<L*u)continue;portsOK=true;
+    if(loss){if(s<2)continue;if(maxD*s*loss[1]>loss[0]*U*(s-1))continue}
+    return {s:s,per:u/s,U:U,maxD:maxD};
+  }
+  if(!portsOK)return {fail:'ports',U:U,maxD:maxD};
+  if(loss&&maxD*loss[1]>=loss[0]*U)return {fail:'loss-proven',U:U,maxD:maxD};
+  return {fail:'loss-uniform',U:U,maxD:maxD};
+}
+function consAlts(cages,links,per,rate,pre){
+  pre=pre||'';
+  return per>1?[{a:pre+'Integrated',q:fmt(cages)+' integrated '+per+' × '+rate+'G split assemblies'},{a:pre+'Optical',q:fmt(cages)+' '+per+'-port leaf modules + '+fmt(links)+' endpoint modules + '+fmt(links)+' fibers'}]
+              :[{a:pre+'Integrated',q:fmt(links)+' integrated cables'},{a:pre+'Optical',q:fmt(2*links)+' modules + '+fmt(links)+' fibers'}];
+}
+function pickCons(alts,c){if(!c)return alts;return alts.filter(function(a){return /Integrated$/.test(a.a)?c==='int':c==='opt'})}
+function lockText(p,key,need){var lk=p.locks[key];if(!lk)return null;if(need>lk.q)return fmt(lk.q)+' ordered + '+fmt(need-lk.q)+' proposed';if(need<lk.q)return fmt(lk.q)+' ordered; requirement is '+fmt(need)+'. '+fmt(lk.q-need)+' surplus need an explicit disposition';return fmt(lk.q)+' ordered · '+fmt(lk.del)+' delivered'}
+
+function core(p,c,end){
+  var E=function(id){return eff(p,id)},V=function(id){return E(id).v};
+  var o={lines:[],conf:[],pats:[],exc:[],loc:null},fam={},famOrder=[],multi=p.groups.length>1,leafTotal=0,leafOK=true;
+  var add=function(l){if(!l.st)l.st='ok';o.lines.push(l);return l};
+  var unk=function(ids){return ids.filter(function(id){var e=E(id);return e.v==null||e.v==='other'})};
+  var ne=function(key,l,deps,need,reason,extra){var x={key:key,l:l,st:'ne',deps:deps,need:need||[],reason:reason||null};if(extra)for(var k in extra)x[k]=extra[k];return add(x)};
+  p.groups.forEach(function(g){
+    var Pp=g+'.',nm=gname(p,g),pre=multi?nm+' — ':'';
+    var cnt=parseCount(V(Pp+'count')),N=cnt?(end==='hi'?cnt.hi:cnt.lo):null;
+    var L=V(Pp+'links'),R=V(Pp+'rate'),net=V(Pp+'net')||'undecided',lf=LEAF[V(Pp+'leaf')],Rk=V(Pp+'racks'),Er=V(Pp+'perRack'),Cp=V(Pp+'rackCap'),cE=E(Pp+'count'),cSup=cE.o==='user'||(cE.o==='assumed'&&cE.starter);
+    var eDeps=[Pp+'count',Pp+'links',Pp+'rate'],u=unk(eDeps);
+    if(u.length)ne(g+'.eplinks',pre+'Endpoint links',eDeps,u);
+    else add({key:g+'.eplinks',l:pre+'Endpoint links ('+R+'G)',q:N*L,deps:eDeps,flags:/^assumes every rack/.test(cE.src||'')?['count assumes every rack is full (capacity), not stated occupancy']:[],tr:T(fmt(N*L)+' links = '+fmt(N)+' endpoints × '+L+' links each',[Pp+'count',Pp+'links'],[T(R+' Gb/s per link',[Pp+'rate'])])});
+    var lDeps=eDeps.concat([Pp+'leaf']),lOpt=[Pp+'rail',Pp+'homing',Pp+'place',Pp+'racks',Pp+'perRack',Pp+'rackCap'];
+    var LB={leaves:pre+'Leaf switches',cages:pre+'Leaf endpoint ports / cages',epcab:pre+'Endpoint cable construction'};
+    var cf=null,mk=function(id,t,because,inputs,relax){cf=g+'.'+id;o.conf.push({id:cf,kind:'proven',t:pre+t,because:because+' Both answers are kept; nothing was changed.',inputs:inputs,relax:relax,aff:['leaves','cages','cables']})},S1=function(k,v){var x={};x[Pp+k]=v;return x};
+    if(Er&&Cp&&Er>Cp)mk('C-occ','Populated endpoints per rack exceed rack capacity',Er+' populated per rack is more than the '+Cp+'-endpoint capacity.',[Pp+'perRack',Pp+'rackCap'],[{t:'Use '+Cp+' populated per rack',set:S1('perRack',Cp)},{t:'Rack capacity is wrong',go:Pp+'rackCap'}]);
+    else if(N!=null&&cSup&&Rk&&Cp&&N>Rk*Cp)mk('C-rack','More endpoints than rack positions',fmt(N)+' endpoints cannot fit in '+Rk+' racks × '+Cp+' capacity = '+fmt(Rk*Cp)+' positions.',[Pp+'count',Pp+'racks',Pp+'rackCap'],[{t:'The racks are right: use '+fmt(Rk*Cp)+' endpoints',set:S1('count',Rk*Cp)},{t:'The count is right: use '+cdiv(N,Cp)+' racks',set:S1('racks',cdiv(N,Cp))},{t:'Rack capacity is wrong',go:Pp+'rackCap'}]);
+    else if(N!=null&&cSup&&Rk&&Er&&(N>Rk*Er||N<=(Rk-1)*Er))mk('C-occmis','Endpoint count disagrees with racks × populated per rack',fmt(N)+' endpoints, but '+Rk+' racks × '+Er+' populated per rack = '+fmt(Rk*Er)+(N<=(Rk-1)*Er?' (more racks than the count needs, even allowing a partly filled last rack).':'.'),[Pp+'count',Pp+'racks',Pp+'perRack'],[{t:'The racks are right: use '+fmt(Rk*Er)+' endpoints',set:S1('count',Rk*Er)},{t:'The count is right: use '+cdiv(N,Er)+' racks',set:S1('racks',cdiv(N,Er))},{t:'Populated per rack is wrong',go:Pp+'perRack'}]);
+    if(!cf&&N!=null&&Rk){
+      if(Er&&cSup&&N<Rk*Er)o.exc.push(pre+'last rack partly populated: '+fmt(N-(Rk-1)*Er)+' of '+Er);
+      if(Cp){var occ=Er?Math.min(Er,Cp):null,used=N;if(used<Rk*Cp)o.exc.push(pre+fmt(Rk*Cp-used)+' rack positions unused ('+fmt(used)+' populated of '+fmt(Rk*Cp)+' capacity)')}
+    }
+    var pk=c[g+'.pack']||packings(p,g)[0],pl=c[g+'.place']||placements(p,g)[0];
+    if(pk==='CONFLICT'&&!cf){cf=g+'.C-railpair';var r1={},r2={};r1[Pp+'homing']='single';r2[Pp+'rail']='no';o.conf.push({id:cf,kind:'notshown',t:pre+'Rail-optimized and dual-homed together: not modelled here',because:'Rail optimization sends link n of each endpoint to rail n’s leaf; ESLAG bundles links across a leaf pair. A design combining them (for example two links per rail) may exist, but this prototype does not model it, so no quantity is shown. This is not a claim that the combination is impossible.',inputs:[Pp+'rail',Pp+'homing'],relax:[{t:'Keep rail optimization; not dual-homed',set:r1},{t:'Keep dual-homing; not rail-optimized',set:r2}],aff:['leaves','cages','cables']})}
+    if(cf){['leaves','cages','epcab'].forEach(function(k){add({key:g+'.'+k,l:LB[k],st:'cf',cid:cf,deps:lDeps,opt:lOpt})});leafOK=false;return}
+    var need=unk(lDeps),why=null;
+    if(!need.length){if(!lf.per||!lf.per[R])why='This leaf profile has no '+R+' Gb/s endpoint mode.';else if(pk==='pair'&&L%2)why='Dual-homing here splits links evenly across a pair; '+L+' links cannot be split evenly.';else if(pl==='rack'&&!Rk)need=[Pp+'racks']}
+    if(need.length||why){['leaves','cages','epcab'].forEach(function(k){ne(g+'.'+k,LB[k],lDeps,need,why,{opt:lOpt})});leafOK=false;return}
+    var blocks=[];
+    if(pl==='rack'){var perR=Er||cdiv(N,Rk),rem=N,first=0;if(!Er)o.exc.push(pre+'rack-local blocks assume '+cdiv(N,Rk)+' endpoints per rack (spread evenly; populated per rack not answered)');for(var i=0;i<Rk&&rem>0;i++){var n=Math.min(perR,rem);blocks.push({n:n,name:'rack '+(i+1),first:first});first+=n;rem-=n}}
+    else blocks.push({n:N,name:'',first:0});
+    var res=packLeaves(pk,blocks,L,R,lf);
+    if(res.why){['leaves','cages','epcab'].forEach(function(k){ne(g+'.'+k,LB[k],lDeps,[],res.why,{opt:lOpt})});leafOK=false;return}
+    var lv=res.leaves,nL=lv.length,cages=sum(lv.map(function(x){return x.cages})),unused=sum(lv.map(function(x){return lf.cages-x.cages}));
+    var desc=pk==='rail'?'one leaf per rail for every block of up to '+res.slots+' endpoints':pk==='pair'?'leaf pairs, '+Math.floor(res.slots/(L/2))+' endpoints per pair, '+(L/2)+' links to each leaf':Math.floor(res.slots/L)+' endpoints per leaf, all '+L+' links on that leaf';
+    var tBlocks=T(pl==='rack'?blocks.length+' racks: '+blocks.map(function(b){return b.n}).join(' + ')+' endpoints (rack-local leaves)':'placement not per rack: '+fmt(N)+' endpoints in one pool'+(Rk?'':' (no rack information)'),[Pp+'place',Pp+'racks',Pp+'perRack',Pp+'count']);
+    var tLeaves=T(fmt(nL)+' leaves — '+PACKNAME[pk]+': '+desc,[Pp+'rail',Pp+'homing'],[tBlocks,T(res.slots+' endpoint link slots per leaf = '+lf.cages+' × '+res.per+' at '+R+' Gb/s',[Pp+'leaf',Pp+'rate'])]);
+    add({key:g+'.leaves',l:LB.leaves,q:nL,deps:lDeps,opt:lOpt,locks:['lock:'+g+'.leaves'],lock:lockText(p,g+'.leaves',nL),flags:pk==='pair'?['ESLAG on this leaf profile: unverified (R02 C03, K09)']:[],tr:tLeaves});
+    add({key:g+'.cages',l:LB.cages+' ('+(res.per>1?res.per+' × '+R+'G cages':R+'G')+')',q:cages,deps:lDeps,opt:lOpt,note:unused?fmt(unused)+' intentionally unused':null,tr:T(fmt(cages)+' = sum over leaves of ceil(links on leaf ÷ '+res.per+')',[Pp+'leaf'],[tLeaves])});
+    if(unused)o.exc.push(pre+fmt(unused)+' intentionally unused endpoint '+(res.per>1?'cages':'ports'));
+    var alts=pickCons(consAlts(cages,N*L,res.per,R),V('cons'));
+    add({key:g+'.epcab',l:LB.epcab,alts:alts,deps:lDeps,opt:lOpt.concat(['cons','reach']),tr:T((alts.length>1?'separate totals, never summed: ':'')+alts.map(function(a){return a.q}).join(' | '),['cons'])});
+    var seen={};lv.forEach(function(x){var k=x.blk+'|'+x.chunk+'|'+(x.rail!=null?x.rail:'');if(seen[k])return;seen[k]=1;
+      var tag=g.toUpperCase()+(x.blk?'-'+x.blk.replace('rack ','R'):'')+'-'+String.fromCharCode(65+x.chunk);
+      o.pats.push({key:g+'|'+k,grp:(multi?nm+' ':'')+(x.blk||''),t:(multi?nm+': ':'')+(x.blk?x.blk+', ':'')+'endpoints '+x.first+'–'+(x.first+x.eps-1)+(pk==='rail'?', rail '+x.rail+' → leaf '+tag+'-r'+x.rail:pk==='pair'?' → leaf pair '+tag+' (one side each)':' → leaf '+tag),n:pk==='pair'?2*x.links:x.links,d:pk==='rail'?'cages 1–'+x.cages+(res.per>1?' · lanes 1–'+res.per:''):'ports 1–'+x.cages*res.per,un:lf.cages-x.cages})});
+    if(!multi&&pk==='rail'&&pl==='central')o.loc={slots:res.slots,per:res.per,rails:L,N:N,g:g};
+    leafTotal+=nL;
+    var fnet=net==='undecided'&&c.netrel==='separate'?'undecided-'+g:net,fk=fnet+'|'+lf.ur;if(!fam[fk]){fam[fk]={net:fnet,ur:lf.ur,lfu:lf.u,D:[],deps:[],locks:[],n:0,gn:nm};famOrder.push(fk)}
+    var F=fam[fk];lv.forEach(function(x){F.D.push(x.D)});F.deps=uniq(F.deps.concat(lDeps,lOpt,[Pp+'net']));F.locks.push('lock:'+g+'.leaves');F.n+=nL;
+  });
+  var famNets={};famOrder.forEach(function(k){famNets[fam[k].net]=(famNets[fam[k].net]||0)+1});
+  var spTotal=0,spOK=leafOK;
+  famOrder.forEach(function(k){
+    var F=fam[k],NET=(NETS[F.net]||(/^undecided-/.test(F.net)?F.gn+' — network not decided':c.netrel==='shared'?'Undecided networks, shared (conditional)':'Network not decided'))+(famNets[F.net]>1?' ('+F.ur+'G uplinks)':''),fid='n.'+F.net+'.'+F.ur;
+    var spId='spine'+F.ur,uId='upl'+F.ur,sp=SPN[V(spId)],u=V(uId),topo=V('topo'),du=parseF(V('du')),loss=parseF(V('loss')),minS=V('minsp')||1;
+    var sDeps=F.deps.concat([spId,uId]),sOpt=['du','loss','minsp','topo'],locks=F.locks.concat(['lock:'+fid+'.spines']);
+    var LB={spines:NET+' — spine switches',links:NET+' — '+(topo==='mesh'?'mesh links':'leaf-to-spine links'),cab:NET+' — inter-switch cable construction'};
+    if(u>F.lfu){['spines','links','cab'].forEach(function(x){ne(fid+'.'+x,LB[x],sDeps,[],'More active uplinks than the leaf profile has.',{opt:sOpt})});spOK=false;return}
+    if(topo==='mesh'){
+      var L=F.n,per=L>1?Math.floor(u/(L-1)):0;
+      if(L<2||!per){['spines','links','cab'].forEach(function(x){ne(fid+'.'+x,LB[x],sDeps,[],L<2?'A mesh needs at least two leaves.':'Too many leaves for a full mesh with '+u+' uplinks each (R02 C07: small meshes only).',{opt:sOpt})});spOK=false;return}
+      var mx=Math.max.apply(null,F.D),Um=(L-1)*per*F.ur,ml=L*(L-1)/2*per;
+      if(du&&mx*du[1]>du[0]*Um){o.conf.push({id:fid+'.C-du',kind:'proven',t:NET+': cannot satisfy normal D/U ≤ '+frac(du[0],du[1]),because:'The busiest leaf has D = '+fmt(mx)+' Gb/s and '+fmt(Um)+' Gb/s of mesh links: D/U '+frac(mx,Um)+'.',inputs:['du','topo'],relax:[{t:'Raise the D/U limit',go:'du'},{t:'Use leaf-spine',set:{topo:'ls'}}],aff:['spines','links','cables']});['spines','links','cab'].forEach(function(x){add({key:fid+'.'+x,l:LB[x],st:'cf',cid:fid+'.C-du',deps:sDeps,opt:sOpt})});spOK=false;return}
+      add({key:fid+'.spines',l:LB.spines,q:0,note:'mesh: no spines (a real zero, not an unknown)',deps:sDeps,opt:sOpt,tr:T('mesh topology: leaves connect directly',['topo'])});
+      add({key:fid+'.links',l:LB.links+' ('+F.ur+'G)',q:ml,note:per+' per leaf pair · conditional (R02 C07)',deps:sDeps,opt:sOpt,tr:T(fmt(ml)+' = '+L+'·'+(L-1)+'/2 leaf pairs × '+per+' links; normal D/U '+frac(mx,Um),['topo',uId,'du'])});
+      var ma=pickCons(consAlts(ml,ml,1,F.ur),V('cons'));add({key:fid+'.cab',l:LB.cab,alts:ma,deps:sDeps,opt:sOpt.concat(['cons','reach']),tr:T(ma.map(function(a){return a.q}).join(' | '),['cons'])});
+      o.pats.push({key:fid+'|mesh',grp:'inter-switch',t:NET+': every leaf pair, direct',n:ml,d:per+' links per pair',un:0});
+      return;
+    }
+    if(!sp||!sp.ports){['spines','links','cab'].forEach(function(x){ne(fid+'.'+x,LB[x],sDeps,[spId],null,{opt:sOpt})});spOK=false;return}
+    var lockS=p.locks[fid+'.spines'],S,ls,per2=null,tr;
+    if(lockS){
+      var mins=F.D.map(function(d){return du?Math.min(u,cdiv(d*du[1],du[0]*F.ur)):u}),need=sum(mins),cap=lockS.q*sp.ports,grp={};
+      mins.forEach(function(m){grp[m]=(grp[m]||0)+1});var br=Object.keys(grp).sort(function(a,b){return b-a}).map(function(m){return plural(grp[m],'leaf','leaves')+' × '+m}).join(' + ');
+      if(need>cap){var cid=fid+'.C-lock';o.conf.push({id:cid,kind:'proven',t:NET+': the ordered spines cannot connect every leaf',because:fmt(lockS.q)+' ordered spines × '+sp.ports+' ports = '+fmt(cap)+' ports. '+(du?'Keeping every leaf at D/U ≤ '+frac(du[0],du[1])+' needs ':'With no D/U limit set, every leaf keeps all '+u+' uplinks: ')+br+' = '+fmt(need)+' uplink ports, '+fmt(need-cap)+' more than the ordered spines have.',inputs:['lock:'+fid+'.spines'].concat(F.locks,['du']),relax:[{t:'Add spine capacity and rebalance existing links (changes approved, possibly installed, cabling: R06 class T2). Requires an explicit change to the spine order record.',go:'lock:'+fid+'.spines'}].concat(du?[]:[{t:'Set a D/U limit: partly filled leaves may then need fewer uplinks',set:{du:'1'}}]).concat([{t:'Take uplinks from existing leaves (raises their D/U). Not modelled in this prototype.'}]),aff:['spines','links','cables','OOB']});
+        ['spines','links','cab'].forEach(function(x){add({key:fid+'.'+x,l:LB[x],st:'cf',cid:cid,deps:sDeps,opt:sOpt,locks:locks})});spOK=false;return}
+      S=lockS.q;ls=need;tr=T(fmt(S)+' spines: ordered quantity (locked). '+fmt(need)+' of '+fmt(cap)+' spine ports used ('+br+')',[uId,'du']);
+    } else {
+      var r=solve(F.D,u,F.ur,sp.ports,minS,du,loss);
+      if(!r.s){var c2={id:fid+'.C-spine',aff:['spines','links','cables','OOB']},m2=r.maxD,U=r.U,lt=loss?frac(loss[0],loss[1]):'';
+        if(r.fail==='du'){c2.kind='proven';c2.t=NET+': cannot satisfy normal D/U ≤ '+frac(du[0],du[1]);c2.because='The busiest leaf has D = '+fmt(m2)+' Gb/s and at most U = '+fmt(U)+' Gb/s of active uplinks: D/U '+frac(m2,U)+' with any spine count.';c2.inputs=['du',uId];c2.relax=[{t:'Raise the D/U limit',go:'du'},{t:'Activate more uplinks per leaf',go:uId}]}
+        else if(r.fail==='loss-proven'){c2.kind='proven';c2.t=NET+': cannot satisfy D/U ≤ '+lt+' after one spine failure';c2.because='Each full leaf has D = '+fmt(m2)+' Gb/s and U = '+fmt(U)+' Gb/s. Losing 1 of S spines leaves U·(S−1)/S, so D/U after the loss exceeds '+lt+' for every S. Routing cannot add missing cut capacity (R04 T06, N04).';c2.inputs=['loss',uId,'spine'+F.ur];c2.relax=[];if(V('loss')!=='8/7'&&8*U>=7*m2)c2.relax.push({t:'Accept D/U ≤ 8/7 after a spine loss',set:{loss:'8/7'}});c2.relax.push({t:'No spine-failure requirement',set:{loss:'none'}});c2.relax.push({t:'Fewer endpoints per leaf or a leaf with more uplink capacity (needs catalog evidence)',go:F.deps.filter(function(x){return /leaf$/.test(x)})[0]||uId})}
+        else if(r.fail==='loss-uniform'){c2.kind='notshown';c2.t=NET+': not shown to be possible — D/U ≤ '+lt+' after one spine failure';c2.because='No spine count dividing the '+u+' uplinks evenly meets the policy within the port limit. Non-uniform allocations were not searched.';c2.inputs=['loss',uId];c2.relax=[{t:'Relax the spine-failure policy',go:'loss'},{t:'Change active uplinks per leaf',go:uId}]}
+        else{c2.kind='notshown';c2.t=NET+': not shown to be possible — one spine layer for '+fmt(F.D.length*u)+' leaf uplinks';c2.because='No even spine allocation has enough ports with this spine profile.';c2.inputs=['spine'+F.ur,uId];c2.relax=[{t:'Fewer active uplinks per leaf',go:uId}]}
+        o.conf.push(c2);['spines','links','cab'].forEach(function(x){add({key:fid+'.'+x,l:LB[x],st:'cf',cid:c2.id,deps:sDeps,opt:sOpt,locks:locks})});spOK=false;return}
+      S=r.s;per2=r.per;ls=F.D.length*u;
+      tr=T(fmt(S)+' spines = smallest S ≥ '+minS+' that divides '+u+' uplinks per leaf evenly, with '+sp.ports+'·S ≥ '+fmt(ls)+' leaf uplinks'+(loss?'; after one spine loss D/U = '+frac(r.maxD*S,r.U*(S-1)):''),[spId,uId,'minsp','loss'],[T(fmt(F.D.length)+' leaves in this network (from the endpoint groups above)',F.deps.filter(function(x){return /\.(count|rail|homing|place)$/.test(x)})),T('normal D/U on the busiest leaf = '+frac(r.maxD,r.U),['du'])]);
+    }
+    spTotal+=S;
+    add({key:fid+'.spines',l:LB.spines,q:S,deps:sDeps,opt:sOpt,locks:locks,lock:p.locks[fid+'.spines']?fmt(p.locks[fid+'.spines'].q)+' ordered · '+fmt(p.locks[fid+'.spines'].del)+' delivered':null,tr:tr});
+    add({key:fid+'.links',l:LB.links+' ('+F.ur+'G)',q:ls,note:per2?per2+' per leaf–spine pair':null,deps:sDeps,opt:sOpt,locks:locks,tr:T(fmt(ls)+' = '+(lockS?'uplinks needed per leaf, summed':fmt(F.D.length)+' leaves × '+u+' uplinks'),[uId],[tr])});
+    var al=pickCons(consAlts(ls,ls,1,F.ur),V('cons'));add({key:fid+'.cab',l:LB.cab,alts:al,deps:sDeps,opt:sOpt.concat(['cons','reach']),locks:locks,tr:T(al.map(function(a){return a.q}).join(' | '),['cons'])});
+    o.pats.push({key:fid+'|ls',grp:'inter-switch',t:NET+': each of '+F.D.length+' leaves → each of '+S+' spines',n:ls,d:per2?per2+' links per pair':'per-leaf uplinks as needed',un:0});
+  });
+  // network scope
+  Object.keys(NETS).forEach(function(n){
+    var st=V('net.'+n),used=p.groups.some(function(g){return V(g+'.net')===n});
+    if(st==='in'&&!used)ne('scope.'+n,NETS[n]+' network',['net.'+n],[],'In scope, but no endpoint group serves it yet. Add a group or assign one. Never shown as 0.');
+    if(st==='out'&&used){var rs={};rs['net.'+n]='in';o.conf.push({id:'C-scope-'+n,kind:'input',t:'A group serves '+NETS[n]+', which is marked out of scope',because:'Both answers are kept.',inputs:['net.'+n],relax:[{t:'Mark '+NETS[n]+' in scope',set:rs}],aff:[]})}
+  });
+  o.undecidedNets=Object.keys(NETS).filter(function(n){return E('net.'+n).v==null&&!p.groups.some(function(g){return V(g+'.net')===n})}).map(function(n){return NETS[n]});
+  o.outNets=Object.keys(NETS).filter(function(n){return V('net.'+n)==='out'}).map(function(n){return NETS[n]});
+  var oDeps=[];o.lines.forEach(function(l){if(/\.(leaves|spines)$/.test(l.key))oDeps=oDeps.concat(l.deps||[])});
+  if(!o.lines.some(function(l){return /\.leaves$/.test(l.key)&&l.st==='ok'}))ne('oob','Switch out-of-band management ports',uniq(oDeps),[],'Needs leaf counts first.');
+  else if(leafOK&&spOK)add({key:'oob',l:'Switch out-of-band management ports',q:leafTotal+spTotal,deps:uniq(oDeps),note:'OOB network is an external dependency (R06 O1)',tr:T(fmt(leafTotal+spTotal)+' = '+fmt(leafTotal)+' leaves + '+fmt(spTotal)+' spines, one each',[])});
+  else add({key:'oob',l:'Switch out-of-band management ports',q:leafTotal,bound:true,deps:uniq(oDeps),note:'lower bound while some switch counts are open',tr:T('at least the '+fmt(leafTotal)+' leaves counted so far',[])});
+  return o;
+}
+
+/* ===== generation: alternatives for undecided choices, ranges for count ranges ===== */
+function qtext(l){if(!l)return '—';if(l.st==='ne')return 'Not estimated';if(l.st==='cf')return '— suspended (conflict)';if(l.alts)return l.alts.map(function(a){return a.a+': '+a.q}).join(' | ');if(l.qs)return l.qs;return (l.bound?'≥ ':'')+fmt(l.q)}
+function qfull(l){return qtext(l)+(l&&l.lock?' ['+l.lock+']':'')}
+function dimsOf(p){var d=[],multi=p.groups.length>1;var und=p.groups.filter(function(g){return !eff(p,g+'.net').v});if(und.length>1)d.push({k:'netrel',vals:['separate','shared'],f:und.map(function(g){return g+'.net'}),nm:'',names:{separate:'undecided networks kept separate',shared:'undecided networks share switches (conditional)'}});p.groups.forEach(function(g){var pk=packings(p,g);if(pk.length>1)d.push({k:g+'.pack',vals:pk,f:[g+'.rail',g+'.homing'],nm:(multi?gname(p,g)+': ':''),names:PACKNAME});var pl=placements(p,g);if(pl.length>1)d.push({k:g+'.place',vals:pl,f:[g+'.place'],nm:(multi?gname(p,g)+': ':''),names:PLACENAME})});return d}
+function gen(p){
+  var dims=dimsOf(p),combos=[{}];
+  dims.forEach(function(d){var nx=[];combos.forEach(function(c){d.vals.forEach(function(v){var x=clone(c);x[d.k]=v;nx.push(x)})});combos=nx});
+  var tooMany=combos.length>12;if(tooMany)combos=[combos[0]];
+  var lab=function(c){return dims.map(function(d){return d.nm+d.names[c[d.k]]}).join(' · ')};
+  var hasRange=p.groups.some(function(g){var c=parseCount(eff(p,g+'.count').v);return c&&c.lo!==c.hi});
+  var runs=combos.map(function(c){return {c:c,lab:lab(c),lo:core(p,c,'lo'),hi:hasRange?core(p,c,'hi'):null}});
+  var dimF=uniq([].concat.apply([],dims.map(function(d){return d.f})));
+  var keys=[];runs.forEach(function(r){r.lo.lines.forEach(function(l){if(keys.indexOf(l.key)<0)keys.push(l.key)})});
+  var find=function(o,k){if(!o)return null;for(var i=0;i<o.lines.length;i++)if(o.lines[i].key===k)return o.lines[i];return null};
+  var comb=function(a,b){if(!b||!a)return qfull(a);var x=qfull(a),y=qfull(b);if(x===y)return x;if(a.q!=null&&b.q!=null&&!a.alts&&!a.lock&&!b.lock)return (a.bound?'≥ ':'')+fmt(a.q)+'–'+fmt(b.q);return x+' … '+y};
+  var out={lines:[],conf:[],pats:runs[0].lo.pats,exc:[],loc:runs.length===1&&!hasRange?runs[0].lo.loc:null,dims:dims,runs:runs.length,undecidedNets:runs[0].lo.undecidedNets,outNets:runs[0].lo.outNets,tooMany:tooMany,swing:{}};
+  keys.forEach(function(k){
+    var per=runs.map(function(r){var a=find(r.lo,k),b=r.hi?find(r.hi,k):null;return {r:r,a:a,b:b,t:a?comb(a,b):'not applicable under this alternative'}});
+    var base=clone((per.filter(function(x){return x.a})[0]).a);
+    var deps=[],opt=[],locks=[];per.forEach(function(x){if(x.a){deps=deps.concat(x.a.deps||[]);opt=opt.concat(x.a.opt||[]);locks=locks.concat(x.a.locks||[])}});
+    base.deps=uniq(deps);base.opt=uniq(opt);base.locks=uniq(locks);
+    var fl=[];per.forEach(function(x){(x.a&&x.a.flags||[]).forEach(function(t){var lbl=runs.length>1&&!per.every(function(y){return y.a&&(y.a.flags||[]).indexOf(t)>=0})?t+' (under: '+x.r.lab+')':t;if(fl.indexOf(lbl)<0)fl.push(lbl)})});base.flags=fl;
+    var texts=uniq(per.map(function(x){return x.t}));
+    if(texts.length===1&&runs.length>1){base.und=dimF.filter(function(fid){return base.deps.indexOf(fid)>=0||base.opt.indexOf(fid)>=0});base.sameAll=true}
+    if(texts.length===1){var x0=per[0];if(x0.b&&qfull(x0.a)!==x0.t){base.range=true;base.qs=x0.t;base.q=null;base.alts=null;base.lock=null;base.tr=T('Range: the endpoint count is a range, so this line is too',[],[T('low end: '+qfull(x0.a),[],[x0.a.tr]),T('high end: '+qfull(x0.b),[],[x0.b.tr])]);base.rangeLo=x0.a.q;base.rangeHi=x0.b.q}}
+    else{
+      var by={},ord=[];per.forEach(function(x){if(!by[x.t]){by[x.t]=[];ord.push(x.t)}by[x.t].push(x.r.lab)});
+      base.alts=ord.map(function(t){return {a:by[t].join(' / '),q:t}});base.q=null;base.qs=null;base.lock=null;base.st='ok';base.varies=true;base.und=dimF;
+      base.tr=T('Separate alternatives because '+dims.map(function(d){return d.nm+(d.k==='netrel'?'network membership':d.k.indexOf('pack')>0?'rail preference / redundancy':'leaf placement')}).join(' and ')+' '+(dims.length>1?'are':'is')+' not decided. These are the alternatives this prototype evaluates, not every possible design. Never summed.',dimF,per.map(function(x){return T(x.r.lab+': '+x.t,[],x.a&&x.a.tr?[x.a.tr]:[])}));
+      var nums=per.map(function(x){return x.a&&x.a.st!=='cf'&&x.a.st!=='ne'?x.a.q:null}).filter(function(v){return v!=null});
+      if(nums.length>1){var sp=Math.max.apply(null,nums)-Math.min.apply(null,nums);if(sp>0)dimF.forEach(function(f){var s=out.swing[f];if(!s||sp>s.sp)out.swing[f]={sp:sp,l:base.l,lo:Math.min.apply(null,nums),hi:Math.max.apply(null,nums)}})}
+    }
+    if(base.range&&base.rangeHi!=null){p.groups.forEach(function(g){if(base.deps.indexOf(g+'.count')>=0){var f=g+'.count',sp=base.rangeHi-base.rangeLo;var s=out.swing[f];if(sp>0&&(!s||sp>s.sp))out.swing[f]={sp:sp,l:base.l,lo:base.rangeLo,hi:base.rangeHi,range:true}}})}
+    if(tooMany)(base.flags=base.flags||[]).push('shown for one combination only: too many undecided choices to list as alternatives');
+    out.lines.push(base);
+  });
+  var cs={};runs.forEach(function(r){r.lo.conf.concat(r.hi?r.hi.conf:[]).forEach(function(c){if(!cs[c.id]){cs[c.id]={c:c,labs:[]};out.conf.push(c)}if(cs[c.id].labs.indexOf(r.lab)<0)cs[c.id].labs.push(r.lab)})});
+  out.conf.forEach(function(c){if(runs.length>1&&cs[c.id].labs.length<runs.length)c.only=cs[c.id].labs.join(' / ')});
+  var ex={},eo=[];runs.forEach(function(r){r.lo.exc.forEach(function(e){if(!ex[e]){ex[e]=[];eo.push(e)}ex[e].push(r.lab)})});eo.forEach(function(e){out.exc.push(runs.length>1&&ex[e].length<runs.length?e+' (under: '+ex[e].join(' / ')+')':e)});
+  return fin(p,out);
+}
+function fin(p,o){
+  o.lines.forEach(function(l){
+    var all=(l.deps||[]).concat(l.opt||[]),und=l.und||[];
+    l.rest=uniq(all.filter(function(id){var e=eff(p,id);return fd(id)&&e.o==='assumed'}));
+    l.nchk=uniq((l.opt||[]).filter(function(id){var e=eff(p,id);return fd(id)&&e.o==='unknown'&&und.indexOf(id)<0&&!/\.(racks|perRack|rackCap|place)$/.test(id)}));
+    l.need=l.need||[];l.flags=l.flags||[];
+    l.prec=l.st==='ne'?'unresolved':l.st==='cf'?'suspended by conflict':l.varies?'alternatives (undecided choices)':l.range?'bounded (range)':l.alts&&l.alts.length>1?'exact per alternative':l.bound?'bounded (lower bound)':'exact under stated assumptions';
+    if(p.relBlocked&&/cab$/.test(l.key))l.flags.push('blocked for qualification on <TARGET>: compatibility evidence unknown (example)');
+    if(l.alts&&l.alts.length===1){l.qs=l.alts[0].q;l.alts=null}
+    if(l.tr)l.tr=stripTr(l.tr);
+  });
+  return o;
+}
+function stripTr(n){return n?{t:n.t,ids:n.ids,kids:(n.kids||[]).filter(Boolean).map(stripTr)}:null}
+
+/* ===== derived views ===== */
+function latest(p){return p.revs[p.revs.length-1]||null}
+function changedSince(p,rev){var now=snap(p),ids=[];Object.keys(now.i).forEach(function(id){if(JSON.stringify(now.i[id])!==JSON.stringify(rev.snap.i[id]||null))ids.push(id)});Object.keys(now.l).concat(Object.keys(rev.snap.l)).forEach(function(k){if(JSON.stringify(now.l[k]||null)!==JSON.stringify(rev.snap.l[k]||null)&&ids.indexOf('lock:'+k)<0)ids.push('lock:'+k)});if(now.t!==rev.snap.t)ids.push('target');if(JSON.stringify(now.g)!==JSON.stringify(rev.snap.g))ids.push('groups');return ids}
+function lineStale(p,l,ch){if(ch.indexOf('groups')>=0)return ['endpoint groups'];var all=(l.deps||[]).concat(l.opt||[]).concat(l.locks||[]);return ch.filter(function(id){return all.indexOf(id)>=0}).map(function(id){return label(id,p)})}
+function generate(p,ev,why){
+  var out=gen(p),prev=latest(p);
+  p.revs.push({n:p.revs.length+1,s:p.session,ir:p.inputRev,ev:ev||(prev?prev.ev:EV0),tgt:p.target.label,snap:snap(p),out:out,why:why||''});
+  ui.view=null;ui.trace=null;ui.prev=null;save();
+  var r=latest(p),pv=r.n>1?p.revs[r.n-2]:null,dd=pv?diff(pv,r):null;
+  announce('Revision '+r.n+' generated from details r'+r.ir+': '+(dd?dd.rows.filter(function(x){return x.ch}).length+' lines changed, ':'')+plural(out.conf.length,'conflict')+'.');
+}
+function diff(a,b){
+  var ka={},kb={},rows=[];a.out.lines.forEach(function(l){ka[l.key]=l});b.out.lines.forEach(function(l){kb[l.key]=l});
+  uniq(b.out.lines.map(function(l){return l.key}).concat(a.out.lines.map(function(l){return l.key}))).forEach(function(k){
+    var x=ka[k],y=kb[k],tx=x?qfull(x):'—',ty=y?qfull(y):'—';
+    var ch=!x||!y||tx!==ty||x.st!==y.st||x.prec!==y.prec||JSON.stringify(x.rest)!==JSON.stringify(y.rest)||JSON.stringify(x.flags)!==JSON.stringify(y.flags);
+    var dl=x&&y&&x.q!=null&&y.q!=null&&!x.alts&&!y.alts&&x.st===y.st?y.q-x.q:null;
+    rows.push({k:k,l:(y||x).l,tx:tx,ty:ty,ch:ch,dl:dl,x:x,y:y});
+  });
+  var inp=[],keys=uniq(Object.keys(a.snap.i).concat(Object.keys(b.snap.i)));
+  keys.forEach(function(id){var u=a.snap.i[id],v=b.snap.i[id];if(JSON.stringify(u||null)!==JSON.stringify(v||null))inp.push({id:id,f:fsnap(id,u),t:fsnap(id,v)})});
+  uniq(Object.keys(a.snap.l).concat(Object.keys(b.snap.l))).forEach(function(k){var u=a.snap.l[k],v=b.snap.l[k];if(JSON.stringify(u||null)!==JSON.stringify(v||null))inp.push({id:'lock:'+k,f:u?u.q+' ordered':'none',t:v?v.q+' ordered':'none'})});
+  if(a.snap.t!==b.snap.t)inp.push({id:'target',f:a.snap.t,t:b.snap.t});
+  if(JSON.stringify(a.snap.g)!==JSON.stringify(b.snap.g))inp.push({id:'groups',f:a.snap.g.length+' group(s)',t:b.snap.g.length+' group(s)'});
+  var ca=a.out.conf.map(function(c){return c.id}),cb=b.out.conf.map(function(c){return c.id});
+  return {rows:rows,inp:inp,newC:b.out.conf.filter(function(c){return ca.indexOf(c.id)<0}),resC:a.out.conf.filter(function(c){return cb.indexOf(c.id)<0}),ev:a.ev!==b.ev?[a.ev,b.ev]:null};
+}
+function fsnap(id,s){if(!s)return '—';if(s.o==='na')return 'not applicable';return (s.v==null?(s.m?'undecided':'not answered'):optLabel(id,s.v))+' ('+(s.o==='user'?'supplied':s.o==='unknown'?(s.m?'asked':'unanswered'):s.o)+')'}
+function suggestions(p,out){
+  var sc={},why={};
+  var bump=function(id,s,w){if(!fd(id))return;var e=eff(p,id);if(e.o==='user'||e.o==='na'||e.o==='derived')return;sc[id]=(sc[id]||0)+s;(why[id]=why[id]||[]).push(w)};
+  out.lines.forEach(function(l){l.need.forEach(function(id){bump(id,1000,'needed by '+l.l.toLowerCase())})});
+  Object.keys(out.swing).forEach(function(id){var s=out.swing[id];if(s.range){if(eff(p,id).o==='user')return;}bump(id,100+s.sp,(s.range?'narrowing the range':'deciding')+' could change '+s.l.toLowerCase()+' ('+fmt(s.lo)+' to '+fmt(s.hi)+')')});
+  p.groups.forEach(function(g){var c=parseCount(eff(p,g+'.count').v),s=out.swing[g+'.count'];if(c&&c.lo!==c.hi&&s){sc[g+'.count']=(sc[g+'.count']||0)+100+s.sp;(why[g+'.count']=why[g+'.count']||[]).push('a narrower count would narrow '+s.l.toLowerCase()+' ('+fmt(s.lo)+'–'+fmt(s.hi)+')')}});
+  out.conf.forEach(function(c){c.inputs.forEach(function(id){bump(id,50,'feeds an open conflict')})});
+  out.lines.forEach(function(l){l.nchk.forEach(function(id){bump(id,5,'not yet checked by '+l.l.toLowerCase())})});
+  return Object.keys(sc).sort(function(a,b){return sc[b]-sc[a]}).slice(0,4).map(function(id){return {id:id,why:uniq(why[id]).slice(0,2).join('; ')}});
+}
+function preview(p,set){
+  var q=clone(p);Object.keys(set).forEach(function(id){q.ans[id]={v:set[id]}});
+  var a=gen(p),b=gen(q),ka={};a.lines.forEach(function(l){ka[l.key]=l});
+  var ch=b.lines.filter(function(l){var x=ka[l.key];return !x||qfull(x)!==qfull(l)}).map(function(l){return l.l+': '+(ka[l.key]?qfull(ka[l.key]):'—')+' → '+qfull(l)});
+  return (ch.length?ch.join(' · '):'no quantity change')+(b.conf.length?' · still '+plural(b.conf.length,'conflict'):' · no conflicts');
+}
+function tally(p){var t={user:0,assumed:0,derived:0,unknown:0};fields(p).forEach(function(f){if(f.nostate)return;var e=eff(p,f.id);if(t[e.o]!=null)t[e.o]++});return t}
+function outputsAvail(p,out){
+  var lines=out?out.lines:[],has=function(re){return lines.some(function(l){return re.test(l.key)&&l.st!=='ne'})};
+  var anyCount=p.groups.some(function(g){return eff(p,g+'.count').v!=null}),anyType=p.groups.some(function(g){return eff(p,g+'.links').v!=null&&eff(p,g+'.rate').v!=null});
+  return [
+    ['Endpoint link and port counts',anyCount&&anyType,'an endpoint count (or racks × endpoints per rack) and an endpoint type'],
+    ['Leaf switch counts',has(/\.leaves$/),'the above; undecided rail preference, redundancy or placement appear as alternatives'],
+    ['Spine and inter-switch counts',has(/^n\..*\.spines$/),'leaf counts; uplink and spine defaults are assumed until confirmed'],
+    ['Cable construction totals',has(/cab$/),'link counts; shown per construction until decided'],
+    ['Rack-aware leaf placement',p.groups.some(function(g){return eff(p,g+'.racks').v!=null}),'rack count for a group (placement shown as alternatives until decided)'],
+    ['Procurement package',false,'later: qualified parts, SKUs and lengths, and an approver'],
+    ['Connection map',false,'later: port assignment, cable construction and placement']
+  ];
+}
+
+/* ===== projects, starters, presets ===== */
+function newProject(name,id){id=id||('p'+Date.now().toString(36)+Math.floor(Math.random()*1e4));var p={id:id,ans:{},locks:{},groups:['g1'],inputRev:0,hist:[],revs:[],session:1,closed:false,target:{label:'latest Hedgehog release',curr:'unknown'},rel:null,relBlocked:false,vis:'Hedgehog only',starter:null};if(name)p.ans.name={v:name};store.projects[id]=p;store.order=[id].concat(store.order.filter(function(x){return x!==id}));save();return p}
+function fromStarter(s,id){var p=newProject(s.n+' (customised)',id);p.starter={id:s.id,v:s.v,n:s.n};Object.keys(s.ans).forEach(function(k){p.ans[k]=/name$/.test(k)?{v:s.ans[k]}:{v:s.ans[k],from:s.id+' v'+s.v}});p.inputRev=1;p.hist.unshift({r:1,s:1,id:'groups',bv:'—',av:'answers copied from starter '+s.id+' v'+s.v+' (placeholder)',why:'started from a design'});save();return p}
+function preset(x){
+  var p=newProject('Example from scratch (synthetic, demo)','demo-scratch');
+  setAns(p,'req',{v:'“About 128 B200 HGX servers for training; rest TBD.”'},'session 1');
+  setAns(p,'g1.count',{v:128},'session 1');setAns(p,'g1.profile',{v:'b200'},'session 1');
+  generate(p,null,'first output');
+  if(x==='s1'){openP(p.id,false);return}
+  p.session=2;ui.resume=resumeInfo(p,1);
+  if(x==='s3'){
+    setAns(p,'g1.count',{v:136},'customer update');setAns(p,'g1.racks',{v:8},'customer update');setAns(p,'g1.perRack',{v:16},'customer update');generate(p);
+    setAns(p,'g1.racks',{v:9},'chosen from conflict');setAns(p,'g1.rail',{v:'yes'},'customer decided');setAns(p,'g1.place',{v:'central'},'customer decided');setAns(p,'g1.net',{v:'backend'},'customer decided');generate(p);
+    setLock(p,'g1.leaves',{q:24,del:0},'synthetic order');setLock(p,'n.backend.800.spines',{q:16,del:0},'synthetic order');
+    p.session=3;ui.resume=resumeInfo(p,2);
+    setAns(p,'g1.count',{v:260},'customer growth');setAns(p,'g1.racks',{v:17},'customer growth');
+  }
+  save();openP(p.id,false,true);
+}
+function resumeInfo(p,last){var r=latest(p);return {s:p.session,last:last,rev:r?r.n:null,ir:r?r.ir:null,edits:r?p.inputRev-r.ir:p.inputRev}}
+
+/* ===== rendering ===== */
+var live=$('#live');
+function announce(t){live.textContent='';setTimeout(function(){live.textContent=t},30)}
+function render(){
+  var a=document.activeElement,fid=a&&a.getAttribute&&a.getAttribute('data-fid');
+  var dp=$('.dpanel'),dps=dp?dp.scrollTop:0,app=$('#app');
+  app.innerHTML=ui.screen==='home'?renderHome():renderWS();
+  var nd=$('.dpanel');if(nd)nd.scrollTop=dps;
+  if(fid){var el=document.querySelector('[data-fid="'+fid+'"]');if(el){el.focus();if(el.type==='search'||el.type==='text'){try{el.setSelectionRange(el.value.length,el.value.length)}catch(e){}}}}
+}
+function renderHome(){
+  var h='<h2>Projects</h2><p class="note">Saved in this browser'+(storageOK?'':' — <b>storage is blocked here, so work lasts only while this tab is open</b>')+'. Closing a project never finishes it.</p>';
+  var ids=store.order.filter(function(id){return store.projects[id]});
+  if(!ids.length)h+='<p>No projects yet.</p>';
+  else{h+='<div class="scroll"><table><caption class="sr">Saved projects</caption><thead><tr><th scope="col">Project</th><th scope="col">Started from</th><th scope="col">Latest output</th><th scope="col">Edits since</th><th scope="col">Actions</th></tr></thead><tbody>';
+    ids.forEach(function(id){var p=store.projects[id],r=latest(p);h+='<tr><th scope="row">'+esc(eff(p,'name').v)+'<div class="note">session '+p.session+'</div></th><td>'+(p.starter?esc(p.starter.id+' v'+p.starter.v+' (placeholder)'):'scratch')+'</td><td>'+(r?'revision '+r.n+' (details r'+r.ir+')':'none yet')+'</td><td class="num">'+(r?p.inputRev-r.ir:p.inputRev)+'</td><td><button class="btn" data-act="open" data-pid="'+esc(id)+'" data-fid="open-'+esc(id)+'">Resume</button><button class="btn" data-act="del" data-pid="'+esc(id)+'">Delete</button></td></tr>'});
+    h+='</tbody></table></div>'}
+  h+='<h2 style="margin-top:18px">Start a project</h2><div class="cards">';
+  h+='<div class="panel"><h3 style="margin-top:0">Start from scratch</h3><p>Opens the workspace with the essential questions first. An endpoint count and type are enough for a first BOM; answer anything else you know, in any order. Unanswered choices stay open — they are never guessed.</p><button class="btn primary" data-act="scratch" data-fid="scratch">Start from scratch</button></div>';
+  h+='<div class="panel"><h3 style="margin-top:0">Start from a design</h3><p>Browse starter designs by endpoint count, rack count, topology or network purpose. A starter fills the same details you would enter from scratch; customise anything.</p><a class="btn" href="#lib-h" data-act="tolib">Browse starter designs</a></div></div>';
+  h+=renderLibrary();
+  return h;
+}
+function renderLibrary(){
+  var h='<h2 id="lib-h" tabindex="-1" style="margin-top:18px">Starter designs</h2><p class="banner" role="note"><b>Placeholders only.</b> These are synthetic examples, not supported or qualified designs. Once from-scratch planning works, the same tooling will build real starters. One starter can appear in several views; it is always the same design.</p>';
+  h+='<div role="tablist" aria-label="Library views">'+VIEWS.map(function(v){var s=ui.lib===v.id;return '<button role="tab" data-tabset="lib" id="lt-'+v.id+'" aria-controls="lp" aria-selected="'+s+'" tabindex="'+(s?0:-1)+'" data-act="lib" data-v="'+v.id+'" data-fid="lt-'+v.id+'">'+v.t+'</button>'}).join('')+'</div>';
+  var V=VIEWS.filter(function(v){return v.id===ui.lib})[0],buckets={},ord=[];
+  STARTERS.forEach(function(s){var b=V.b(starterFacts(s));if(!buckets[b]){buckets[b]=[];ord.push(b)}buckets[b].push(s)});if(V.o)ord.sort(function(a,b){return V.o.indexOf(a)-V.o.indexOf(b)});
+  h+='<div role="tabpanel" id="lp" aria-labelledby="lt-'+ui.lib+'" tabindex="0">';
+  ord.forEach(function(b){h+='<h3>'+esc(b)+'</h3><ul style="margin:0;padding-left:18px">'+buckets[b].map(function(s){var also=VIEWS.filter(function(v){return v.id!==ui.lib}).map(function(v){return v.t.replace('By ','')+': '+v.b(starterFacts(s))});return '<li style="margin:4px 0"><button class="link" data-act="lib-sel" data-s="'+s.id+'" data-fid="ls-'+s.id+'-'+ui.lib+'">'+esc(s.id+' · '+s.n)+'</button> <span class="chip">placeholder v'+s.v+'</span><div class="note">'+esc(s.d)+' Also listed under — '+esc(also.join('; '))+'.</div></li>'}).join('')+'</ul>'});
+  h+='</div>';
+  if(ui.libSel){var s=STARTERS.filter(function(x){return x.id===ui.libSel})[0],q=newPreview(s);
+    h+='<div class="panel" style="margin-top:10px" aria-labelledby="sp-h"><h3 id="sp-h" tabindex="-1" style="margin-top:0">'+esc(s.id+' · '+s.n)+' <span class="chip">placeholder v'+s.v+'</span></h3><p class="note">Selection is kept when you switch views. These answers are copied into a new project as <b>assumptions</b> (“from starter '+s.id+'”) until you confirm or change them in the same details workspace.</p><div class="scroll"><table><caption class="sr">Starter answers</caption><thead><tr><th scope="col">Detail</th><th scope="col">Value</th></tr></thead><tbody>'+Object.keys(s.ans).filter(function(k){return !/name$/.test(k)}).map(function(k){return '<tr><td>'+esc(fd(k).l)+'</td><td>'+esc(optLabel(k,s.ans[k]))+'</td></tr>'}).join('')+'</tbody></table></div><p><b>Preview:</b> '+esc(q)+'</p><button class="btn primary" data-act="lib-use" data-s="'+s.id+'" data-fid="lib-use">Customise in workspace</button></div>'}
+  return h;
+}
+function newPreview(s){var p={ans:{},groups:['g1'],locks:{},target:{label:''}};Object.keys(s.ans).forEach(function(k){p.ans[k]={v:s.ans[k]}});var o=gen(p);return o.lines.filter(function(l){return /(eplinks|leaves|spines)$/.test(l.key)}).map(function(l){return l.l.replace(/^.* — /,'')+': '+qtext(l)}).join(' · ')}
+function renderWS(){
+  var p=P(),r=latest(p),vr=ui.view?p.revs[ui.view-1]:r,cur=gen(p);
+  var h='<div class="projhdr" aria-label="Project context"><div><b>'+esc(eff(p,'name').v)+'</b> · Visible to: '+esc(p.vis)+' · Session '+p.session+' · <span class="note">'+(storageOK?'All edits saved in this browser':'Saving blocked — kept only in this tab')+'</span> <button class="btn small" data-act="close" data-fid="close">Save and close</button></div>';
+  h+='<div><b>Started from:</b> '+(p.starter?esc(p.starter.id+' v'+p.starter.v+' — '+p.starter.n)+' (placeholder). Its values show as assumptions until you confirm them.':'scratch')+'</div>';
+  h+='<div><b>Installing on:</b> '+esc(p.target.label)+' — <em>currentness '+esc(p.target.curr)+'</em>'+(p.target.label.indexOf('<')<0?' (placeholder; pending #3)':'')+'</div>';
+  h+='<div><b>Shown output built from evidence:</b> '+(vr?'revision '+vr.n+' · '+esc(vr.ev):'no output yet')+'</div>';
+  if(vr&&vr.tgt!==p.target.label)h+='<div class="banner" role="note">This revision was built for “'+esc(vr.tgt)+'”, not the current installation target. Review release impact before treating it as current.</div>';
+  else if(vr&&vr.ev===EV0)h+='<div class="banner" role="note">Built from a research snapshot; the installation target’s currentness is unknown. Do not treat this output as current for installation.</div>';
+  h+='</div>';
+  if(ui.resume){var rs=ui.resume;h+='<div class="banner info" role="status"><b>Welcome back — session '+rs.s+'.</b> '+(rs.rev?'Latest output: revision '+rs.rev+' (details r'+rs.ir+'). ':'No output yet. ')+(rs.edits?plural(rs.edits,'detail edit')+' not yet in an output. ':'No detail edits since that output. ')+'Pick up anywhere; nothing needs finishing. <button class="btn small" data-act="dismiss-resume">Dismiss</button></div>'}
+  h+='<p class="skip note">Jump to: <a href="#details-h">Details</a> <a href="#outputs-h">Outputs</a></p>';
+  h+='<div class="ws"><aside class="panel dpanel" aria-labelledby="details-h">'+renderDetails(p,cur)+'</aside><section class="panel" aria-labelledby="outputs-h">'+renderOutputs(p,r,vr,cur)+'</section></div>';
+  return h;
+}
+function renderDetails(p,cur){
+  var t=tally(p),h='<h2 id="details-h" tabindex="-1">Project details</h2>';
+  if(!p.revs.length)h+='<p class="note" style="margin:0 0 6px"><b>First BOM:</b> enter how many endpoints and what kind. Everything else is optional; leave anything you don’t know.</p>';
+  var confIn={};cur.conf.forEach(function(c){c.inputs.forEach(function(id){confIn[id]=1})});
+  p.groups.forEach(function(g,i){var sid='grp-'+g,fs=GF(g),c=counts(p,fs),open=ui.open[sid]!=null?ui.open[sid]:(i===0&&!p.revs.length);
+    h+='<details class="sec" data-sec="'+sid+'"'+(open?' open':'')+'><summary data-fid="sec-'+sid+'">Endpoints — '+esc(gname(p,g))+(c?' <span class="note">— '+c+'</span>':'')+'</summary>';
+    h+='<div class="ess">'+fs.filter(function(f){return f.sub==='what'&&f.need}).map(function(f){f.sec=sid;f.g=g;return fieldHTML(p,f,confIn[f.id])}).join('')+'</div>';
+    fs.filter(function(f){return f.sub==='what'&&!f.need}).forEach(function(f){f.sec=sid;f.g=g;h+=fieldHTML(p,f,confIn[f.id])});
+    ['how','where','switch'].forEach(function(sub){var sf=fs.filter(function(f){return f.sub===sub}),sc=counts(p,sf),body=sf.map(function(f){f.sec=sid;f.g=g;return fieldHTML(p,f,confIn[f.id])}).join(''),key=sid+'-'+sub;
+      if(ui.optMode==='collapsed')h+='<details class="sub" data-sub="'+key+'"'+(ui.open[key]?' open':'')+'><summary data-fid="sub-'+key+'">'+SUBS[sub][0]+' <span class="note">(optional'+(sc?' — '+sc:'')+')</span></summary><div class="note">'+SUBS[sub][1]+'</div>'+body+'</details>';
+      else h+='<h4 style="margin:10px 0 2px">'+SUBS[sub][0]+' <span class="note" style="font-weight:400">(optional)</span></h4><div class="note">'+SUBS[sub][1]+'</div>'+body});
+    if(p.groups.length>1)h+='<p><button class="btn small" data-act="rm-group" data-g="'+g+'">Remove this group…</button></p>';
+    h+='</details>'});
+  if(p.groups.length<3)h+='<p style="margin:4px 0"><button class="btn small" data-act="add-group" data-fid="add-group">+ Add another endpoint group (mixed inventory)</button></p>';
+  h+='<p class="note" style="margin:4px 0">Optional questions: <button class="btn small" data-act="optmode" data-m="expanded" aria-pressed="'+(ui.optMode!=='collapsed')+'" data-fid="om-e">Show all</button><button class="btn small" data-act="optmode" data-m="collapsed" aria-pressed="'+(ui.optMode==='collapsed')+'" data-fid="om-c">Collapse to headings</button></p>';
+  h+='<label for="find" style="font-weight:600">Find a detail</label><br><input id="find" type="search" data-fid="find" placeholder="e.g. rack, rail, spine, cable" value="'+esc(ui.find)+'" style="width:100%">';
+  if(ui.find.trim()){var q=ui.find.trim().toLowerCase(),res=fields(p).filter(function(f){return (f.l+' '+(f.h||'')+' '+(f.unlock||'')+' '+secTitle(p,f.sec)).toLowerCase().indexOf(q)>=0});
+    h+='<ul aria-label="Matching details" style="margin:4px 0;padding-left:18px">'+(res.length?res.map(function(f){var na=f.ap&&!f.ap(p);return '<li><button class="link" data-act="go" data-id="'+f.id+'">'+esc(f.l)+'</button> <span class="note">in '+esc(secTitle(p,f.sec))+(na?' — not applicable yet':'')+'</span></li>'}).join(''):'<li class="note">No matching detail.</li>')+'</ul>'}
+  var sg=suggestions(p,cur);
+  if(!ui.hideSug&&sg.length&&p.revs.length){h+='<div class="sug"><b>Suggested questions</b> <span class="note">(optional)</span><ol>'+sg.map(function(s){return '<li><button class="link" data-act="go" data-id="'+s.id+'">'+esc(fd(s.id).l)+'</button>'+(fd(s.id).g&&p.groups.length>1?' <span class="note">('+esc(gname(p,fd(s.id).g))+')</span>':'')+' <span class="note">— '+esc(s.why)+'</span></li>'}).join('')+'</ol><button class="btn small" data-act="hide-sug">Hide</button> <button class="btn small" data-act="copy-q">Copy open questions for the customer</button></div>'}
+  else if(ui.hideSug)h+='<p><button class="btn small" data-act="show-sug">Show suggested questions</button></p>';
+  if(ui.copy&&ui.copy.where==='q')h+='<label class="note" for="copyq">Open questions (select and copy)</label><textarea id="copyq" class="copy" readonly>'+esc(ui.copy.text)+'</textarea>';
+  SECS.forEach(function(s){
+    if(s.id==='groups')return;
+    var fs=PF.filter(function(f){return f.sec===s.id}),c=counts(p,fs);
+    h+='<details class="sec" data-sec="'+s.id+'"'+(ui.open[s.id]?' open':'')+'><summary data-fid="sec-'+s.id+'">'+esc(s.t)+(c?' <span class="note">— '+c+'</span>':'')+'</summary>';
+    if(s.id==='target')h+=targetSec(p);
+    if(s.id==='nets')h+='<div class="note">Separate from which network each endpoint group serves. Unanswered networks are listed as “scope not decided”, never as 0.</div>';
+    fs.forEach(function(f){h+=fieldHTML(p,f,confIn[f.id])});
+    h+='</details>';
+  });
+  h+='<p class="note"><b>Details recorded:</b> '+t.user+' supplied · '+t.assumed+' assumed · '+t.derived+' derived · '+t.unknown+' open — a record of what hh-aid knows, not a readiness score.</p>';
+  return h;
+}
+function counts(p,fs){var c={user:0,assumed:0,derived:0,unknown:0};fs.forEach(function(f){if(f.nostate)return;var e=eff(p,f.id);if(c[e.o]!=null)c[e.o]++});return [c.user?c.user+' supplied':'',c.assumed?c.assumed+' assumed':'',c.derived?c.derived+' derived':'',c.unknown?c.unknown+' open':''].filter(Boolean).join(' · ')}
+function secTitle(p,sec){if(/^grp-/.test(sec))return 'Endpoints — '+gname(p,sec.slice(4));var s=SECS.filter(function(x){return x.id===sec})[0];return s?s.t:sec}
+function targetSec(p){var r=latest(p);return '<div class="field"><div><b>Installing on:</b> '+esc(p.target.label)+' — currentness '+esc(p.target.curr)+'</div><div><b>Latest output built from:</b> '+(r?esc(r.ev):'no output yet')+'</div><div class="note">Evidence is kept per revision for reproducibility; it is not the installation target.</div><button class="btn small" data-act="tab" data-tab="rel">Open release review</button></div>'}
+function fieldHTML(p,f,conf){
+  var e=eff(p,f.id),id='in-'+f.id.replace('.','-'),h='<div class="field" id="f-'+f.id.replace('.','-')+'">';
+  if(f.ap&&!f.ap(p))return h+'<div class="note"><b>'+esc(f.l)+'</b> — not applicable: single-link endpoints have one leaf connection.'+(p.ans[f.id]?' Your earlier answer is kept.':'')+'</div></div>';
+  var tag=f.need?'<span class="chip">needed for a first BOM</span>':'';
+  if(f.type==='radio'){
+    h+='<fieldset style="border:0;padding:0;margin:0"><legend class="main" style="font-weight:600">'+esc(f.l)+' '+tag+'</legend>';
+    f.opts().forEach(function(o){h+='<label style="display:block"><input type="radio" name="r-'+id+'" value="'+o[0]+'" data-in="'+f.id+'" data-fid="'+id+'-'+o[0]+'"'+(String(e.v)===o[0]?' checked':'')+'> '+esc(o[1])+'</label>'});
+    h+='<label style="display:block"><input type="radio" name="r-'+id+'" value="__und" data-in="'+f.id+'" data-fid="'+id+'-und"'+(e.marked?' checked':'')+'> Not decided yet</label></fieldset>';
+  } else {
+    h+='<label class="main" for="'+id+'">'+esc(f.l)+' '+tag+'</label>';
+    if(f.type==='sel'){var opts=f.opts().slice();if(e.v!=null&&!opts.some(function(o){return o[0]===String(e.v)}))opts.push([String(e.v),String(e.v)]);h+='<select id="'+id+'" data-in="'+f.id+'" data-fid="'+id+'"><option value="">'+(e.marked?'Not decided yet':'Not answered yet')+'</option>'+opts.map(function(o){return '<option value="'+o[0]+'"'+(String(e.v)===o[0]?' selected':'')+'>'+esc(o[1])+'</option>'}).join('')+'<option value="__und">Not decided yet</option></select>'}
+    else if(f.type==='num')h+='<input id="'+id+'" type="number" min="'+f.min+'" max="'+f.max+'" step="1" data-in="'+f.id+'" data-fid="'+id+'" value="'+(e.v==null?'':e.v)+'">';
+    else if(f.type==='count')h+='<input id="'+id+'" type="text" inputmode="numeric" autocomplete="off" data-in="'+f.id+'" data-fid="'+id+'" value="'+esc(e.o==='user'||e.starter?(e.v==null?'':e.v):'')+'" placeholder="'+(e.o==='derived'?esc(e.v)+' (derived from racks)':'e.g. 128 or 120-136')+'" style="width:12em">';
+    else h+='<input id="'+id+'" type="text" data-in="'+f.id+'" data-fid="'+id+'" value="'+esc(e.v||'')+'" style="width:100%">';
+  }
+  if(ui.errs[f.id])h+='<div class="err" role="alert">'+esc(ui.errs[f.id])+'</div>';
+  if(!f.nostate){
+    h+='<div class="meta">'+chipE(e)+(conf?'<span class="chip conflict">conflicting</span>':'')+(e.src?' <span class="note">'+esc(e.src)+'</span>':'');
+    var lbl=esc(f.l);
+    if(e.o==='assumed')h+=' <button class="btn small" data-act="confirm" data-id="'+f.id+'" aria-label="Confirm: '+lbl+'">Confirm</button><button class="btn small" data-act="unknown" data-id="'+f.id+'" aria-label="Don’t assume: '+lbl+'">Don’t assume</button>';
+    if(e.o==='user'||e.marked)h+=' <button class="btn small" data-act="clear" data-id="'+f.id+'" aria-label="Clear answer: '+lbl+'">Clear answer</button>';
+    h+='</div>';
+    if(f.unlock)h+='<div class="note">Affects: '+esc(f.unlock)+'.</div>';
+  }
+  if(f.h)h+='<div class="note">'+esc(f.h)+'</div>';
+  return h+'</div>';
+}
+var TABS=[['bom','BOM'],['chg','Changes'],['revs','Revisions and history'],['links','Links'],['rel','Release'],['later','Later stages']];
+function renderOutputs(p,r,vr,cur){
+  var ch=r?changedSince(p,r):[],h='<h2 id="outputs-h" tabindex="-1">Generated outputs</h2><div class="status box" aria-label="Output status">';
+  if(!r)h+='<div>No output yet. Generate whenever you like — open questions appear as alternatives, ranges or “Not estimated”, never as invented numbers.</div>';
+  else{var ls=r.out.lines,ne=ls.filter(function(l){return l.st==='ne'}).length,cf=ls.filter(function(l){return l.st==='cf'}).length,va=ls.filter(function(l){return l.varies}).length,ce=ls.length-ne-cf,stl=ls.filter(function(l){return lineStale(p,l,ch).length}).length;
+    h+='<div><b>Latest output:</b> revision '+r.n+' · session '+r.s+' · from details r'+r.ir+'</div>';
+    h+='<div><b>BOM readiness:</b> '+ce+' line'+(ce===1?'':'s')+' conditional estimate'+(va?' ('+va+' with alternatives)':'')+' · 0 qualified quantity scope · '+ne+' not estimated · '+cf+' suspended by conflict.</div>';
+    h+='<div>'+(ch.length?'<span class="chip stale">'+plural(p.inputRev-r.ir,'edit')+' since this output</span> '+esc(ch.map(function(id){return label(id,p)}).join(', '))+' — '+plural(stl,'line')+' marked stale; the rest are unaffected.':'Up to date with the current details.')+'</div>'}
+  var av=outputsAvail(p,r?r.out:cur);
+  h+='<details'+(r?'':' open')+'><summary>What each output needs</summary><ul style="margin:4px 0;padding-left:18px">'+av.map(function(x){return '<li>'+(x[1]?'<span class="chip ce">available</span> ':'<span class="chip ne">needs</span> ')+'<b>'+esc(x[0])+'</b> — '+esc(x[2])+'</li>'}).join('')+'</ul></details>';
+  h+='<div><button class="btn primary" data-act="gen" data-fid="gen">'+(r?(ch.length?'Generate revision '+(r.n+1)+' from current details':'Regenerate (no detail changes)'):'Generate first output')+'</button></div></div>';
+  h+='<div role="tablist" aria-label="Outputs">'+TABS.map(function(t){var s=ui.tab===t[0];return '<button role="tab" data-tabset="out" id="tab-'+t[0]+'" aria-controls="tp" aria-selected="'+s+'" tabindex="'+(s?0:-1)+'" data-act="tab" data-tab="'+t[0]+'" data-fid="tab-'+t[0]+'">'+t[1]+'</button>'}).join('')+'</div>';
+  h+='<div role="tabpanel" id="tp" aria-labelledby="tab-'+ui.tab+'" tabindex="0">';
+  h+=ui.tab==='bom'?tabBOM(p,r,vr,ch):ui.tab==='chg'?tabChanges(p):ui.tab==='revs'?tabRevs(p):ui.tab==='links'?tabLinks(p,vr,ch):ui.tab==='rel'?tabRel(p):tabLater(p,r);
+  return h+'</div>';
+}
+function goBtn(p,id){return '<button class="link" data-act="go" data-id="'+id+'">'+esc(label(id,p))+'</button>'}
+function tabBOM(p,r,vr,ch){
+  if(!vr)return '<p>No BOM yet.</p>';
+  var ro=vr!==r,h='';
+  if(ro)h+='<div class="banner info"><b>Read-only: revision '+vr.n+'</b> (session '+vr.s+', details r'+vr.ir+'). Revisions are never overwritten. <button class="btn small" data-act="view" data-n="">Back to latest</button></div>';
+  h+='<div class="label">Conditional estimate — assumptions listed — hypothetical hardware — not a design, not orderable</div>';
+  var ls=vr.out.lines,ne=ls.filter(function(l){return l.st==='ne'}).length,cf=ls.filter(function(l){return l.st==='cf'}).length,asm=uniq([].concat.apply([],ls.map(function(l){return l.rest})));
+  h+='<div class="summary" aria-label="BOM summary"><span>'+ls.length+' lines</span><span>0 qualified</span><span>'+ne+' not estimated</span><span>'+cf+' suspended</span><span>'+ls.filter(function(l){return l.varies}).length+' with alternatives</span><span>'+asm.length+' assumptions in use</span><span>'+plural(vr.out.conf.length,'conflict')+'</span></div>';
+  if(vr.out.dims.length)h+='<p class="note"><b>Undecided choices shown as alternatives:</b> '+vr.out.dims.map(function(d){return esc(d.nm)+d.f.map(function(f){return goBtn(p,f)}).join(' / ')}).join('; ')+'. Lines that are the same under every alternative this prototype evaluated show one number; that is not a claim about every possible design.</p>';
+  vr.out.conf.forEach(function(c){h+=conflictHTML(p,c,ro)});
+  h+='<div class="scroll"><table><caption class="sr">BOM lines, revision '+vr.n+'</caption><thead><tr><th scope="col">Line</th><th scope="col">Quantity (select for why)</th><th scope="col">Precision · claim</th><th scope="col">Rests on / needs</th></tr></thead><tbody>';
+  ls.forEach(function(l){
+    var st=ro?[]:lineStale(p,l,ch),q;
+    var inner=l.alts?l.alts.map(function(a){return '<span style="display:block"><i>'+esc(a.a)+':</i> '+esc(a.q)+'</span>'}).join(''):esc(qtext(l));
+    q='<button class="qty" data-act="trace" data-k="'+esc(l.key)+'" data-fid="q-'+esc(l.key)+'" aria-label="'+esc(l.l)+': '+esc(qtext(l))+'. Explain">'+inner+'</button>'+(l.alts?'<div class="note">separate totals, never summed</div>':'');
+    if(l.lock)q+='<div><span class="chip locked">'+esc(l.lock)+'</span></div>';
+    if(l.note)q+='<div class="note">'+esc(l.note)+'</div>';
+    if(!ro&&/\.(leaves|spines)$/.test(l.key)&&l.st==='ok'&&l.q!=null){var lk=p.locks[l.key];
+      if(ui.lockForm===l.key)q+='<div class="inl"><label>Ordered <input type="number" min="1" id="lk-q" data-fid="lk-q" value="'+(lk?lk.q:l.q)+'" style="width:5em"></label><label>Delivered <input type="number" min="0" id="lk-d" value="'+(lk?lk.del:0)+'" style="width:5em"></label><button class="btn small primary" data-act="lock-save" data-k="'+esc(l.key)+'">Record</button><button class="btn small" data-act="lock-cancel">Cancel</button></div>';
+      else q+='<div><button class="btn small" data-act="lock-form" data-k="'+esc(l.key)+'" data-fid="lf-'+esc(l.key)+'">'+(lk?'Change order record':'Record order')+'</button>'+(lk?'<button class="btn small" data-act="unlock" data-k="'+esc(l.key)+'">Remove order record…</button>':'')+'</div>'}
+    var claim=l.st==='ne'?'<span class="chip ne">unresolved</span>':l.st==='cf'?'<span class="chip conflict">suspended</span>':esc(l.prec)+' · <span class="chip ce">conditional estimate</span>';
+    var rest='';
+    if(l.st==='ne')rest=(l.need.length?'<b>Needs:</b> '+l.need.map(function(id){return goBtn(p,id)}).join(', '):'')+(l.reason?'<div>'+esc(l.reason)+'</div>':'');
+    else if(l.st==='cf')rest='Resolve <a href="#cf-'+esc(l.cid)+'">the conflict</a>.';
+    else{rest=(l.rest.length?'<b>Rests on '+plural(l.rest.length,'assumption')+':</b> '+l.rest.map(function(id){return goBtn(p,id)}).join(', '):'No open assumptions in its inputs (hardware still hypothetical)');
+      if(l.und&&l.und.length)rest+='<div><b>Undecided:</b> '+l.und.map(function(id){return goBtn(p,id)}).join(', ')+(l.sameAll?' (same result under every alternative evaluated here)':' (alternatives shown)')+'</div>';
+      if(l.range)rest+='<div><b>Range</b> from the endpoint count range.</div>';
+      if(l.nchk.length)rest+='<div><b>Not checked:</b> '+l.nchk.map(function(id){return goBtn(p,id)}).join(', ')+'</div>'}
+    l.flags.forEach(function(f){rest+='<div><span class="chip '+(/^blocked/.test(f)?'blocked':'unverified')+'">'+esc(f)+'</span></div>'});
+    if(st.length)rest+='<div><span class="chip stale">stale — changed: '+esc(st.join(', '))+'</span></div>';
+    if(!ro&&r.tgt!==p.target.label)rest+='<div><span class="chip stale">release review pending</span></div>';
+    h+='<tr class="'+(st.length?'stale':'')+'"><th scope="row">'+esc(l.l)+'</th><td class="num">'+q+'</td><td>'+claim+'</td><td>'+rest+'</td></tr>';
+    if(ui.trace===l.key)h+='<tr><td colspan="4">'+traceHTML(p,vr,l)+'</td></tr>';
+  });
+  h+='</tbody></table></div>';
+  if(vr.out.undecidedNets.length)h+='<p class="note"><b>Network scope not decided:</b> '+esc(vr.out.undecidedNets.join(', '))+' — <button class="link" data-act="go" data-id="net.backend">set network scope</button>. Not shown as 0.</p>';
+  if(vr.out.outNets.length)h+='<p class="note"><b>Out of scope by your choice:</b> '+esc(vr.out.outNets.join(', '))+'.</p>';
+  h+='<p class="note">Qualified quantity scope needs qualified parts and target applicability; with hypothetical hardware no line can reach it here.</p>';
+  return h;
+}
+function conflictHTML(p,c,ro){
+  var h='<div class="conflictbox" id="cf-'+esc(c.id)+'" role="group" aria-labelledby="cft-'+esc(c.id)+'"><h3 id="cft-'+esc(c.id)+'" style="margin-top:0"><span class="chip conflict">conflict</span> '+esc(c.t)+' <span class="chip">'+(c.kind==='proven'?'demonstrated: these answers cannot all hold':c.kind==='input'?'contradictory answers':'not proven feasible: not modelled or not searched')+'</span></h3>';
+  if(c.only)h+='<p class="note">Only under: '+esc(c.only)+'.</p>';
+  h+='<p><b>Because:</b> '+esc(c.because)+'</p><p><b>Inputs involved:</b> '+c.inputs.map(function(id){if(/^lock:/.test(id))return esc(label(id,p))+(p.locks[id.slice(5)]?' <span class="chip locked">locked</span>':'');var e=eff(p,id);return goBtn(p,id)+' '+chipE(e)}).join(' · ')+'</p>';
+  h+='<b>Ways forward</b> <span class="note">(nothing is changed automatically; not checked for minimality)</span><ol>';
+  c.relax.forEach(function(x,i){h+='<li>'+esc(x.t);if(!ro&&x.set){h+=' <button class="btn small" data-act="preview" data-c="'+esc(c.id)+'" data-i="'+i+'" data-fid="pv-'+esc(c.id)+i+'">Preview</button><button class="btn small" data-act="apply" data-c="'+esc(c.id)+'" data-i="'+i+'">Use as my answer</button>';if(ui.prev&&ui.prev.c===c.id&&ui.prev.i===i)h+='<div class="note" role="status">Preview: '+esc(ui.prev.text)+'</div>'}else if(!ro&&x.go)h+=' <button class="btn small" data-act="go" data-id="'+esc(x.go)+'">Go to detail</button>';h+='</li>'});
+  h+='</ol>';if(c.aff.length)h+='<p class="note">Suspended: '+esc(c.aff.join(', '))+'. Every other line keeps its value.</p>';
+  return h+'</div>';
+}
+function traceHTML(p,vr,l){
+  var ro=vr!==latest(p),h='<section class="trace" aria-labelledby="trh" tabindex="-1" id="trace"><h3 id="trh" style="margin-top:0">Why '+esc(qtext(l))+'? — '+esc(l.l)+'</h3>';
+  if(l.st==='ne')h+='<p>Not estimated. '+(l.need.length?'Missing: '+l.need.map(function(id){return goBtn(p,id)}).join(', ')+'. ':'')+esc(l.reason||'')+' hh-aid does not invent a quantity when inputs are insufficient.</p>';
+  else if(l.st==='cf')h+='<p>Suspended by <a href="#cf-'+esc(l.cid)+'">a conflict</a>.</p>';
+  else h+='<ul>'+node(p,l.tr,ro)+'</ul>';
+  h+='<p class="note"><b>Counts:</b> requirement <code>dem:'+esc(l.key)+'</code> (stable aggregate demand ID across revisions). <b>Revision:</b> '+vr.n+' · <b>Evidence:</b> '+esc(vr.ev)+'.</p>';
+  var w=uniq((l.und||[]).concat(l.rest||[],l.nchk||[]));
+  if(w.length)h+='<p><b>What would change it:</b> '+w.map(function(id){return goBtn(p,id)}).join(' · ')+'</p>';
+  h+='<button class="btn small" data-act="copy-t" data-k="'+esc(l.key)+'">Copy as text with assumptions</button><button class="btn small" data-act="trace" data-k="'+esc(l.key)+'">Close explanation</button>';
+  if(ui.copy&&ui.copy.where==='t'+l.key)h+='<label class="note" for="copyt" style="display:block">Explanation text</label><textarea id="copyt" class="copy" readonly>'+esc(ui.copy.text)+'</textarea>';
+  return h+'</section>';
+}
+function node(p,n,ro){if(!n)return '';var ids=n.ids.filter(function(id){return fd(id)}),h='<li>'+esc(n.t);ids.forEach(function(id){var e=eff(p,id);h+=' '+chipE(e)+'<span class="note">'+esc(label(id,p))+'</span>'+(!ro?' <button class="btn small" data-act="go" data-id="'+id+'" aria-label="Change '+esc(label(id,p))+'">Change</button>':'')});if(n.kids.length)h+='<ul>'+n.kids.map(function(k){return node(p,k,ro)}).join('')+'</ul>';return h+'</li>'}
+function traceText(p,l,vr){var out=[l.l+': '+qtext(l)+' ['+l.prec+(l.st==='ok'?' · conditional estimate':'')+']'];(function walk(n,d){if(!n)return;var ids=n.ids.filter(function(i){return fd(i)});out.push(new Array(d+1).join('  ')+'- '+n.t+(ids.length?' ('+ids.map(function(i){return label(i,p)+': '+ORG(eff(p,i))}).join('; ')+')':''));n.kids.forEach(function(k){walk(k,d+1)})})(l.tr,1);if(l.rest.length)out.push('Rests on: '+l.rest.map(function(i){return label(i,p)}).join(', '));if(l.und&&l.und.length)out.push('Undecided (alternatives shown): '+l.und.map(function(i){return label(i,p)}).join(', '));if(l.nchk.length)out.push('Not checked: '+l.nchk.map(function(i){return label(i,p)}).join(', '));out.push('Revision '+vr.n+'; evidence '+vr.ev+'. Hypothetical hardware; not orderable.');return out.join('\n')}
+function tabChanges(p){
+  if(p.revs.length<2)return '<p>Generate a second revision to compare. Every revision keeps the details revision it came from.</p>';
+  var b=ui.cmpB||p.revs.length,a=ui.cmpA||b-1;if(a>=b)a=b-1;var A=p.revs[a-1],B=p.revs[b-1],d=diff(A,B);
+  var opts=function(sel,nm){return '<select data-act2="cmp" data-w="'+nm+'" data-fid="cmp-'+nm+'" aria-label="'+(nm==='a'?'Compare from':'Compare to')+'">'+p.revs.map(function(r){return '<option value="'+r.n+'"'+(r.n===sel?' selected':'')+'>revision '+r.n+' (session '+r.s+')</option>'}).join('')+'</select>'};
+  var h='<div class="inl">Compare '+opts(a,'a')+' → '+opts(b,'b')+'</div>',chs=d.rows.filter(function(x){return x.ch}),un=d.rows.length-chs.length;
+  h+='<div class="summary" aria-label="Change summary">'+chs.filter(function(x){return x.dl}).map(function(x){return '<span>'+(x.dl>0?'+':'')+fmt(x.dl)+' '+esc(x.l.toLowerCase())+'</span>'}).join('')+'<span>'+plural(chs.length,'line')+' changed</span><span>'+un+' unchanged</span>'+(d.newC.length?'<span class="chip conflict">'+plural(d.newC.length,'new conflict')+'</span>':'')+(d.resC.length?'<span>'+plural(d.resC.length,'conflict')+' resolved</span>':'')+'</div>';
+  h+='<h3>Detail changes (details r'+A.ir+' → r'+B.ir+')</h3>'+(d.inp.length?'<ul>'+d.inp.map(function(x){return '<li><b>'+esc(label(x.id,p))+':</b> '+esc(x.f)+' → '+esc(x.t)+'</li>'}).join('')+'</ul>':'<p class="note">No detail changes.</p>');
+  if(d.ev)h+='<p><b>Evidence:</b> '+esc(d.ev[0])+' → '+esc(d.ev[1])+'</p>';
+  h+='<h3>Changed lines</h3>'+(chs.length?'<div class="scroll"><table><caption class="sr">Changed lines</caption><thead><tr><th scope="col">Line</th><th scope="col">Revision '+a+'</th><th scope="col">Revision '+b+'</th><th scope="col">Why</th></tr></thead><tbody>'+chs.map(function(x){var w=[];if(x.x&&x.y&&x.x.st!==x.y.st)w.push(x.y.st==='cf'?'suspended by conflict':x.y.st==='ne'?'now not estimated':'now estimated');if(x.x&&x.y&&!!x.x.varies!==!!x.y.varies)w.push(x.y.varies?'now shown as alternatives':'alternatives resolved to one value');if(x.x&&x.y&&JSON.stringify(x.x.rest)!==JSON.stringify(x.y.rest))w.push('rests on '+x.x.rest.length+' → '+x.y.rest.length+' assumptions');if(!x.x)w.push('new line');if(!x.y)w.push('line removed');return '<tr><th scope="row">'+esc(x.l)+'</th><td>'+esc(x.tx)+'</td><td>'+esc(x.ty)+'</td><td>'+esc(w.join('; ')||'quantity changed')+'</td></tr>'}).join('')+'</tbody></table></div>':'<p class="note">No line changed.</p>');
+  if(un)h+='<details><summary>'+un+' unchanged lines</summary><ul>'+d.rows.filter(function(x){return !x.ch}).map(function(x){return '<li>'+esc(x.l)+': '+esc(x.ty)+'</li>'}).join('')+'</ul></details>';
+  h+='<p class="note">Planning IDs are kept; ordered quantities are never re-optimised. No approvals are recorded in this prototype; in the product, an approval on revision '+a+' applies only to that revision’s hash.</p>';
+  return h;
+}
+function tabRevs(p){
+  var h='<h3 style="margin-top:0">Revisions</h3>';
+  h+=!p.revs.length?'<p>No revisions yet.</p>':'<div class="scroll"><table><caption class="sr">Revisions</caption><thead><tr><th scope="col">Revision</th><th scope="col">Session</th><th scope="col">From details</th><th scope="col">Evidence</th><th scope="col">Result</th><th scope="col">Actions</th></tr></thead><tbody>'+p.revs.slice().reverse().map(function(r){return '<tr><th scope="row">'+r.n+(r.n===p.revs.length?' (latest)':'')+'</th><td>'+r.s+'</td><td>r'+r.ir+'</td><td>'+esc(r.ev)+'</td><td>'+r.out.lines.length+' lines · '+plural(r.out.conf.length,'conflict')+'</td><td><button class="btn small" data-act="view" data-n="'+r.n+'">View</button>'+(r.n>1?'<button class="btn small" data-act="cmp-prev" data-n="'+r.n+'">Compare with previous</button>':'')+'</td></tr>'}).join('')+'</tbody></table></div>';
+  h+='<h3>Detail history</h3><p class="note">Every change is kept with its session. Undo creates a new details revision; nothing is erased.</p>';
+  h+=!p.hist.length?'<p>No edits yet.</p>':'<div class="scroll"><table><caption class="sr">Detail history</caption><thead><tr><th scope="col">Details rev</th><th scope="col">Session</th><th scope="col">Detail</th><th scope="col">Change</th><th scope="col"></th></tr></thead><tbody>'+p.hist.slice(0,50).map(function(x,i){return '<tr><td>r'+x.r+'</td><td>'+x.s+'</td><td>'+esc(label(x.id,p))+(x.why?'<div class="note">'+esc(x.why)+'</div>':'')+'</td><td>'+esc(x.bv)+' → '+esc(x.av)+'</td><td>'+(x.id==='groups'&&!x.grp?'':'<button class="btn small" data-act="undo" data-i="'+i+'">Undo</button>')+'</td></tr>'}).join('')+'</tbody></table></div>';
+  return h;
+}
+function tabLinks(p,vr,ch){
+  if(!vr)return '<p>No output yet.</p>';
+  var r=latest(p),pv=vr.n>1?p.revs[vr.n-2]:null,pk={};if(pv)pv.out.pats.forEach(function(x){pk[x.key]=x.n});
+  var pats=vr.out.pats.map(function(x){return {x:x,chg:pv?pk[x.key]!==x.n:false}}),q=ui.patq.trim().toLowerCase();
+  var rows=pats.filter(function(o){return !q||(o.x.t+' '+o.x.grp).toLowerCase().indexOf(q)>=0});if(ui.patchg)rows=rows.filter(function(o){return o.chg});rows.sort(function(a,b){return b.chg-a.chg});
+  var shown=rows.filter(function(o){return o.chg||ui.patexp||!pv}),coll=rows.filter(function(o){return !(o.chg||ui.patexp||!pv)});
+  var h='<h3 style="margin-top:0">Reviewing '+fmt(sum(vr.out.pats.map(function(x){return x.n})))+' links without a giant graph</h3>';
+  if(vr.out.runs>1)h+='<p class="note">Patterns are shown for the first alternative ('+esc(vr.out.dims.map(function(d){return d.nm+d.names[d.vals[0]]}).join(' · '))+'). Decide the open choices to see one layout.</p>';
+  var stl=vr===r?vr.out.lines.filter(function(l){return lineStale(p,l,ch).length}).length:0;
+  h+='<div class="conflictbox" style="border-width:1px"><b>Exceptions first:</b> '+[vr.out.conf.length?'<span class="chip conflict">'+plural(vr.out.conf.length,'conflict')+'</span>':'',stl?'<span class="chip stale">'+plural(stl,'stale line')+'</span>':'',pv?'<span class="chip changed">'+pats.filter(function(o){return o.chg}).length+' changed patterns since revision '+pv.n+'</span>':''].concat(vr.out.exc.map(function(e){return '<span class="chip">'+esc(e)+'</span>'})).filter(Boolean).join(' ')+(vr.out.conf.length||stl||vr.out.exc.length?'':' none')+'</div>';
+  if(vr.out.loc){var L=vr.out.loc;h+='<div class="inl"><label>Find endpoint <input id="srv" type="search" inputmode="numeric" placeholder="0–'+(L.N-1)+'" size="6" data-fid="srv" value="'+esc(ui.srv)+'"></label><label>rail <select id="rail" data-fid="rail">'+Array.apply(null,{length:L.rails}).map(function(_,i){return '<option'+(String(i)===ui.rail?' selected':'')+'>'+i+'</option>'}).join('')+'</select></label><span role="status">'+esc(locate(L))+'</span></div>'}
+  h+='<div class="inl"><label>Filter patterns <input id="patq" type="search" data-fid="patq" value="'+esc(ui.patq)+'" placeholder="e.g. rack 3, storage"></label>'+(pv?'<label><input type="checkbox" id="patchg" data-fid="patchg"'+(ui.patchg?' checked':'')+'> changed since revision '+pv.n+' only</label><label><input type="checkbox" id="patexp" data-fid="patexp"'+(ui.patexp?' checked':'')+'> expand unchanged</label>':'')+'</div>';
+  h+='<div class="scroll"><table><caption class="sr">Link patterns, revision '+vr.n+'</caption><thead><tr><th scope="col">Pattern</th><th scope="col">Links</th><th scope="col">Ports</th><th scope="col">Status</th></tr></thead><tbody>';
+  h+=shown.slice(0,120).map(function(o){return '<tr><td>'+esc(o.x.t)+'</td><td class="num">'+fmt(o.x.n)+'</td><td>'+esc(o.x.d)+'</td><td>'+(o.chg?'<span class="chip changed">changed in revision '+vr.n+'</span>':pv?'<span class="chip unchanged">unchanged</span>':'')+(o.x.un?' <span class="note">'+o.x.un+' unused (intentional)</span>':'')+'</td></tr>'}).join('');
+  if(shown.length>120)h+='<tr><td colspan="4">'+fmt(shown.length-120)+' more patterns — narrow the filter.</td></tr>';
+  if(coll.length)h+='<tr><td colspan="4"><span class="chip unchanged">unchanged</span> '+plural(coll.length,'pattern')+', '+fmt(sum(coll.map(function(o){return o.x.n})))+' links, collapsed.</td></tr>';
+  if(!rows.length)h+='<tr><td colspan="4">No patterns match.</td></tr>';
+  return h+'</tbody></table></div><p class="note">Per-link rows and CSV export are proposed (D02 §12) but not built.</p>';
+}
+function locate(L){var v=ui.srv.trim();if(v==='')return '';var n=+v;if(!(n>=0&&n<L.N&&Math.floor(n)===n))return 'Enter an endpoint number from 0 to '+(L.N-1)+'.';var r=+ui.rail,d=Math.floor(n/L.slots),j=n%L.slots;return 'endpoint '+n+' rail '+r+' → leaf '+L.g.toUpperCase()+'-'+String.fromCharCode(65+d)+'-r'+r+' cage '+(1+Math.floor(j/L.per))+(L.per>1?' lane '+(1+j%L.per):'')}
+var RELROWS=[{a:'Connection and domain semantics',res:'unchanged',aff:'—',eff:'none'},{a:'Switch roles, modes, profile budgets',res:'changed',aff:'leaf switch lines',eff:'recheck mode/budget; counts kept if the recheck passes'},{a:'Validation, config, import contract',res:'unchanged',aff:'—',eff:'none'},{a:'Operational constraints',res:'unchanged',aff:'—',eff:'none'},{a:'hh-aid catalog / compatibility evidence',res:'unknown',blocked:true,aff:'cable lines',eff:'no line may claim qualified quantity scope for <TARGET> until checked'}];
+function tabRel(p){
+  var r=latest(p),h='<h3 style="margin-top:0">Latest-release impact review</h3><p><b>Installing on:</b> '+esc(p.target.label)+' — currentness '+esc(p.target.curr)+'<br><b>Latest output built from:</b> '+(r?esc(r.ev):'no output yet')+'</p>';
+  if(!p.rel)return h+'<p>No new target recorded. Until compat’s release screen (#3) reports, currentness is unknown and no output is described as current.</p><button class="btn" data-act="rel-start" data-fid="rel-start">Simulate: record a new target observation (placeholder)</button>';
+  var R=p.rel,ready=R.ack&&RELROWS.every(function(x,i){return x.res==='unchanged'||R.rev[i]});
+  h+='<p class="note"><b>Example rows only — not real release findings.</b></p><div class="scroll"><table><caption class="sr">Release impact (example)</caption><thead><tr><th scope="col">Area (compat #3 screen)</th><th scope="col">Result</th><th scope="col">Affects</th><th scope="col">Effect</th><th scope="col">Review</th></tr></thead><tbody>'+RELROWS.map(function(x,i){return '<tr><td>'+esc(x.a)+'</td><td><span class="chip '+x.res+'">'+(x.res==='unchanged'?'unchanged with evidence':x.res==='unknown'?'unknown/uncovered':'changed (example)')+'</span>'+(x.blocked?' <span class="chip blocked">blocked</span>':'')+'</td><td>'+esc(x.aff)+'</td><td>'+esc(x.eff)+'</td><td>'+(x.res==='unchanged'?(R.ack?'acknowledged':'—'):(R.rev[i]?'reviewed':'<button class="btn small" data-act="rel-rev" data-i="'+i+'">Mark reviewed</button>'))+'</td></tr>'}).join('')+'</tbody></table></div>';
+  h+='<p>'+(R.ack?'':'<button class="btn" data-act="rel-ack" data-fid="rel-ack">Acknowledge 3 unchanged with evidence</button>')+'<button class="btn primary" data-act="rel-go" data-fid="rel-go"'+(ready&&!R.done?'':' disabled')+'>Revalidate into revision '+(p.revs.length+1)+'</button>'+(R.done?' <span class="chip">done: revision '+R.done+'</span>':(!ready?' <span class="note">Review the changed and unknown rows and acknowledge the unchanged ones first.</span>':''))+'</p>';
+  return h+'<p class="note">Ordered lines carry forward; incompatibility would be a conflict, never a substitution. Earlier revisions stay reproducible. The blocked item gates only dependent claims.</p>';
+}
+function tabLater(p,r){return '<div class="cards"><div class="panel later"><h3 style="margin-top:0">Connection map</h3><p>Later stage: port-to-port realisation of the link patterns. Needs a decided rail/redundancy layout, cable construction, placement and port assignment. <b>Not a prerequisite for the BOM.</b></p></div><div class="panel later"><h3 style="margin-top:0">Procurement package</h3><p>None declared. Needs qualified quantity scope (exact SKUs, lengths, compatibility for the target), then a named approver.'+(r?' 0 of '+r.out.lines.length+' lines qualified (hypothetical hardware).':'')+'</p></div><div class="panel later"><h3 style="margin-top:0">Installation package</h3><p>Later stage: wiring export, site binding and acceptance (R06 I5–I9).</p></div></div>'}
+
+/* ===== events ===== */
+function openP(id,newSession,keepResume){
+  var p=store.projects[id];if(!p)return;
+  if(newSession&&p.closed){var last=p.session;p.session++;ui.resume=resumeInfo(p,last)}else if(!keepResume)ui.resume=null;
+  p.closed=false;save();ui.pid=id;ui.screen='ws';ui.tab='bom';ui.view=null;ui.trace=null;ui.prev=null;ui.copy=null;ui.lockForm=null;ui.errs={};ui.find='';ui.open={};
+  render();if(p.revs.length){var hd=$('#outputs-h');if(hd)hd.focus()}else{var es=$('.ess'),ci=$('#in-g1-count'),dh=$('#details-h');if(es&&dh&&es.getBoundingClientRect().bottom>window.innerHeight&&dh.scrollIntoView)dh.scrollIntoView({block:'start'});if(ci)ci.focus({preventScroll:true})}
+}
+function goField(id){
+  if(/^lock:/.test(id)){ui.tab='bom';ui.lockForm=id.slice(5);render();var b=$('#lk-q');if(b)b.focus();return}
+  var f=fd(id);if(!f)return;ui.open[f.sec||(f.g?'grp-'+f.g:'')]=true;if(f.g&&f.sub&&f.sub!=='what')ui.open['grp-'+f.g+'-'+f.sub]=true;render();
+  var fe=$('#f-'+id.replace('.','-')),el=fe&&fe.querySelector('input:checked,input,select,textarea');
+  if(fe&&fe.scrollIntoView)fe.scrollIntoView({block:'center'});if(el)el.focus();
+  announce('Opened '+f.l+' in '+secTitle(P(),f.sec)+'.');
+}
+document.addEventListener('click',function(ev){
+  var b=ev.target.closest('[data-act]');if(!b)return;if(b.tagName==='INPUT'||b.tagName==='SELECT')return;
+  var a=b.getAttribute('data-act'),p=P();
+  if(a==='preset'){preset(b.getAttribute('data-x'));return}
+  if(a==='reset'){if(confirm('Delete all prototype projects saved in this browser?')){store={projects:{},order:[]};save();ui.screen='home';render()}return}
+  if(a==='scratch'){var np=newProject('Untitled project');openP(np.id,false);return}
+  if(a==='tolib'){ev.preventDefault();var lh=$('#lib-h');if(lh){lh.scrollIntoView();lh.focus()}return}
+  if(a==='lib'){ui.lib=b.getAttribute('data-v');render();$('#lt-'+ui.lib).focus();return}
+  if(a==='lib-sel'){ui.libSel=b.getAttribute('data-s');render();var sh=$('#sp-h');if(sh)sh.focus();return}
+  if(a==='lib-use'){var s=STARTERS.filter(function(x){return x.id===b.getAttribute('data-s')})[0];var sp=fromStarter(s);openP(sp.id,false);ui.open['grp-g1']=true;render();return}
+  if(a==='open'){openP(b.getAttribute('data-pid'),true);return}
+  if(a==='del'){var dp=store.projects[b.getAttribute('data-pid')];if(dp&&confirm('Delete '+eff(dp,'name').v+' and all its revisions from this browser?')){delete store.projects[dp.id];save();render()}return}
+  if(!p)return;
+  if(a==='close'){p.closed=true;save();ui.screen='home';ui.resume=null;render();announce('Saved and closed. Resume any time.');var o=$('[data-fid="open-'+p.id+'"]');if(o)o.focus();return}
+  if(a==='dismiss-resume'){ui.resume=null;render();return}
+  if(a==='gen'){generate(p);ui.tab='bom';render();return}
+  if(a==='tab'){ui.tab=b.getAttribute('data-tab');ui.copy=null;render();var t=$('#tab-'+ui.tab);if(t)t.focus();return}
+  if(a==='go'){goField(b.getAttribute('data-id'));return}
+  if(a==='confirm'){var id=b.getAttribute('data-id');setAns(p,id,{v:eff(p,id).v},'confirmed');render();return}
+  if(a==='unknown'){setAns(p,b.getAttribute('data-id'),{unknown:true},'don’t assume');render();return}
+  if(a==='clear'){setAns(p,b.getAttribute('data-id'),null,'answer cleared');render();return}
+  if(a==='add-group'){var n=1;while(p.groups.indexOf('g'+n)>=0)n++;setGroups(p,p.groups.concat(['g'+n]),'added endpoint group');ui.open['grp-g'+n]=true;render();var c=$('#in-g'+n+'-count');if(c)c.focus();return}
+  if(a==='rm-group'){var g=b.getAttribute('data-g');if(confirm('Remove '+gname(p,g)+'? Its lines leave the next output. Its answers stay in history; Undo restores the group.')){setGroups(p,p.groups.filter(function(x){return x!==g}),'removed '+gname(p,g));render()}return}
+  if(a==='optmode'){ui.optMode=b.getAttribute('data-m');try{localStorage.setItem('hh-aid-d02-optmode',ui.optMode)}catch(e){}render();return}
+  if(a==='hide-sug'){ui.hideSug=true;render();return}
+  if(a==='show-sug'){ui.hideSug=false;render();return}
+  if(a==='copy-q'){var open=fields(p).filter(function(f){if(f.nostate||(f.ap&&!f.ap(p)))return false;var e=eff(p,f.id);return e.o==='unknown'||e.o==='assumed'});ui.copy={where:'q',text:'Open questions for '+eff(p,'name').v+':\n'+open.map(function(f){var e=eff(p,f.id);return '- '+(f.g&&p.groups.length>1?gname(p,f.g)+': ':'')+f.l+(e.o==='assumed'?' (we assumed: '+showV(p,f.id,e)+')':e.marked?' (undecided)':'')}).join('\n')};render();var cq=$('#copyq');if(cq){cq.focus();cq.select()}return}
+  if(a==='trace'){var k=b.getAttribute('data-k');ui.trace=ui.trace===k?null:k;ui.copy=null;render();var tr=$('#trace');if(tr)tr.focus();else{var qb=document.querySelector('[data-fid="q-'+k+'"]');if(qb)qb.focus()}return}
+  if(a==='copy-t'){var vr=ui.view?p.revs[ui.view-1]:latest(p),l=vr.out.lines.filter(function(x){return x.key===b.getAttribute('data-k')})[0];ui.copy={where:'t'+l.key,text:traceText(p,l,vr)};render();var ct=$('#copyt');if(ct){ct.focus();ct.select()}return}
+  if(a==='preview'||a==='apply'){var cv=latest(p).out.conf.filter(function(c){return c.id===b.getAttribute('data-c')})[0],rl=cv&&cv.relax[+b.getAttribute('data-i')];if(!rl)return;
+    if(a==='preview'){ui.prev={c:cv.id,i:+b.getAttribute('data-i'),text:preview(p,rl.set)};render();announce('Preview: '+ui.prev.text)}
+    else{Object.keys(rl.set).forEach(function(id){setAns(p,id,{v:rl.set[id]},'chosen from conflict')});ui.prev=null;render();announce('Answer recorded. Generate when ready; the conflict stays until you do.')}return}
+  if(a==='lock-form'){ui.lockForm=b.getAttribute('data-k');render();var lq=$('#lk-q');if(lq)lq.focus();return}
+  if(a==='lock-cancel'){var lkf=ui.lockForm;ui.lockForm=null;render();var bb=document.querySelector('[data-fid="lf-'+lkf+'"]');if(bb)bb.focus();return}
+  if(a==='lock-save'){var kk=b.getAttribute('data-k'),qq=parseInt($('#lk-q').value,10),dd=parseInt($('#lk-d').value,10)||0;if(!(qq>0)||dd<0||dd>qq){announce('Enter an ordered quantity of at least 1 and a delivered quantity between 0 and the ordered quantity.');return}setLock(p,kk,{q:qq,del:dd},'order recorded');ui.lockForm=null;render();return}
+  if(a==='unlock'){var uk=b.getAttribute('data-k');if(confirm('Remove the order record for '+uk+'? Dependent switch, link, cable and OOB lines become stale. It stays in history and can be undone.')){setLock(p,uk,null,'order record removed');render()}return}
+  if(a==='view'){var n2=b.getAttribute('data-n');ui.view=n2?+n2:null;if(ui.view===p.revs.length)ui.view=null;ui.tab='bom';ui.trace=null;render();$('#tab-bom').focus();return}
+  if(a==='cmp-prev'){var m=+b.getAttribute('data-n');ui.cmpA=m-1;ui.cmpB=m;ui.tab='chg';render();$('#tab-chg').focus();return}
+  if(a==='undo'){var hi=p.hist[+b.getAttribute('data-i')];if(hi.lock)setLock(p,hi.lock,hi.prev,'undo of details r'+hi.r);else if(hi.id==='groups')setGroups(p,hi.grp,'undo of details r'+hi.r);else setAns(p,hi.id,hi.prev,'undo of details r'+hi.r);render();return}
+  if(a==='rel-start'){p.target={label:'<TARGET>',curr:'placeholder observation — example only, not from #3'};p.inputRev++;p.hist.unshift({r:p.inputRev,s:p.session,id:'target',bv:'latest Hedgehog release (currentness unknown)',av:'<TARGET> (placeholder)',why:'simulated target observation'});p.rel={ack:false,rev:{},done:null};save();render();announce('Placeholder target recorded; outputs marked release review pending.');return}
+  if(a==='rel-ack'){p.rel.ack=true;save();render();return}
+  if(a==='rel-rev'){p.rel.rev[+b.getAttribute('data-i')]=true;save();render();return}
+  if(a==='rel-go'){p.relBlocked=true;generate(p,EVT,'revalidated against placeholder target');p.rel.done=p.revs.length;save();ui.tab='bom';render();return}
+});
+document.addEventListener('change',function(ev){
+  var t=ev.target,p=P();
+  if(t.getAttribute('data-act2')==='cmp'){if(t.getAttribute('data-w')==='a')ui.cmpA=+t.value;else ui.cmpB=+t.value;render();return}
+  if(!p)return;
+  if(t.id==='rail'){ui.rail=t.value;render();return}
+  if(t.id==='patchg'){ui.patchg=t.checked;render();return}
+  if(t.id==='patexp'){ui.patexp=t.checked;render();return}
+  var id=t.getAttribute('data-in');if(!id)return;var f=fd(id);delete ui.errs[id];var v=t.value;
+  if(v==='__und'){setAns(p,id,{unknown:true},'customer has not decided');render();return}
+  if(f.type==='count'){if(v.trim()===''){setAns(p,id,null);render();return}var c=parseCount(v);if(!c){ui.errs[id]='Enter a whole number such as 128, or a range such as 120-136. Nothing was saved.';render();return}setAns(p,id,{v:c.lo===c.hi?c.lo:c.lo+'-'+c.hi});render();return}
+  if(f.type==='num'){if(v.trim()===''){setAns(p,id,null);render();return}var n=Number(v);if(!(Math.floor(n)===n&&n>=f.min&&n<=f.max)){ui.errs[id]='Enter a whole number from '+f.min+' to '+f.max+'. Nothing was saved.';render();return}setAns(p,id,{v:n});render();return}
+  if(f.type==='text'){setAns(p,id,v.trim()?{v:v}:null);render();return}
+  setAns(p,id,v===''?null:{v:v});render();
+});
+document.addEventListener('input',function(ev){var t=ev.target;if(t.id==='find'){ui.find=t.value;render();return}if(t.id==='patq'){ui.patq=t.value;render();return}if(t.id==='srv'){ui.srv=t.value;render();return}});
+document.addEventListener('toggle',function(ev){var t=ev.target;if(t.classList&&t.classList.contains('sec'))ui.open[t.getAttribute('data-sec')]=t.open;if(t.classList&&t.classList.contains('sub'))ui.open[t.getAttribute('data-sub')]=t.open},true);
+document.addEventListener('keydown',function(ev){
+  var t=ev.target;if(!t.getAttribute||t.getAttribute('role')!=='tab')return;
+  var set=t.getAttribute('data-tabset'),list=[].slice.call(document.querySelectorAll('[role=tab][data-tabset="'+set+'"]')),i=list.indexOf(t),n=null;
+  if(ev.key==='ArrowRight')n=(i+1)%list.length;else if(ev.key==='ArrowLeft')n=(i-1+list.length)%list.length;else if(ev.key==='Home')n=0;else if(ev.key==='End')n=list.length-1;
+  if(n==null)return;ev.preventDefault();list[n].click();
+});
+var hsh=location.hash;
+if(/^#demo-s[123]$/.test(hsh))preset(hsh.slice(6));
+else if(hsh==='#scratch'){var sp0=newProject('Untitled project');openP(sp0.id,false)}
+else if(hsh==='#library'){render();var lh0=$('#lib-h');if(lh0){lh0.scrollIntoView();lh0.focus()}}
+else render();
+window.__proto={gen:gen,eff:eff,store:function(){return store},newProject:newProject,fromStarter:fromStarter,STARTERS:STARTERS,VIEWS:VIEWS,starterFacts:starterFacts,generate:generate,setAns:setAns,setLock:setLock,setGroups:setGroups,diff:diff,suggestions:suggestions};
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,91 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><title>D02 prototype interaction check</title></head><body><p>Automated interaction and arithmetic checks for walkthrough.html (revision 3.1). Synthetic data only; not a usability test. In Chrome, run with --allow-file-access-from-files (see experience-design.md §19).</p><pre id="o">running</pre><iframe id="f" src="walkthrough.html" style="width:1200px;height:900px"></iframe>
+<script>
+var out=[],fail=0;function ok(c,m){out.push((c?'PASS ':'FAIL ')+m);if(!c)fail++}
+document.getElementById('f').onload=function(){try{
+var w=this.contentWindow,d=w.document,A=w.__proto,$=function(s){return d.querySelector(s)};
+w.confirm=function(){return true};
+function L(p){var o={};A.gen(p).lines.forEach(function(l){o[l.key]=l});return o}
+function click(s){var e=$(s);if(!e)throw new Error('missing '+s);e.click()}
+function setv(s,v){var e=$(s);if(!e)throw new Error('missing '+s);e.value=v;e.dispatchEvent(new w.Event('change',{bubbles:true}))}
+function radio(s){var e=$(s);if(!e)throw new Error('missing '+s);e.checked=true;e.dispatchEvent(new w.Event('change',{bubbles:true}))}
+function S(id){return A.STARTERS.filter(function(s){return s.id===id})[0]}
+// ---- from scratch, mixed knowledge ----
+var p=A.newProject('t-scratch');A.setAns(p,'g1.count',{v:128});A.setAns(p,'g1.profile',{v:'b200'});var g=A.gen(p),l=L(p);
+ok(l['g1.eplinks'].q===1024&&l['g1.leaves'].q===16&&!l['g1.leaves'].varies&&l['g1.cages'].q===512,'scratch 128 B200: 1,024 links, 16 leaves, 512 cages; same under every undecided packing');
+ok(l['n.undecided.800.spines'].q===8&&l['n.undecided.800.links'].q===512&&l.oob.q===24,'8 spines, 512 leaf-spine links, 24 OOB; network not decided is labelled, not assumed');
+ok(g.dims.length===1&&g.dims[0].vals.length===3,'rail preference and redundancy unanswered: three packings evaluated as alternatives');
+ok(A.eff(p,'g1.rail').o==='unknown'&&A.eff(p,'g1.rail').v===null,'unanswered rail preference is unknown, not false');
+A.setAns(p,'g1.count',{v:136});l=L(p);var lv=l['g1.leaves'];
+ok(lv.varies&&lv.alts.length===3&&/24/.test(lv.alts[0].q)&&/18/.test(lv.alts[1].q)&&/17/.test(lv.alts[2].q),'136: leaves shown as separate alternatives 24 | 18 | 17 ('+lv.alts.map(function(a){return a.a+'='+a.q}).join('; ')+')');
+ok(l['g1.eplinks'].q===1088&&l['g1.cages'].q===544&&!l['g1.cages'].varies,'136: links 1,088 and cages 544 identical under every alternative');
+var sg=A.suggestions(p,A.gen(p));ok(sg.length&&/g1\.(rail|homing)/.test(sg[0].id)&&/could change/.test(sg[0].why),'top suggestion is the rail/redundancy choice with its quantity swing: '+sg[0].why);
+A.setAns(p,'g1.racks',{v:8});A.setAns(p,'g1.perRack',{v:16});g=A.gen(p);l=L(p);
+ok(g.conf.some(function(c){return c.id==='g1.C-occmis'&&c.kind==='proven'})&&l['g1.leaves'].st==='cf'&&l['g1.eplinks'].q===1088,'136 endpoints vs 8 racks × 16 populated: mismatch shown, both answers kept, leaves suspended, links kept');
+ok(A.eff(p,'g1.count').v===136&&A.eff(p,'g1.racks').v===8,'contradictory answers are not silently changed');
+A.setAns(p,'g1.racks',{v:9});g=A.gen(p);l=L(p);
+ok(!g.conf.some(function(c){return /g1\.C-(rack|occmis)/.test(c.id)})&&g.exc.some(function(e){return /^last rack partly populated: 8 of 16/.test(e)})&&g.dims.some(function(x){return /place/.test(x.k)}),'9 racks × 16 populated: consistent (last rack 8 of 16); placement undecided becomes an alternative');
+var sc=g.conf.filter(function(c){return /C-spine/.test(c.id)})[0];ok(sc&&sc.only==='rail-optimized · rack-local leaves'&&L(p)['g1.eplinks'].q===1088,'72 rack-local rail leaves exceed one spine layer: conflict shown only for that alternative');
+A.setAns(p,'g1.rail',{v:'yes'});A.setAns(p,'g1.place',{v:'central'});l=L(p);ok(l['g1.leaves'].q===24&&!l['g1.leaves'].varies&&l['n.undecided.800.spines'].q===16,'rail yes + shared placement: 24 leaves, 16 spines');
+A.setAns(p,'g1.place',{v:'rack'});l=L(p);ok(l['g1.leaves'].q===72,'rail yes + rack-local leaves in 9 racks: 72 leaves (placement matters)');
+A.setAns(p,'g1.homing',{v:'dual'});g=A.gen(p);ok(g.conf.some(function(c){return c.id==='g1.C-railpair'}),'rail-optimized + dual-homed for the same links: explained, not silently resolved');
+A.setAns(p,'g1.homing',{unknown:true});ok(A.eff(p,'g1.homing').marked&&A.eff(p,'g1.homing').v===null,'“customer hasn’t decided” recorded as asked-undecided, distinct from not answered');
+var r=A.newProject('t-range');A.setAns(r,'g1.count',{v:'120-136'});A.setAns(r,'g1.profile',{v:'b200'});A.setAns(r,'g1.rail',{v:'yes'});l=L(r);
+ok(l['g1.leaves'].range&&l['g1.leaves'].qs==='16–24'&&l['g1.eplinks'].qs==='960–1,088'&&/bounded/.test(l['g1.leaves'].prec),'count range 120-136: leaves 16–24, links 960–1,088, precision bounded');
+var c=A.newProject('t-custom');A.setAns(c,'g1.count',{v:64});A.setAns(c,'g1.profile',{v:'custom'});l=L(c);ok(l['g1.eplinks'].st==='ne'&&l['g1.eplinks'].need.indexOf('g1.links')>=0,'custom endpoint without links: not estimated, names what it needs');
+var o=A.newProject('t-only-racks');A.setAns(o,'g1.profile',{v:'nvl72'});A.setAns(o,'g1.racks',{v:4});l=L(o);ok(A.eff(o,'g1.count').o==='assumed'&&/every rack is full/.test(A.eff(o,'g1.count').src)&&l['g1.eplinks'].q===288&&l['g1.eplinks'].rest.indexOf('g1.count')>=0&&/every rack is full/.test(l['g1.eplinks'].flags.join()),'racks only: full-rack count (4 × 18 capacity = 72) is an explicit assumption carried into the output, not a derived fact');
+A.setAns(o,'g1.perRack',{v:10});l=L(o);g=A.gen(o);ok(A.eff(o,'g1.count').o==='derived'&&A.eff(o,'g1.count').v===40&&l['g1.eplinks'].q===160&&g.exc.some(function(e){return /32 rack positions unused \(40 populated of 72 capacity\)/.test(e)}),'partly filled racks: 4 × 10 populated → count derived 40; 32 of 72 positions unused');
+A.setAns(o,'g1.perRack',null);A.setAns(o,'g1.count',{v:60});g=A.gen(o);ok(!g.conf.length&&g.exc.some(function(e){return /12 rack positions unused/.test(e)})&&L(o)['g1.eplinks'].q===240,'supplied 60 in 4 racks of capacity 18: partly filled, no conflict');
+A.setAns(o,'g1.count',{v:80});ok(A.gen(o).conf.some(function(c){return c.id==='g1.C-rack'}),'supplied 80 > 4 × 18 capacity: over-capacity contradiction');
+A.setAns(o,'g1.count',null);A.setAns(o,'g1.perRack',{v:20});ok(A.gen(o).conf.some(function(c){return c.id==='g1.C-occ'}),'populated 20 per rack > capacity 18: contradiction');
+var u2=A.newProject('t-two-unknown-nets');A.setAns(u2,'g1.count',{v:128});A.setAns(u2,'g1.profile',{v:'b200'});A.setAns(u2,'g1.rail',{v:'yes'});A.setGroups(u2,['g1','g2']);A.setAns(u2,'g2.count',{v:64});A.setAns(u2,'g2.profile',{v:'b200'});A.setAns(u2,'g2.rail',{v:'yes'});g=A.gen(u2);l=L(u2);
+ok(g.dims.some(function(d){return d.k==='netrel'})&&l['n.undecided-g1.800.spines'].varies&&/^8$/.test(l['n.undecided-g1.800.spines'].alts[0].q)&&/not applicable/.test(l['n.undecided-g1.800.spines'].alts[1].q)&&l['n.undecided-g2.800.spines'].alts[0].q==='4'&&/not applicable/.test(l['n.undecided.800.spines'].alts[0].q)&&l['n.undecided.800.spines'].alts[1].q==='16','two groups, both networks unknown: separate (8 + 4 spines) and shared (16, conditional) shown as alternatives; never silently combined');
+var m=A.newProject('t-mixed');A.setAns(m,'g1.count',{v:128});A.setAns(m,'g1.profile',{v:'b200'});A.setAns(m,'g1.rail',{v:'yes'});A.setAns(m,'g1.net',{v:'backend'});A.setGroups(m,['g1','g2']);A.setAns(m,'g2.count',{v:40});A.setAns(m,'g2.profile',{v:'gen25'});A.setAns(m,'g2.net',{v:'storage'});A.setAns(m,'g2.homing',{v:'dual'});A.setAns(m,'g2.rail',{v:'no'});l=L(m);
+ok(l['n.backend.800.spines'].q===8&&l['n.storage.100.spines'].q===2&&l['g2.leaves'].q===2&&l.oob.q===28,'mixed inventory: backend 16+8 and storage 2+2 switches, separate per network; OOB 28');
+ok(A.eff(m,'net.storage').o==='derived'&&A.eff(m,'net.frontend').o==='unknown'&&A.gen(m).undecidedNets.indexOf('Frontend')>=0,'network scope derived from groups; others listed as not decided, not 0');
+A.setAns(m,'net.backend',{v:'out'});ok(A.gen(m).conf.some(function(c){return c.id==='C-scope-backend'}),'group serving an out-of-scope network is flagged');
+A.setAns(m,'g2.profile',{v:'b200'});A.setAns(m,'g2.profile',{v:'gen25'});ok(A.eff(m,'g2.homing').v==='dual','answers survive profile changes (applicability, not deletion)');
+// ---- starter library ----
+function SL(s){var q=A.fromStarter(s);return L(q)}
+l=SL(S('S1'));ok(l['g1.leaves'].q===16&&l['n.backend.800.spines'].q===8,'S1 placeholder: 16 leaves, 8 spines');
+l=SL(S('S2'));ok(l['g1.eplinks'].q===576&&l['g1.leaves'].q===32&&l['g1.cages'].q===288&&l['n.backend.800.spines'].q===5&&l['n.backend.800.links'].q===320&&l.oob.q===37,'S2 placeholder: 576 / 32 / 288 / 5 / 320 / 37');
+l=SL(S('S3'));ok(l['g1.eplinks'].q===80&&l['g1.leaves'].q===2&&l['n.frontend.100.spines'].q===0&&l['n.frontend.100.links'].q===8&&l.oob.q===2,'S3 placeholder: 80 links, 2 leaves, mesh 0 spines / 8 links, OOB 2');
+l=SL(S('S4'));ok(l['g1.leaves'].q===4&&l['n.storage.100.spines'].q===2&&l['n.storage.100.links'].q===32&&l.oob.q===6,'S4 placeholder: 4 leaves, 2 spines, 32 links, OOB 6');
+var q1=A.fromStarter(S('S2'));ok(A.eff(q1,'g1.racks').o==='assumed'&&/from starter S2/.test(A.eff(q1,'g1.racks').src)&&A.eff(q1,'g1.count').o==='derived','starter values arrive as assumptions with provenance; count stays derived');
+var perView=A.VIEWS.map(function(v){var seen={};A.STARTERS.forEach(function(s){var b=v.b(A.starterFacts(s));seen[s.id]=(seen[s.id]||0)+1});return Object.keys(seen).every(function(k){return seen[k]===1})&&Object.keys(seen).length===A.STARTERS.length});
+ok(perView.every(Boolean),'each starter appears exactly once in every view (one identity, several perspectives)');
+// ---- DOM ----
+w.localStorage.clear();w.location.hash='';
+click('[data-act=preset][data-x=s1]');click('[data-act=close]');
+ok(!!$('[data-act=scratch]')&&!!$('#lib-h'),'home offers from-scratch and starter-library paths');
+ok(/S1 · /.test($('#lp').textContent),'library count view lists S1');
+click('[data-act=lib-sel][data-s=S2]');click('#lt-topo');ok(!!$('#sp-h')&&/S2/.test($('#sp-h').textContent)&&/S2 · /.test($('#lp').textContent),'switching views keeps the selected starter; S2 also in topology view');
+click('#lt-racks');ok(/5–16 racks/.test($('#lp').textContent),'rack-count view buckets S2 under 5–16 racks');
+click('[data-act=lib-use]');ok(/Started from:<\/b> S2 v0/.test(d.body.innerHTML)&&/from starter S2/.test(d.body.textContent),'customised starter opens the same workspace with provenance');
+click('[data-act=close]');click('[data-act=scratch]');ok(d.activeElement&&d.activeElement.id==='in-g1-count','scratch opens workspace focused on the first essential question');
+ok(/First BOM:/.test(d.body.textContent)&&!/Next →|Finish/.test(d.body.textContent),'no wizard steps or finish button; minimum stated briefly');
+var rc=$('#in-g1-count').getBoundingClientRect(),rp=$('#in-g1-profile').getBoundingClientRect();var es=$('.ess');ok(es&&es.querySelectorAll('.field').length===2&&es.contains($('#in-g1-count'))&&es.contains($('#in-g1-profile'))&&rc.top>0&&rp.bottom<w.innerHeight,'count and endpoint type are adjacent in one essentials block and visible on first entry (tops '+Math.round(rc.top)+' / '+Math.round(rp.top)+', viewport '+w.innerHeight+')');
+click('[data-fid=om-c]');ok(d.querySelectorAll('details.sub').length===3&&!!$('#in-g1-count'),'collapsed view (alternative B): optional groups become headings in the same workspace; essentials stay visible');
+click('[data-act=go][data-id="g1.racks"]'.replace('[data-act=go][data-id="g1.racks"]','[data-fid=om-e]'));ok(!d.querySelectorAll('details.sub').length,'show-all view (alternative A) restored');
+setv('#in-g1-count','abc');ok(/Nothing was saved/.test(d.body.textContent),'invalid count rejected with a message');
+setv('#in-g1-count','128');setv('#in-g1-profile','b200');
+radio('[data-fid="in-g1-rail-und"]');ok(/not decided yet/.test($('#f-g1-rail').textContent),'rail “Not decided yet” shows neutrally and stays distinct from not answered');
+click('[data-act=gen]');ok(d.querySelectorAll('button.qty').length>=8&&/Undecided choices shown as alternatives/.test(d.body.textContent),'first output with explicit undecided choices');
+click('[data-fid="q-g1.leaves"]');ok(!!$('#trace')&&/Why 16\?/.test($('#trace').textContent),'leaf trace opens');
+click('[data-act=close]');click('[data-act=open]');ok(/Welcome back — session 2/.test(d.body.textContent),'resume shows session 2 summary');
+setv('#in-g1-count','136');ok(/stale/.test(d.querySelector('[data-fid="q-g1.leaves"]').closest('tr').textContent),'count edit marks leaves stale');
+click('[data-act=gen]');ok(/rail-optimized:/.test(d.querySelector('[data-fid="q-g1.leaves"]').textContent),'regenerated leaves show labelled alternatives');
+var fi=$('#find');fi.value='rack';fi.dispatchEvent(new w.Event('input',{bubbles:true}));ok(/How many racks hold these endpoints/.test(d.body.textContent),'find a detail by keyword');
+click('[data-act=go][data-id="g1.racks"]');ok(d.activeElement&&d.activeElement.id==='in-g1-racks','find result jumps to the field');
+setv('#in-g1-racks','8');setv('#in-g1-perRack','16');click('[data-act=gen]');ok(!!$('[id="cf-g1.C-occmis"]'),'mismatch panel after generate');
+click('[data-act=preview][data-c="g1.C-occmis"][data-i="1"]');ok(/Preview:/.test(d.body.textContent),'preview a way forward');
+click('[data-act=apply][data-c="g1.C-occmis"][data-i="1"]');click('[data-act=gen]');ok(!$('[id="cf-g1.C-occmis"]'),'applied and regenerated: mismatch resolved');
+click('#tab-chg');ok(/Changed lines/.test(d.body.textContent),'changes tab');
+click('[data-act=add-group]');ok(!!$('#in-g2-count'),'add endpoint group for mixed inventory');
+click('#tab-revs');ok(d.querySelectorAll('[data-act=undo]').length>0,'history with undo');
+click('#tab-rel');click('[data-act=rel-start]');click('[data-act=rel-ack]');var gd=0;while($('[data-act=rel-rev]')&&gd++<9)click('[data-act=rel-rev]');click('[data-act=rel-go]');ok(/blocked for qualification/.test(d.body.textContent),'release revalidation flags cable lines');
+click('[data-act=close]');click('[data-act=preset][data-x=s3]');ok(/Welcome back — session 3/.test(d.body.textContent),'preset s3 resumes');
+click('[data-act=gen]');ok(/24 ordered \+ 16 proposed/.test(d.body.textContent)&&!!$('[id="cf-n.backend.800.C-lock"]')&&/1,280/.test(d.body.textContent),'growth to 260: ordered leaves kept (24 + 16 proposed); locked spines conflict 1,280 vs 1,024');
+click('#tab-links');ok(/Exceptions first/.test(d.body.textContent),'links tab');
+}catch(e){out.push('ERROR '+e.message+' '+e.stack)}
+document.getElementById('o').textContent=(fail?'FAILURES '+fail:'ALL PASS')+'\n'+out.join('\n');};
+</script></body></html>
