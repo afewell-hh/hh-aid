@@ -1,0 +1,374 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Server profile screens</title>
+<style>
+:root{--bg:#fafaf8;--fg:#1d1d1b;--mut:#5d5d58;--line:#9a9a92;--soft:#e9e9e4;--card:#fff;--hi:#fff4c2;--unk:#f3e3ff;--gen:#e3f0ff;--cust:#ffe3d6;--ok:#dff3e0;--bad:#ffd9d9;--focus:#1b5fd1}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#1b1b1a;--fg:#ecece6;--mut:#b2b2aa;--line:#77776f;--soft:#2c2c2a;--card:#232322;--hi:#4a4322;--unk:#3d2c4a;--gen:#22364d;--cust:#4d3024;--ok:#24402a;--bad:#4d2626;--focus:#7fb0ff}}
+:root[data-theme=dark]{--bg:#1b1b1a;--fg:#ecece6;--mut:#b2b2aa;--line:#77776f;--soft:#2c2c2a;--card:#232322;--hi:#4a4322;--unk:#3d2c4a;--gen:#22364d;--cust:#4d3024;--ok:#24402a;--bad:#4d2626;--focus:#7fb0ff}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:14px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif}
+main{max-width:1240px;margin:0 auto;padding:16px}
+h1{font-size:22px;margin:8px 0}h2{font-size:18px;margin:28px 0 8px;border-top:2px solid var(--line);padding-top:14px}h3{font-size:15px;margin:14px 0 6px}
+p,li{max-width:80ch}
+a{color:var(--focus)}
+:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+.banner{border:2px dashed var(--line);padding:8px 12px;background:var(--soft)}
+nav.toc{columns:3 220px;font-size:13px}
+.frame{border:2px solid var(--line);background:var(--card);margin:10px 0 18px;overflow:hidden}
+.frame>.cap{display:flex;gap:8px;justify-content:space-between;flex-wrap:wrap;background:var(--soft);padding:6px 10px;font-size:12px;border-bottom:1px solid var(--line)}
+.frame>.cap b{font-size:13px}
+.app{display:grid;grid-template-columns:200px minmax(0,1fr) 280px;min-height:200px}
+.app.two{grid-template-columns:200px minmax(0,1fr)}
+.app.one{grid-template-columns:minmax(0,1fr)}
+.app.side{grid-template-columns:minmax(0,1fr) 340px}
+.pane{padding:10px;border-right:1px solid var(--line);min-width:0;overflow-x:auto}
+.pane:last-child{border-right:0}
+.pane h4{margin:0 0 6px;font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:var(--mut)}
+.tree{list-style:none;margin:0;padding:0;font-size:13px}.tree ul{list-style:none;padding-left:14px;margin:2px 0}
+.tree .sel{background:var(--hi);font-weight:600}
+.scroll{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:12.5px}
+th,td{border:1px solid var(--line);padding:3px 6px;text-align:left;vertical-align:top}
+th{background:var(--soft);font-weight:600}
+td.n{text-align:right;font-variant-numeric:tabular-nums}
+tr.child td:first-child{padding-left:22px}tr.gchild td:first-child{padding-left:38px}
+tr.sel td{background:var(--hi)}
+.tag{display:inline-block;border:1px solid var(--line);border-radius:3px;padding:0 4px;font-size:11px;white-space:nowrap}
+.t-sup{background:var(--card)}.t-cls{background:var(--soft)}.t-gen{background:var(--gen)}.t-unk{background:var(--unk)}.t-cust{background:var(--cust)}.t-out{background:repeating-linear-gradient(45deg,var(--soft),var(--soft) 4px,var(--card) 4px,var(--card) 8px)}.t-ok{background:var(--ok)}.t-bad{background:var(--bad)}.t-stale{background:var(--hi)}
+.btn{display:inline-block;border:1px solid var(--line);padding:2px 8px;border-radius:3px;background:var(--card);font-size:12px;white-space:nowrap}
+.btn.p{border-width:2px;font-weight:600}
+.field{display:inline-block;border:1px solid var(--line);min-width:80px;padding:1px 6px;background:var(--card);font-size:12px}
+.strip{display:flex;flex-wrap:wrap;gap:6px 14px;padding:6px 8px;border:1px solid var(--line);background:var(--soft);font-size:12.5px;margin-bottom:8px}
+.card{border:1px solid var(--line);padding:8px;background:var(--card);min-width:0}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:8px}
+.note{font-size:12px;color:var(--mut)}
+.panel{border-left:4px solid var(--focus);padding-left:8px}
+.bar{background:var(--hi);border:1px solid var(--line);padding:4px 8px;margin:6px 0;font-size:12.5px}
+.ann{font-size:12px;border-left:3px solid var(--line);padding:2px 8px;margin:6px 0;color:var(--mut)}
+svg{max-width:100%;height:auto}
+svg text{fill:var(--fg);font:12px system-ui,sans-serif}
+svg .bx{fill:var(--card);stroke:var(--line);stroke-width:1.5}
+svg .ln{stroke:var(--fg);stroke-width:1.5;fill:none}
+svg .dash{stroke-dasharray:5 4}
+.cmp td:nth-child(n+2){font-size:12px}
+@media (max-width:900px){.app,.app.two,.app.side{grid-template-columns:minmax(0,1fr)}.pane{border-right:0;border-bottom:1px solid var(--line)}}
+</style>
+</head>
+<body>
+<main>
+<h1>Server profile experience: low-fidelity screens</h1>
+<p class="banner"><b>D02 #9 server-class pass, static wireframes.</b> These screens are not a calculator. Every quantity was entered by hand and is checked by <code>bom-arithmetic.py</code>. Every part is a <b>generic placeholder or unverified sponsor shorthand</b>, not a vendor-qualified SKU. Leaf and spine counts are deliberately shown as not estimated. Product terms such as <i>fabric</i> and <i>leaf class</i> are product language only; how they map to upstream Fabric, domain and plane objects is pending compat (#3). Field names are provisional until parts (#6) and model (#8) fixtures land. Rationale: <a href="../server-profile-experience.md">server-profile-experience.md</a>.</p>
+<p class="note"><i>Server</i> means any non-switch device attached to the fabric, including storage arrays, appliances and other endpoints, following Hedgehog's Server concept. The product UI explains this once, on F1.</p>
+
+<nav class="toc" aria-label="Screens">
+<a href="#legend">K. Represented versus missing data</a><br>
+<a href="#alt-a">A. Master/detail profile editor</a><br>
+<a href="#alt-b">B. Canvas</a><br>
+<a href="#alt-c">C. Hybrid (recommended hypothesis)</a><br>
+<a href="#f1">F1 Choose server family</a><br>
+<a href="#f2">F2 Inspect default profile</a><br>
+<a href="#f3">F3 Customize DPU variant</a><br>
+<a href="#f4">F4 Assign ports to fabric and leaf class</a><br>
+<a href="#f5">F5 Create leaf class in context</a><br>
+<a href="#f6">F6 Return with edits intact</a><br>
+<a href="#f7">F7 Enter population</a><br>
+<a href="#f8">F8 Expanded BOM</a><br>
+<a href="#f9">F9 Add a second server class</a><br>
+<a href="#e1">E1 Both-ends comparison and filters</a><br>
+<a href="#l1">L1 Edit scope: project versus class</a><br>
+<a href="#l2">L2 New class revision available</a><br>
+<a href="#l3">L3 Stale lines and regenerated BOM</a><br>
+<a href="#map">M. Review tasks and feedback-to-screen map</a>
+</nav>
+
+<!-- ============================================================ -->
+<h2 id="legend">K. Represented versus missing data (shown on every screen)</h2>
+<div class="frame"><div class="cap"><b>K Legend</b><span>Answer origin and compatibility are separate axes (R05 §2)</span></div>
+<div class="pane scroll"><table>
+<tr><th>Mark</th><th>Meaning</th><th>Effect on outputs</th></tr>
+<tr><td><span class="tag t-sup">supplied</span></td><td>An engineer entered it in this project.</td><td>Used. Provenance is "user", with time.</td></tr>
+<tr><td><span class="tag t-cls">from class r1</span></td><td>Inherited from the pinned server-class revision, or from the family default when there is no class.</td><td>Used as an assumption the engineer can confirm or change.</td></tr>
+<tr><td><span class="tag t-cust">customized</span></td><td>A project-only change to an inherited value. The class value is kept and shown.</td><td>Used. It survives class updates unless the engineer resets it (L2).</td></tr>
+<tr><td><span class="tag t-gen">generic</span></td><td>A generic placeholder component, such as a "400G-class optic".</td><td>Contributes <b>quantity</b>. Not orderable: no SKU or price is implied.</td></tr>
+<tr><td><span class="tag t-unk">unknown</span></td><td>Not answered or not decided. "Not decided yet" records no interview event.</td><td>Dependent lines show what is missing. Never counted as zero, never defaulted silently.</td></tr>
+<tr><td><span class="tag t-out">out of scope</span></td><td>External structured or fiber cabling: jumpers, trunks, panels and RJ45 patch cords.</td><td>Disclosed with the quantity basis (for example "800 optical links need external fiber"). Not part of the BOM.</td></tr>
+<tr><td><span class="tag t-unk">compat: unverified</span> <span class="tag t-ok">documented</span> <span class="tag t-bad">mismatch</span></td><td>Compatibility evidence between two ends. This is a separate axis from origin.</td><td>An override is recorded as an engineer choice. It never becomes "documented" or "supported".</td></tr>
+</table></div></div>
+
+<!-- ============================================================ -->
+<h2 id="alt-a">A. Spacious master/detail profile editor</h2>
+<div class="frame"><div class="cap"><b>A Master/detail</b><span>Tree on the left, nested tables in the centre, non-modal details panel on the right</span></div>
+<div class="app">
+<div class="pane"><h4>Project</h4><ul class="tree"><li>Server classes<ul><li class="sel">HGX 8-GPU (B200-class) ×100</li><li>Storage 2U ×12</li></ul></li><li>Fabrics<ul><li>backend</li><li>frontend</li><li>storage</li></ul></li><li>Leaf classes<ul><li>backend-leaf <span class="tag t-unk">model unknown</span></li></ul></li><li>Outputs: BOM</li></ul></div>
+<div class="pane scroll"><h4>Hardware and ports</h4>
+<table><tr><th>Item / port</th><th>Qty per server</th><th>Mode</th><th>Medium</th><th>Fabric · leaf class</th></tr>
+<tr><td>▾ Backend NIC (generic 400G-class)</td><td class="n">8</td><td>1×400G</td><td>optic <span class="tag t-gen">generic</span></td><td>backend · backend-leaf</td></tr>
+<tr class="child"><td>port 1 (rail 1 … rail 8)</td><td class="n">1 each</td><td>—</td><td>—</td><td>same as parent</td></tr>
+<tr><td>▸ DPU, dual-port <span class="tag t-unk">unverified</span></td><td class="n">1</td><td>2×200G?</td><td>DAC <span class="tag t-gen">generic</span></td><td>frontend · <span class="tag t-unk">not chosen</span></td></tr>
+<tr><td>▸ Storage NIC, dual-port</td><td class="n">1</td><td>2×200G</td><td><span class="tag t-unk">unknown</span></td><td>storage · <span class="tag t-unk">not chosen</span></td></tr>
+<tr><td>▸ Onboard (in-band, BMC)</td><td class="n">1</td><td>RJ45</td><td>integrated</td><td>mgmt networks (external)</td></tr>
+</table></div>
+<div class="pane"><h4>Details: backend NIC</h4><p>Ports: 1. Cage: <span class="field">OSFP?</span><br>Configured mode: 1×400G<br>Rail mapping: NIC n → rail n<br>Medium: optic, generic 400G-class<br>Per-unit lines: none<br><span class="btn">Compare ends…</span></p></div>
+</div>
+<p class="ann">Strengths: everything is reachable by keyboard; dense, sortable and filterable columns; one row edits all 8 identical NICs. Weakness: the three concurrent attachments read as separate rows, so a novice may not see one server with several networks at a glance.</p></div>
+
+<h2 id="alt-b">B. Canvas</h2>
+<div class="frame"><div class="cap"><b>B Canvas</b><span>Server node with NIC blocks; wires to fabric and leaf-class nodes; property inspector</span></div>
+<div class="app two"><div class="pane"><h4>Palette</h4><ul class="tree"><li>NIC</li><li>DPU</li><li>Optic</li><li>DAC / AEC / AOC</li><li>Fabric</li><li>Leaf class</li></ul><p class="note">Drag onto the canvas (keyboard alternative: Add → Place).</p></div>
+<div class="pane scroll">
+<svg viewBox="0 0 760 280" role="img" aria-label="Canvas wireframe: one server node with backend NIC, DPU and storage NIC blocks wired to three fabric nodes">
+<rect class="bx" x="20" y="20" width="250" height="240"/><text x="30" y="40">HGX 8-GPU (B200-class) ×100</text>
+<rect class="bx" x="35" y="55" width="220" height="70"/><text x="45" y="75">8 × backend NIC</text><text x="45" y="95">be1 … be8 (rails 1–8)</text><text x="45" y="115" class="note">8 ports, drawn as 1 block or 8?</text>
+<rect class="bx" x="35" y="140" width="220" height="45"/><text x="45" y="167">DPU dual-port: fe1 fe2</text>
+<rect class="bx" x="35" y="200" width="220" height="45"/><text x="45" y="227">Storage NIC: st1 st2</text>
+<rect class="bx" x="520" y="40" width="200" height="50"/><text x="530" y="70">Fabric: backend</text>
+<rect class="bx" x="520" y="120" width="200" height="50"/><text x="530" y="150">Fabric: frontend</text>
+<rect class="bx" x="520" y="200" width="200" height="50"/><text x="530" y="230">Fabric: storage</text>
+<path class="ln" d="M255 90 C400 90 400 65 520 65"/><path class="ln" d="M255 162 C400 162 400 145 520 145"/><path class="ln dash" d="M255 222 C400 222 400 225 520 225"/>
+<text x="300" y="265">How are 100 servers and 1,200 links shown? As aggregates only.</text>
+</svg></div></div>
+<p class="ann">Strengths: one server with several networks is visible at a glance; direct manipulation is engaging. Weaknesses: dragging needs a single-pointer alternative (WCAG 2.5.7) and a full keyboard model; precision and bulk edits are slow; dense port attributes (cage, mode, PMD, reach) end up in an inspector one item at a time; the canvas becomes an aggregate drawing that does not show per-port detail.</p></div>
+
+<h2 id="alt-c">C. Hybrid: table-primary editor with a synchronized attachment map</h2>
+<div class="frame"><div class="cap"><b>C Hybrid</b><span>A's editor plus a compact map that supports click-to-select. No drag is required; every action is also in the table.</span></div>
+<div class="app"><div class="pane"><h4>Project</h4><ul class="tree"><li>Server classes<ul><li class="sel">HGX 8-GPU ×100</li></ul></li><li>Fabrics (3)</li><li>Leaf classes (1)</li><li>BOM</li></ul></div>
+<div class="pane scroll"><h4>Attachment map (one server)</h4>
+<svg viewBox="0 0 640 150" role="img" aria-label="Attachment map: hardware rows on the left connected to fabric columns backend, frontend, storage and management">
+<text x="10" y="18">Hardware</text><text x="330" y="18">backend</text><text x="420" y="18">frontend</text><text x="510" y="18">storage</text><text x="590" y="18">mgmt</text>
+<rect class="bx" x="10" y="28" width="240" height="24"/><text x="16" y="45">8 × backend NIC · 8 ports · rails 1–8</text><circle cx="345" cy="40" r="7" fill="currentColor"/><path class="ln" d="M250 40 H338"/>
+<rect class="bx" x="10" y="60" width="240" height="24"/><text x="16" y="77">1 × DPU dual-port · 2 ports</text><circle cx="440" cy="72" r="7" fill="none" stroke="currentColor" stroke-width="2"/><path class="ln dash" d="M250 72 H433"/>
+<rect class="bx" x="10" y="92" width="240" height="24"/><text x="16" y="109">1 × storage NIC · 2 ports</text><circle cx="530" cy="104" r="7" fill="none" stroke="currentColor" stroke-width="2"/><path class="ln dash" d="M250 104 H523"/>
+<rect class="bx" x="10" y="124" width="240" height="22"/><text x="16" y="140">Onboard · in-band + BMC</text><rect x="598" y="128" width="14" height="14" fill="currentColor"/><path class="ln" d="M250 135 H598"/>
+</svg>
+<p class="note">Solid dot: fabric and leaf class chosen. Hollow dot and dashed line: fabric chosen, leaf class unknown (a valid state). Square: external management network, outside the fabric. Selecting a row or dot selects the same rows in the table below.</p>
+<h4>Hardware and ports</h4><p class="note">(the same table as A)</p></div>
+<div class="pane"><h4>Details</h4><p>The selected item's fields, both-ends comparison, per-unit lines and provenance.</p></div></div>
+<p class="ann">The recommendation is a hypothesis to test with review tasks RT1–RT10. The map earns its place only if reviewers find mixed fabrics faster with it than in A. If not, drop it and ship A.</p></div>
+
+<!-- ============================================================ -->
+<h2 id="f1">F1 Choose a server family</h2>
+<div class="frame"><div class="cap"><b>F1</b><span>Scratch project → Add server class. No other questions are required first.</span></div>
+<div class="app two"><div class="pane"><h4>Project: untitled</h4><ul class="tree"><li>Server classes (none)</li><li>Fabrics (none)</li><li>BOM: needs a server class and count</li></ul><p class="note"><a href="#">Browse starter library</a> (the same library views as revision 3.1)</p></div>
+<div class="pane"><h3>What kind of server?</h3>
+<p class="note">"Server" means any non-switch device on the fabric: GPU and CPU servers, storage, appliances and gateways. <span class="field">Search families…</span></p>
+<div class="cards">
+<div class="card"><b>GPU baseboard servers</b><br>HGX 8-GPU (B200-class) <span class="tag t-gen">illustrative</span><br>HGX 8-GPU (B300-class) <span class="tag t-gen">illustrative</span></div>
+<div class="card"><b>Rack-scale GPU trays</b><br>GB-class compute tray <span class="tag t-gen">illustrative</span></div>
+<div class="card"><b>Storage servers</b><br>Storage 2U, generic <span class="tag t-gen">illustrative</span></div>
+<div class="card"><b>General compute</b><br>1U dual-socket, generic</div>
+<div class="card"><b>Appliances and other</b><br>Firewall, load balancer, gateway host…</div>
+<div class="card"><b>Describe my own</b><br>Start with an empty profile</div>
+</div>
+<h3>HGX 8-GPU (B200-class): common configurations</h3>
+<table><tr><th></th><th>Configuration</th><th>Network attachments per server</th></tr>
+<tr class="sel"><td>◉</td><td>Default: backend + frontend DPU + storage NIC</td><td>8 backend · 2 frontend · 2 storage · in-band · BMC</td></tr>
+<tr><td>○</td><td>No separate storage network</td><td>8 backend · 2 frontend · in-band · BMC</td></tr>
+<tr><td>○</td><td>Not sure yet: start from the default and mark undecided parts</td><td>The same profile, with the DPU and storage NIC marked "Not decided yet"</td></tr>
+</table>
+<p class="note">These are 2–3 common configurations, not a catalog entry for every NIC and storage permutation. The DPU variant (one dual-port versus two single-port) is a field inside the profile (F3), not another catalog entry. <span class="tag t-unk">unverified</span>: the sponsor's configurations need vendor evidence.</p>
+<p><span class="btn p">Open profile</span> <span class="btn">Cancel</span></p></div></div></div>
+
+<h2 id="f2">F2 Inspect the default profile (recommended layout C)</h2>
+<div class="frame"><div class="cap"><b>F2</b><span>Room to see the whole network profile of one server. Desktop ≥ 1,280 px; narrow widths stack the panes.</span></div>
+<div class="app"><div class="pane"><h4>Project</h4><ul class="tree"><li>Server classes<ul><li class="sel">HGX 8-GPU (B200-class)<br><span class="note">project copy of class r1 · count: <span class="tag t-unk">not entered</span></span></li></ul></li><li>Fabrics (suggested from profile)<ul><li>backend <span class="tag t-cls">suggested</span></li><li>frontend <span class="tag t-cls">suggested</span></li><li>storage <span class="tag t-cls">suggested</span></li></ul></li><li>Leaf classes (none)</li><li>BOM <span class="btn">Generate</span></li></ul></div>
+<div class="pane scroll">
+<div class="strip"><span><b>Per server:</b> 12 fabric ports in 3 attachments</span><span>2 management ports (external networks)</span><span>Per-unit lines: 3</span><span>Unknown: 4 <a href="#">show</a></span></div>
+<h4>Hardware and ports (treegrid: ←/→ collapses/expands, ↑/↓ moves between rows)</h4>
+<table>
+<tr><th>Item / port</th><th>Qty / server</th><th>Identity</th><th>Cage · mode</th><th>Medium (server end)</th><th>Fabric · leaf class</th><th>Rail · plane</th></tr>
+<tr><td>▾ Backend NIC</td><td class="n">8 <span class="tag t-cls">r1</span></td><td>generic 400G-class <span class="tag t-gen">generic</span></td><td>OSFP? · 1×400G <span class="tag t-unk">cage unverified</span></td><td>optic, 400G-class <span class="tag t-gen">generic</span></td><td>backend · <span class="tag t-unk">leaf class not chosen</span></td><td>rail = NIC index · plane <span class="tag t-unk">unknown</span></td></tr>
+<tr class="child"><td>be1 … be8 (8 ports, collapsed; <a href="#">expand all 8</a>)</td><td class="n">1 per NIC</td><td></td><td>same</td><td>same</td><td>same</td><td>rails 1–8</td></tr>
+<tr><td>▸ DPU (sponsor "BF3" shorthand)</td><td class="n">1</td><td>dual-port <span class="tag t-unk">unverified</span></td><td>? · 2×200G? <span class="tag t-unk">unverified</span></td><td>DAC <span class="tag t-gen">generic</span></td><td>frontend · <span class="tag t-unk">not chosen</span></td><td>—</td></tr>
+<tr><td>▸ Storage NIC</td><td class="n">1</td><td>generic 200G-class <span class="tag t-gen">generic</span></td><td>? · 2×200G</td><td><span class="tag t-unk">not decided yet</span></td><td>storage · <span class="tag t-unk">not chosen</span></td><td>—</td></tr>
+<tr><td>▸ Onboard</td><td class="n">1</td><td>included in server</td><td>RJ45 ×2</td><td>integrated PHY</td><td>in-band mgmt · BMC/OOB (external)</td><td>—</td></tr>
+</table>
+<h4>Per-unit BOM lines (any item, including ones outside the topology)</h4>
+<table><tr><th>Line</th><th>Qty / server</th><th>Purchase</th><th>Affects topology?</th></tr>
+<tr><td>Power cord (generic)</td><td class="n">4</td><td><span class="tag t-unk">included or separate?</span></td><td>no</td></tr>
+<tr><td>Rail kit</td><td class="n">1</td><td>included in server SKU</td><td>no</td></tr>
+<tr><td>Support contract</td><td class="n">1</td><td>separately purchased</td><td>no</td></tr>
+<tr><td colspan="4"><span class="btn">+ Add line</span> (applies per server unit; switches have their own per-unit lines)</td></tr></table>
+</div>
+<div class="pane"><h4>Details: Backend NIC</h4>
+<p><b>Inherited from class r1</b>, project copy. Every edit asks for its scope (L1).</p>
+<p>Ports per NIC: 1<br>Cage form factor: <span class="tag t-unk">unverified</span><br>Supported modes: 1×400G <span class="tag t-unk">source needed</span><br>Server-end medium: generic optic<br>Far end: decided by the leaf class<br>GPU↔NIC: NIC n serves GPU n (class assumption)</p>
+<p><span class="btn">Change identity…</span> <span class="btn">Compare ends</span></p></div></div></div>
+
+<h2 id="f3">F3 Customize the NIC/DPU/storage variant</h2>
+<div class="frame"><div class="cap"><b>F3</b><span>DPU row → Change variant. Inline and non-modal, with a preview before applying.</span></div>
+<div class="app one"><div class="pane scroll">
+<table><tr><th>Item</th><th>Qty / server</th><th>Ports</th><th>Fabric</th></tr>
+<tr class="sel"><td>▾ DPU variant: <span class="field">◉ 1 × dual-port ○ 2 × single-port ○ Not decided yet</span></td><td class="n">1</td><td>fe1, fe2</td><td>frontend</td></tr></table>
+<div class="bar"><b>Preview: 2 × single-port</b><br>DPUs per server 1 → 2 (×100 servers: 100 → 200) · frontend ports unchanged (2) · frontend links unchanged (200) · DAC assemblies unchanged (200)<br>
+Not evaluated: whether two cards change failure independence or the PCIe/slot fit. <span class="tag t-unk">unverified</span><br>
+Apply to: <span class="field">◉ This project only (customization)</span> <span class="field">○ Save as a new class revision…</span> <span class="btn p">Apply</span> <span class="btn">Cancel</span></div>
+<p class="note">"Not decided yet" keeps both variants as explicit alternatives in the BOM (the D01 conditional-alternative contract). Equal totals are not shown as equivalent designs.</p></div></div></div>
+
+<h2 id="f4">F4 Assign ports to fabric and leaf class (batch)</h2>
+<div class="frame"><div class="cap"><b>F4</b><span>Select be1–be8 (Shift+↓ or the checkboxes) → batch bar</span></div>
+<div class="app one"><div class="pane scroll">
+<div class="bar">8 ports selected · <span class="btn">Set fabric ▾</span> <span class="btn">Set leaf class ▾</span> <span class="btn">Set medium ▾</span> <span class="btn">Clear selection</span></div>
+<table><tr><th>☑</th><th>Port</th><th>Rail</th><th>Fabric</th><th>Leaf class</th></tr>
+<tr class="sel"><td>☑</td><td>be1</td><td>1</td><td>backend</td><td><span class="field">— not chosen — ▾</span></td></tr>
+<tr class="sel"><td>☑</td><td>…</td><td>…</td><td>backend</td><td>…</td></tr>
+<tr class="sel"><td>☑</td><td>be8</td><td>8</td><td>backend</td><td>…</td></tr></table>
+<p><b>Leaf class menu:</b> <span class="field">— not chosen (valid) —</span> · <span class="field">existing: none in fabric "backend"</span> · <span class="field">+ Create leaf class in fabric "backend"…</span></p>
+<p class="note">Picking a leaf class sets its fabric. Fabric intent without a leaf class stays valid and is shown hollow on the map. Rails stay attached to ports; the batch never re-numbers them.</p></div></div></div>
+
+<h2 id="f5">F5 Create a leaf class in context (non-modal side panel)</h2>
+<div class="frame"><div class="cap"><b>F5</b><span>The editor stays visible and editable. The panel draft is kept if the engineer clicks elsewhere.</span></div>
+<div class="app side"><div class="pane scroll"><p class="note">(the F4 table stays visible; selected rows be1–be8 are highlighted; the unsaved DPU customization from F3 is intact)</p>
+<table><tr><th>Port</th><th>Leaf class</th></tr><tr class="sel"><td>be1–be8</td><td><i>creating…</i></td></tr></table></div>
+<div class="pane panel"><h4>New leaf class</h4>
+<p>Name <span class="field">backend-leaf</span><br>
+Fabric <span class="field">backend (existing) ▾</span><br>
+<span class="note">Name check: no other leaf class is named "backend-leaf". A fabric named "backend" already exists, so it is reused, not duplicated.</span></p>
+<p>Switch model <span class="field">Not chosen yet ▾</span></p>
+<table><tr><th>Model option</th><th>Source</th><th>Support</th></tr>
+<tr><td>Not chosen yet</td><td>—</td><td>—</td></tr>
+<tr><td>Source-derived profile, e.g. <code>celestica-ds5000</code></td><td>imported, Fabric profile at a pinned release</td><td><span class="tag t-unk">pending compat #3</span></td></tr>
+<tr><td>Manual model…</td><td>local, engineer-described</td><td>not established by entry</td></tr>
+<tr><td>Placeholder ("800G-class leaf")</td><td>placeholder</td><td>none</td></tr></table>
+<p>Per-unit lines for this leaf class: <span class="btn">+ Add</span></p>
+<p><span class="btn p">Create and assign to 8 ports</span> <span class="btn">Discard draft</span></p>
+<p class="note">After Create, focus returns to the leaf-class cell of be1. A profile's presence in source is not support proof; support status is a separate column.</p></div></div></div>
+
+<h2 id="f6">F6 Return with edits intact</h2>
+<div class="frame"><div class="cap"><b>F6</b><span>Back in the editor, with a change summary</span></div>
+<div class="app one"><div class="pane scroll">
+<div class="strip"><span><b>Since last generate:</b> 3 changes</span><span>DPU → 2 × single-port <span class="tag t-cust">customized</span></span><span>be1–be8 → backend-leaf</span><span>new leaf class backend-leaf (model not chosen)</span><span><a href="#">undo</a></span></div>
+<table><tr><th>Item</th><th>Qty / server</th><th>Fabric · leaf class</th></tr>
+<tr><td>Backend NIC</td><td class="n">8</td><td>backend · backend-leaf <span class="tag t-unk">model not chosen</span></td></tr>
+<tr><td>DPU, single-port <span class="tag t-cust">customized (class: 1 × dual-port)</span></td><td class="n">2</td><td>frontend · <span class="tag t-unk">not chosen</span></td></tr>
+<tr><td>Storage NIC</td><td class="n">1</td><td>storage · <span class="tag t-unk">not chosen</span></td></tr></table></div></div></div>
+
+<h2 id="f7">F7 Enter the population</h2>
+<div class="frame"><div class="cap"><b>F7</b><span>A count on the class header and in the project list: one population, no matter how many fabrics</span></div>
+<div class="app one"><div class="pane"><p><b>HGX 8-GPU (B200-class)</b> · project copy of class r1 · <span class="tag t-cust">1 customization</span><br>
+How many servers of this class? <span class="field">100</span> <span class="note">(a range such as 96–128 is allowed; racks and placement are optional details)</span></p>
+<p class="note">There is no separate "backend servers" or "storage servers" count. The 100 servers each carry all their attachments.</p></div></div></div>
+
+<h2 id="f8">F8 Expanded BOM</h2>
+<div class="frame"><div class="cap"><b>F8</b><span>Generate → BOM, grouped by owner, with per-unit multiplication visible. Every number opens its trace.</span></div>
+<div class="app one"><div class="pane scroll">
+<table>
+<tr><th>Line</th><th>Per unit</th><th>× units</th><th>= Total</th><th>Purchase</th><th>Identity</th></tr>
+<tr><th colspan="6">Servers</th></tr>
+<tr><td>HGX 8-GPU (B200-class) server</td><td class="n">1</td><td class="n">100</td><td class="n">100</td><td>server SKU <span class="tag t-unk">unknown</span></td><td><span class="tag t-gen">generic</span></td></tr>
+<tr><th colspan="6">Per-server components</th></tr>
+<tr><td>Backend NIC, 400G-class</td><td class="n">8</td><td class="n">100</td><td class="n">800</td><td><span class="tag t-unk">bundled?</span></td><td><span class="tag t-gen">generic</span></td></tr>
+<tr><td>DPU, single-port <span class="tag t-cust">customized</span></td><td class="n">2</td><td class="n">100</td><td class="n">200</td><td><span class="tag t-unk">bundled?</span></td><td><span class="tag t-unk">unverified</span></td></tr>
+<tr><td>Storage NIC, 200G-class</td><td class="n">1</td><td class="n">100</td><td class="n">100</td><td><span class="tag t-unk">bundled?</span></td><td><span class="tag t-gen">generic</span></td></tr>
+<tr><td>Power cord</td><td class="n">4</td><td class="n">100</td><td class="n">400</td><td><span class="tag t-unk">included or separate?</span></td><td><span class="tag t-gen">generic</span></td></tr>
+<tr><td>Rail kit</td><td class="n">1</td><td class="n">100</td><td class="n">100</td><td>included: not ordered separately</td><td>—</td></tr>
+<tr><td>Support contract</td><td class="n">1</td><td class="n">100</td><td class="n">100</td><td>separate</td><td>—</td></tr>
+<tr><th colspan="6">Connection media (in scope)</th></tr>
+<tr><td>Optic, server end (backend)</td><td class="n">8</td><td class="n">100</td><td class="n">800</td><td>separate</td><td><span class="tag t-gen">generic</span></td></tr>
+<tr><td>Optic, leaf end (backend)</td><td class="n">1 per link</td><td class="n">800 links</td><td class="n">800</td><td>separate</td><td><span class="tag t-unk">depends on leaf model</span></td></tr>
+<tr><td>DAC assembly (frontend), one per link, both ends included</td><td class="n">2</td><td class="n">100</td><td class="n">200</td><td>separate</td><td><span class="tag t-gen">generic</span></td></tr>
+<tr><td>Storage links: medium not decided</td><td class="n">2</td><td class="n">100</td><td class="n">200 links</td><td colspan="2"><span class="tag t-unk">media not counted; not zero</span></td></tr>
+<tr><th colspan="6">Switches</th></tr>
+<tr><td>backend-leaf</td><td colspan="5"><span class="tag t-unk">not estimated: leaf model not chosen</span> · needs ≥ 800 server-facing ports in fabric "backend"</td></tr>
+<tr><td>frontend and storage leaves</td><td colspan="5"><span class="tag t-unk">not estimated: no leaf class</span></td></tr>
+<tr><th colspan="6">Outside scope (disclosed, not part of the BOM)</th></tr>
+<tr><td colspan="6"><span class="tag t-out">out of scope</span> External fiber for 800 backend optical links · RJ45 cords for 200 management links (in-band + BMC) · structured cabling and panels. Interface requirements stay visible in E1.</td></tr>
+</table>
+<div class="bar"><b>Trace for "800" (backend NIC):</b> 8 per server (class r1, unchanged) × 100 servers (supplied) = 800. The 8 NICs are one hardware row, not 8 separately counted populations. Bundling is unknown, so the line may move into the server SKU once parts evidence lands.</div>
+<p class="note">Totals are checked by <code>bom-arithmetic.py</code> (variant: 2 × single-port DPU; the default dual-port variant gives 100 DPUs and otherwise identical lines).</p></div></div></div>
+
+<h2 id="f9">F9 Add a second server class</h2>
+<div class="frame"><div class="cap"><b>F9</b><span>Project → Add server class → Storage 2U (generic) → assign storage ports</span></div>
+<div class="app two"><div class="pane"><h4>Project</h4><ul class="tree"><li>Server classes<ul><li>HGX 8-GPU ×100</li><li class="sel">Storage 2U ×12</li></ul></li><li>Fabrics<ul><li>backend</li><li>frontend</li><li>storage (used by 2 classes)</li></ul></li></ul></div>
+<div class="pane scroll"><table><tr><th>Item / port</th><th>Qty / server</th><th>Fabric · leaf class</th></tr>
+<tr><td>Storage NIC, 200G-class <span class="tag t-gen">generic</span></td><td class="n">1</td><td><span class="field">storage (existing) ▾</span> · <span class="tag t-unk">not chosen</span></td></tr>
+<tr class="child"><td>st1, st2</td><td class="n">2 ports</td><td>same</td></tr>
+<tr><td>Drive, generic</td><td class="n">24</td><td>— (not topology)</td></tr>
+<tr><td>Onboard in-band + BMC</td><td class="n">1</td><td>mgmt (external)</td></tr></table>
+<p>Fabric menu order: <b>existing fabrics first</b> (backend, frontend, storage), then "+ Create fabric…". Typing "storage" offers the existing fabric instead of creating "storage-2".</p>
+<div class="bar">BOM after regenerating: storage-fabric links 200 + 24 = 224 · drives 24 × 12 = 288 · servers 100 + 12 = 112 in two populations</div></div></div></div>
+
+<!-- ============================================================ -->
+<h2 id="e1">E1 Both-ends comparison with explainable filters</h2>
+<div class="frame"><div class="cap"><b>E1</b><span>Backend port (be1–be8, same pattern) ↔ backend-leaf port. Opened from the details panel with "Compare ends".</span></div>
+<div class="app one"><div class="pane scroll">
+<p>Filters: <span class="btn">☑ Same cage family</span> <span class="btn">☑ Same lane rate × lanes</span> <span class="btn">☐ Documented pairs only</span> <span class="btn">☑ Show unknown</span> <a href="#">Why is an option hidden?</a></p>
+<table class="cmp"><tr><th>Attribute</th><th>End A: server be1</th><th>End B: backend-leaf port</th><th>Status</th><th>Evidence / action</th></tr>
+<tr><td>Cage / form factor</td><td>OSFP? <span class="tag t-unk">unverified</span></td><td><span class="tag t-unk">leaf model not chosen</span></td><td><span class="tag t-unk">unknown</span></td><td>Choose a leaf model, or supply the NIC cage source</td></tr>
+<tr><td>Configured mode · electrical lanes</td><td>1×400G · 4×100G? </td><td>—</td><td><span class="tag t-unk">unknown</span></td><td>Mode names do not prove lane signalling</td></tr>
+<tr><td>Medium</td><td>optic, generic 400G-class</td><td>optic, generic 400G-class</td><td><span class="tag t-unk">compat: unverified</span></td><td>Generic placeholders contribute quantity only</td></tr>
+<tr><td>Optical PMD · reach class</td><td><span class="field">DR4? ▾</span></td><td><span class="field">DR4? ▾</span></td><td><span class="tag t-unk">unverified</span></td><td>The names match; that is not compatibility evidence</td></tr>
+<tr><td>Connector · fiber · polarity</td><td>MPO-12? SMF</td><td>MPO-12? SMF</td><td><span class="tag t-unk">unverified</span></td><td>Polarity relates to external cabling (out of scope, requirement kept)</td></tr>
+<tr><td>Assembly ends</td><td colspan="2">Separate optics: 1 module per end, plus external fiber (out of scope)</td><td>—</td><td>Integrated DAC/AEC/AOC: 1 assembly, both ends</td></tr>
+<tr><td>Override</td><td colspan="2"><span class="field">Engineer choice: use DR4 at both ends</span> by user, reason required</td><td><span class="tag t-cust">override</span></td><td>Recorded. Compatibility stays "unverified"; it never becomes "documented" or "supported".</td></tr>
+</table>
+<p class="note">Filter rules explain themselves. For example: "Hidden: 3 options with a different cage family from end A (source: class r1 cage field)". Unknown is shown unless the engineer filters it out, and the count of hidden options is always visible. A mismatch (for example SR at one end and DR at the other) is red, with both values kept; it is never auto-corrected.</p></div></div></div>
+
+<!-- ============================================================ -->
+<h2 id="l1">L1 Edit scope: this project versus the class</h2>
+<div class="frame"><div class="cap"><b>L1</b><span>Editing any inherited value shows an inline scope choice. Project-only is the default.</span></div>
+<div class="app one"><div class="pane">
+<table><tr><th>Identity</th><th>What it is</th><th>Who sees an edit</th></tr>
+<tr><td>Server family</td><td>A recognizable form factor plus 2–3 common configurations (library metadata)</td><td>Library maintainers only</td></tr>
+<tr><td>Server class revision (r1, r2…)</td><td>An immutable, reusable profile. Projects pin one revision.</td><td>New revision only; existing projects are unaffected until they adopt it (L2)</td></tr>
+<tr><td>Project copy plus customizations</td><td>The pinned revision with project-only overrides, each marked</td><td>This project only</td></tr>
+<tr><td>Population</td><td>A count (or range) of physical servers of that copy</td><td>This project only. Not part of the class.</td></tr></table>
+<div class="bar">Changing "Storage NIC" medium → DAC. Apply to: ◉ This project only · ○ Save as class r2 (the library starter is authored with the same tools; publishing follows library rules) · ○ Save as a new class (fork) <span class="btn p">Apply</span></div></div></div></div>
+
+<h2 id="l2">L2 A new class revision is available</h2>
+<div class="frame"><div class="cap"><b>L2</b><span>Notice on the class header. Nothing changes until the engineer adopts.</span></div>
+<div class="app one"><div class="pane scroll">
+<p><b>Class r2 available</b> (pinned: r1). <span class="btn">Review changes</span> <span class="btn">Keep r1</span></p>
+<table><tr><th>Field</th><th>r1</th><th>r2</th><th>This project</th><th>After adopting</th></tr>
+<tr><td>Backend NIC cage</td><td>unverified</td><td>OSFP (source attached)</td><td>inherited</td><td>r2 value</td></tr>
+<tr><td>DPU variant</td><td>1 × dual-port</td><td>1 × dual-port</td><td><span class="tag t-cust">2 × single-port</span></td><td>kept: customization survives</td></tr>
+<tr><td>Power cords</td><td>4</td><td>2</td><td>inherited</td><td>2: BOM line 400 → 200, stale until regenerated</td></tr></table>
+<p class="note">Customizations survive adoption. If r2 changes the very field a customization overrides, both values are shown and the engineer picks; nothing is resolved silently. "Reset to class" removes a customization.</p></div></div></div>
+
+<h2 id="l3">L3 Stale quantities and the regenerated BOM</h2>
+<div class="frame"><div class="cap"><b>L3</b><span>The same stale and diff model as revision 3.1, now per server class</span></div>
+<div class="app one"><div class="pane scroll">
+<table><tr><th>BOM line</th><th>Previous</th><th>Now</th><th>Why</th></tr>
+<tr><td>DPU</td><td class="n">100 (dual-port)</td><td class="n">200 (single-port)</td><td>F3 customization</td></tr>
+<tr><td>Power cord</td><td class="n">400</td><td class="n"><span class="tag t-stale">stale</span> → 200</td><td>adopted r2 (L2)</td></tr>
+<tr><td>Storage links: media</td><td>not counted</td><td class="n">200 DAC</td><td>L1 project edit</td></tr>
+<tr><td>Backend optics</td><td class="n">800 + 800</td><td class="n">unchanged</td><td>—</td></tr></table>
+<p class="note">Only dependent lines become stale. Generate creates a new output revision with a diff; the previous one stays in history. Ordered or locked lines follow the revision 3.1 lock rules.</p></div></div></div>
+
+<!-- ============================================================ -->
+<h2 id="map">M. Review tasks and feedback-to-screen map</h2>
+<div class="frame"><div class="cap"><b>M</b><span>For the sponsor, lead and parts/model reviewers. No sessions have been run.</span></div>
+<div class="pane scroll"><table><tr><th>Task</th><th>Screens</th><th>Look for</th></tr>
+<tr><td>RT1 Start a GPU-server design from scratch and get a first BOM</td><td>F1 → F2 → F7 → F8</td><td>Where does the reviewer hesitate? Is the "server" note understood?</td></tr>
+<tr><td>RT2 Explain every network one HGX server attaches to</td><td>F2 (C map + table) vs A</td><td>Time to answer; does the map help?</td></tr>
+<tr><td>RT3 Switch to two single-port DPUs; say what changes</td><td>F3, L3</td><td>Is "not evaluated: failure independence" noticed?</td></tr>
+<tr><td>RT4 Put all 8 backend ports on a new leaf class without losing the DPU edit</td><td>F4 → F5 → F6</td><td>Edits intact? No duplicate fabric?</td></tr>
+<tr><td>RT5 Leave the storage medium undecided and generate</td><td>F2, F8</td><td>Is "media not counted; not zero" clear?</td></tr>
+<tr><td>RT6 Find why there are 800 backend NICs</td><td>F8 trace</td><td>Is per-unit × count visible without help?</td></tr>
+<tr><td>RT7 Add a storage-server class that reuses the storage fabric</td><td>F9</td><td>Is the existing fabric chosen rather than a new one created?</td></tr>
+<tr><td>RT8 Compare both ends of a backend link; record an override</td><td>E1</td><td>Is it understood that the override is not qualification?</td></tr>
+<tr><td>RT9 Change one value for this project only, then adopt class r2</td><td>L1, L2</td><td>Is the scope choice understood? Does the customization survive?</td></tr>
+<tr><td>RT10 Say what the BOM does not include</td><td>F8 excluded, K</td><td>External cabling disclosed; generic parts not orderable</td></tr>
+</table>
+<h3>Sponsor feedback (main 4449d14) → screens</h3>
+<table><tr><th>Feedback point</th><th>Screens</th></tr>
+<tr><td>"Server" for every non-switch device, explained once</td><td>F1 note, page header</td></tr>
+<tr><td>Recognizable families with default profiles; no flat catalog of permutations</td><td>F1, F3</td></tr>
+<tr><td>Family, class revision and project customization are distinct</td><td>L1, L2, F6</td></tr>
+<tr><td>One server, several concurrent attachments; rails and planes kept</td><td>F2, F4, F7, C map</td></tr>
+<tr><td>Nested NIC/DPU → port → cage/mode → optic or assembly</td><td>F2, E1</td></tr>
+<tr><td>Arbitrary per-unit lines, ×100 expansion, bundled versus separate, shared assemblies counted once</td><td>F2, F8</td></tr>
+<tr><td>Physical detail at both ends; filters; unknowns and overrides visible</td><td>E1, K</td></tr>
+<tr><td>Port → fabric and leaf class; leaf class resolves fabric; partial intent valid</td><td>F4, F5</td></tr>
+<tr><td>Create or reuse a fabric or leaf class in context, without duplicates</td><td>F5, F9</td></tr>
+<tr><td>Source-derived, manual and placeholder switch models with support status</td><td>F5</td></tr>
+<tr><td>External cabling excluded and disclosed; transceivers and assemblies included</td><td>F8, K, E1</td></tr>
+<tr><td>Compare interaction styles; canvas optional</td><td>A, B, C</td></tr>
+<tr><td>Keep the persistent workspace, regeneration and library views</td><td>F1 library link, F6, L3</td></tr></table></div></div>
+
+<p class="note">Static page: no script, no storage. Generated for D02 #9 review.</p>
+</main>
+</body>
+</html>
