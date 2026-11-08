@@ -1,0 +1,11 @@
+# run-fixtures.sh output, 2026-11-08T20:33Z, restricted pinned build per R03 repro.sh (Fabricator v0.51.4 d2316ac, fabric v0.144.1)
+hhfab version v0.51.4-local
+positive: validate OK
+N1-conn-fabric-mismatch: validate FAIL: validating connections: validating *v1beta1.Connection "gpu-01--unbundled--shared-leaf-1": connection is in fabric backend but switch fe-leaf-1 is in fabric frontend
+N2-eslag-across-fabrics: validate FAIL: validating connections: validating *v1beta1.Connection "gpu-01--eslag--fe-leaf-1--fe-leaf-2": connection is in fabric frontend but switch rail-leaf-a1 is in fabric backend
+N3-spine-leaf-domain-mismatch: validate FAIL: validating connections: validating *v1beta1.Connection "spine-b1--fabric--rail-leaf-b1": spine spine-a1 is in domain plane-a but leaf rail-leaf-b1 is in domains [plane-b]
+N4-spine-two-domains: validate FAIL: validating switches: validating *v1beta1.Switch "spine-a1": spine must be in exactly one domain, found 2
+N5-undeclared-domain: validate FAIL: validating switches: validating *v1beta1.Switch "rail-leaf-b1": domain plane-c not found in fabric backend
+N6-manual-profile-without-opt-in: validate FAIL: validating switches: validating *v1beta1.Switch "rail-leaf-a1": switch profile manual-example-64x400 does not exist
+P2-manual-profile-with-opt-in: validate OK
+B1-role-hint-not-enforced: validate OK
