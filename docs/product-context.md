@@ -48,6 +48,14 @@ Investigate unknown, explicitly supplied, assumed, derived, conflicting, and sta
 
 Hedgehog wiring objects are the deployment target. Server objects represent all kinds of non-switch Ethernet endpoints, Switch objects represent switches, and Connection objects represent relationships. Research additional required objects and semantics. The wiring API bounds deployable outputs, but may not express all planning intent, BOM detail, rack placement, or lifecycle evidence. Do not force all questionnaire information into upstream schemas.
 
+### Sponsor feedback: independent questions and starter-design library
+
+After reviewing D02 revision 2, the sponsor liked the overall direction but rejected the single-response “What do you know now?” question. “Servers by count, rail-based” combines independent information: endpoint quantities and a topology preference. The sponsor wants several well-chosen questions that elicit the minimum useful information while encouraging optional detail. A server-count field and separate rail-optimization checkbox were illustrative suggestions, not approved controls. Research established UX practices before choosing the interaction; a checkbox must not accidentally turn “not known” into “no”. Preserve the persistent workspace and partial-information workflow.
+
+The sponsor explicitly likes the server-count, rack-count and similar home-screen entry categories. Keep them as perspectives for discovering a shared library of prebuilt starter designs. One topology may appear in several perspectives; categories must not impose mutually exclusive project types or different calculation semantics. Distinguish choosing a starter from answering independent questions when building from scratch.
+
+Use clearly labelled library placeholders while the from-scratch tooling is designed. Once that tooling works, use the same tooling to build common reusable topologies; engineers then start from one and customize it for their unique real-world design. Do not build a separate template-only authoring path or mistake the current synthetic fixtures for a supported catalog. Library curation, release compatibility, provenance and customization/update behavior need explicit design contracts, but populating a production catalog is not the next task. Retain the useful home-screen categories instead of deleting them to fix the starter form.
+
 ## Topology and component requirements
 
 Server classes describe ports, fabric membership, speed, medium, rails, planes, redundancy relationships, and physical termination. Switch models describe native ports, supported speed and breakout modes, shared lane/bank restrictions, endpoint/uplink reservations, and other required connections. Designs must consider growth, placement, failure domains, bandwidth policies, and operational support rather than only minimizing switch count.
