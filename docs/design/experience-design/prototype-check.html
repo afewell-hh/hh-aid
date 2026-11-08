@@ -1,0 +1,61 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><title>D02 prototype interaction check</title></head><body><p>Automated interaction and arithmetic checks for walkthrough.html. Synthetic data only; not a usability test. In Chrome, run with --allow-file-access-from-files (see experience-design.md §19).</p><pre id="o">running</pre><iframe id="f" src="walkthrough.html" style="width:1200px;height:900px"></iframe>
+<script>
+var out=[],fail=0;function ok(c,m){out.push((c?'PASS ':'FAIL ')+m);if(!c)fail++}
+document.getElementById('f').onload=function(){try{
+var w=this.contentWindow,d=w.document,A=w.__proto,$=function(s){return d.querySelector(s)};
+w.confirm=function(){return true};
+function L(p){var o={};A.gen(p).lines.forEach(function(l){o[l.key]=l});return o}
+function click(s){var e=$(s);if(!e)throw new Error('missing '+s);e.click()}
+var p=A.createFrom({name:'t-rail',kind:'servers',count:128,profile:'b200'},true);var l=L(p);
+ok(l.eplinks.q===1024&&l.leaves.q===16&&l.cages.q===512&&l.spines.q===8&&l.lslinks.q===512&&l.oob.q===24,'F1 counts 1024/16/512/8/512/24');
+ok(l.epcab.alts&&l.epcab.alts.length===2&&/512 integrated/.test(l.epcab.alts[0].q)&&/1,024 fibers/.test(l.epcab.alts[1].q),'F1 endpoint cable alternatives separate');
+A.setAns(p,'loss',{v:'1'});var g=A.gen(p);l=L(p);
+ok(g.conf.length===1&&g.conf[0].kind==='proven'&&l.spines.st==='cf'&&l.leaves.q===16&&l.oob.bound&&l.oob.q===16,'full bandwidth after loss demonstrated infeasible; spines suspended; others kept');
+A.setAns(p,'loss',{v:'8/7'});l=L(p);ok(l.spines.q===8&&A.gen(p).conf.length===0,'8/7 relaxation gives 8 spines');
+A.generate(p);A.setLock(p,'leaves',{q:16,del:0});A.setLock(p,'spines',{q:8,del:0});A.setAns(p,'count',{v:136});g=A.gen(p);l=L(p);
+ok(l.eplinks.q===1088&&l.leaves.q===24&&/16 ordered \+ 8 proposed/.test(l.leaves.lock)&&l.cages.q===544,'136: 1088 links, 24 leaves (16 ordered + 8 proposed), 544 cages');
+ok(g.conf.length===1&&g.conf[0].id==='C-lock'&&/544/.test(g.conf[0].because)&&/32 more/.test(g.conf[0].because),'locked spines conflict: 544 needed vs 512');
+A.generate(p);var dd=A.diff(p.revs[1],p.revs[2]);ok(dd.inp.some(function(x){return x.id==='count'})&&dd.rows.some(function(r){return r.k==='leaves'&&r.dl===8}),'diff shows count change and +8 leaves');
+var q=A.createFrom({name:'t-gate',kind:'servers',profile:'b200'},true);l=L(q);ok(l.eplinks.st==='ne'&&l.eplinks.need.indexOf('count')>=0&&l.leaves.st==='ne','unknown count gates dependent lines; nothing invented');
+var c=A.createFrom({name:'t-custom',kind:'servers',count:64,profile:'custom'},true);l=L(c);ok(l.eplinks.st==='ne'&&l.eplinks.need.indexOf('links')>=0,'custom profile without links is not estimated');
+A.setAns(c,'links',{v:4});A.setAns(c,'rate',{v:'800'});l=L(c);ok(l.eplinks.q===256&&l.leaves.q===8&&l.cages.q===256,'custom 64 x 4 x 800G: 256 links, 8 leaves, 256 native cages');
+var r=A.createFrom({name:'t-rack',kind:'racks',racks:8,profile:'nvl72'},true);l=L(r);
+ok(l.eplinks.q===576&&l.leaves.q===32&&l.cages.q===288&&l.spines.q===5&&l.lslinks.q===320&&l.oob.q===37,'F2 counts 576/32/288/5/320/37');
+A.setAns(r,'loss',{v:'1'});l=L(r);ok(l.spines.q===10&&A.gen(r).conf.length===0,'F2 full bandwidth after spine loss feasible with 10 spines');
+A.setAns(r,'racks',{v:2});A.setAns(r,'loss',{v:'none'});l=L(r);ok(l.leaves.q===8&&l.spines.q===2&&l.lslinks.q===80,'R04 S06-2: 2 racks, 8 leaves, 2 spines, 80 uplinks');
+var m=A.createFrom({name:'t-mesh',kind:'endpoints',count:40,profile:'gen25'},true);l=L(m);
+ok(l.eplinks.q===80&&l.leaves.q===2&&l.ports.q===80&&l.spines.alts.length===2&&/^0/.test(l.spines.alts[0].q)&&l.spines.alts[1].q==='2','F3 40 dual-homed: 80 links, 2 leaves, spines mesh 0 | leaf-spine 2');
+ok(l.islinks.alts[0].q.indexOf('8 mesh')===0&&l.islinks.alts[1].q.indexOf('16 leaf')===0&&l.oob.alts[0].q==='2'&&l.oob.alts[1].q==='4','F3 inter-switch 8 | 16; OOB 2 | 4');
+ok(l.iscab.alts.length===4,'F3 inter-switch cables: 4 separate totals');
+ok(l.leaves.flags.length===1&&/ESLAG/.test(l.leaves.flags[0]),'ESLAG compatibility shown unverified');
+A.setAns(m,'count',{v:60});l=L(m);ok(l.leaves.q===4&&/12 mesh/.test(l.islinks.alts[0].q)&&l.spines.alts[1].q==='2','F3 60 servers: 4 leaves; mesh 12 links; leaf-spine 2 spines');
+A.setAns(m,'du',{v:'1'});g=A.gen(m);ok(g.conf.length===2&&L(m).spines.st==='cf','D/U <= 1 fails both topology alternatives, both shown');
+A.setAns(m,'du',null);A.setAns(m,'nets',{v:['frontend','storage']});l=L(m);ok(l['net-storage']&&l['net-storage'].st==='ne','added storage network shows Not estimated');
+w.localStorage.clear();
+click('[data-act=example][data-x=rail]');ok(!!$('#st-count')&&$('#st-count').value==='128','starter prefilled from example');
+click('[data-act=st-create][data-gen="1"]');ok(/Generated outputs/.test(d.body.textContent)&&!!$('[data-fid="q-spines"]'),'workspace opens with first BOM');
+ok(d.querySelectorAll('button.qty').length>=8,'every quantity is a trace button ('+d.querySelectorAll('button.qty').length+')');
+click('[data-fid="q-spines"]');ok(!!$('#trace')&&/Why 8\?/.test($('#trace').textContent),'spine trace opens');
+click('[data-fid="q-leaves"]');ok(/Why 16\?/.test($('#trace').textContent),'leaf trace opens its own derivation');
+click('[data-act=close]');ok(/Projects/.test(d.body.textContent),'save and close returns to projects');
+click('[data-act=open]');ok(/Welcome back — session 2/.test(d.body.textContent),'resume starts session 2 with summary');
+var sel=$('#in-loss');sel.value='1';sel.dispatchEvent(new w.Event('change',{bubbles:true}));
+ok(/stale/.test($('[data-fid="q-spines"]').closest('tr').textContent),'spine line marked stale after policy edit');
+ok(!/stale/.test($('[data-fid="q-eplinks"]').closest('tr').textContent),'endpoint links line not marked stale');
+click('[data-act=gen]');ok(!!$('#cf-C-spine'),'conflict panel after generate');
+click('[data-act=preview][data-c=C-spine]');ok(/Preview:/.test($('#cf-C-spine').textContent),'relaxation preview: '+($('#cf-C-spine [role=status]')||{}).textContent);
+click('[data-act=apply][data-c=C-spine]');click('[data-act=gen]');ok(!$('#cf-C-spine'),'conflict resolved after applying and generating');
+click('#tab-chg');ok(/Changed lines/.test(d.body.textContent),'changes tab shows diff');
+click('#tab-revs');ok(d.querySelectorAll('[data-act=undo]').length>0,'history with undo');
+click('#tab-links');ok(/Exceptions first/.test(d.body.textContent),'links tab');
+var s=$('#srv');s.value='77';s.dispatchEvent(new w.Event('input',{bubbles:true}));var rl=$('#rail');rl.value='5';rl.dispatchEvent(new w.Event('change',{bubbles:true}));ok(/leaf-B-r5 cage 7 lane 2/.test(d.body.textContent),'locator: endpoint 77 rail 5 -> leaf-B-r5 cage 7 lane 2');
+click('#tab-rel');click('[data-act=rel-start]');click('[data-act=rel-ack]');
+var guard=0;while($('[data-act=rel-rev]')&&guard++<9)click('[data-act=rel-rev]');click('[data-act=rel-go]');ok(/blocked for qualification/.test(d.body.textContent),'revalidated revision flags cable lines blocked');
+var fi=$('#find');fi.value='rack';fi.dispatchEvent(new w.Event('input',{bubbles:true}));ok(/not applicable to this approach/.test(d.body.textContent),'find shows non-applicable detail');
+click('[data-act=close]');click('[data-act=preset][data-x=s3]');ok(/Welcome back — session 3/.test(d.body.textContent)&&/stale/.test(d.body.textContent),'preset s3 resumes with stale lines');
+click('[data-act=gen]');ok(!!$('#cf-C-lock')&&/16 ordered \+ 8 proposed/.test(d.body.textContent),'s3 generate: lock conflict and ordered leaves kept');
+click('[data-act=preset][data-x=s1]');click('[data-act=close]');click('[data-act=example][data-x=mesh]');click('[data-act=st-create][data-gen="1"]');ok(/Mesh:/.test(d.body.textContent)&&/Leaf-spine:/.test(d.body.textContent),'mesh example via same workspace shows alternatives');
+click('[data-act=close]');click('[data-act=example][data-x=rack]');click('[data-act=st-create][data-gen="1"]');ok(/rack-local leaf/.test(d.body.textContent)&&!!$('#f-racks'),'rack example via same workspace');
+}catch(e){out.push('ERROR '+e.message+' '+e.stack)}
+document.getElementById('o').textContent=(fail?'FAILURES '+fail:'ALL PASS')+'\n'+out.join('\n');};
+</script></body></html>

@@ -3,400 +3,884 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>BOM-first Walkthrough</title>
+<title>Planning Workspace Prototype</title>
 <style>
-:root{--bg:#fbfbf9;--fg:#1d1d1b;--muted:#5c5c57;--line:#c9c8c1;--panel:#ffffff;--accent:#1f5fa8;--warn:#8a4b00;--bad:#9b1c1c;--ok:#26632f;--chip:#efeee8;--focus:#1f5fa8}
-@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#171716;--fg:#ecebe6;--muted:#a9a8a0;--line:#45443f;--panel:#201f1d;--accent:#8db8ef;--warn:#f0b46a;--bad:#f19a9a;--ok:#8fd19b;--chip:#2c2b28;--focus:#8db8ef}}
-:root[data-theme="dark"]{--bg:#171716;--fg:#ecebe6;--muted:#a9a8a0;--line:#45443f;--panel:#201f1d;--accent:#8db8ef;--warn:#f0b46a;--bad:#f19a9a;--ok:#8fd19b;--chip:#2c2b28;--focus:#8db8ef}
+:root{--bg:#fbfbf9;--fg:#1d1d1b;--muted:#55554f;--line:#c9c8c1;--panel:#ffffff;--accent:#1f5fa8;--warn:#8a4b00;--bad:#9b1c1c;--ok:#26632f;--chip:#efeee8;--focus:#1f5fa8;--stale:#fff4dc}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#171716;--fg:#ecebe6;--muted:#b0afa7;--line:#45443f;--panel:#201f1d;--accent:#8db8ef;--warn:#f0b46a;--bad:#f19a9a;--ok:#8fd19b;--chip:#2c2b28;--focus:#8db8ef;--stale:#3a2f1a}}
+:root[data-theme="dark"]{--bg:#171716;--fg:#ecebe6;--muted:#b0afa7;--line:#45443f;--panel:#201f1d;--accent:#8db8ef;--warn:#f0b46a;--bad:#f19a9a;--ok:#8fd19b;--chip:#2c2b28;--focus:#8db8ef;--stale:#3a2f1a}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}
 a{color:var(--accent)}
 :focus-visible{outline:3px solid var(--focus);outline-offset:2px}
-header.top{border-bottom:1px solid var(--line);padding:12px 16px;display:flex;flex-wrap:wrap;gap:8px 16px;align-items:baseline}
+p,li,td,th,summary,label,.note,div{overflow-wrap:anywhere}
+header.top{border-bottom:1px solid var(--line);padding:10px 16px}
 header.top h1{font-size:17px;margin:0}
 .note{color:var(--muted);font-size:13px}
-.wrap{max-width:1100px;margin:0 auto;padding:16px}
-nav.steps ol{list-style:none;padding:0;margin:0 0 12px;display:flex;flex-wrap:wrap;gap:6px}
-nav.steps button{font:inherit;font-size:13px;border:1px solid var(--line);background:var(--panel);color:var(--fg);padding:4px 10px;border-radius:999px;cursor:pointer}
-nav.steps button[aria-current="step"]{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent);font-weight:600}
-.project{border:1px dashed var(--line);background:var(--panel);padding:10px 12px;margin-bottom:12px;display:grid;gap:4px}
-.project b{font-weight:600}
-.project,.label,td,summary,p,li{overflow-wrap:anywhere}
-.banner{border-left:4px solid var(--warn);padding:6px 10px;background:var(--chip);margin-top:6px}
-section.screen{display:none}
-section.screen.active{display:block}
+.wrap{max-width:1400px;margin:0 auto;padding:12px 16px 40px}
 h2{font-size:18px;margin:4px 0 8px}
-h3{font-size:15px;margin:16px 0 6px}
-.grid{display:grid;gap:12px;grid-template-columns:minmax(0,2fr) minmax(0,1fr)}
-@media (max-width:760px){.grid{grid-template-columns:1fr}}
-.box{border:1px solid var(--line);background:var(--panel);padding:10px 12px;border-radius:4px}
+h3{font-size:15px;margin:14px 0 6px}
+.panel{border:1px solid var(--line);background:var(--panel);border-radius:6px;padding:12px}
+.ws{display:grid;gap:14px;grid-template-columns:minmax(290px,370px) minmax(0,1fr);align-items:start}
+.dpanel{position:sticky;top:8px;max-height:calc(100vh - 16px);overflow:auto}
+@media (max-width:900px){.ws{grid-template-columns:minmax(0,1fr)}.dpanel{position:static;max-height:none}}
+.ws>*{min-width:0}
+.scroll table{min-width:520px}
+.projhdr{border:1px dashed var(--line);background:var(--panel);padding:8px 12px;margin-bottom:10px;display:grid;gap:2px}
+.banner{border-left:4px solid var(--warn);padding:6px 10px;background:var(--chip);margin:6px 0}
+.banner.info{border-left-color:var(--accent)}
+.btn{font:inherit;font-size:14px;border:1px solid var(--accent);color:var(--accent);background:transparent;padding:3px 10px;border-radius:4px;cursor:pointer;margin:2px 4px 2px 0}
+.btn.primary{background:var(--accent);color:var(--bg)}
+.btn.small{font-size:12px;padding:1px 7px}
+.btn:disabled{opacity:.55;cursor:not-allowed}
+.link{font:inherit;font-size:inherit;background:none;border:0;color:var(--accent);text-decoration:underline;cursor:pointer;padding:0}
+.qty{font:inherit;font-variant-numeric:tabular-nums;background:none;border:1px solid var(--line);border-radius:4px;color:var(--fg);cursor:pointer;padding:1px 6px;text-align:left}
+.qty:hover{border-color:var(--accent)}
+.chip{display:inline-block;border:1px solid var(--line);background:var(--chip);border-radius:3px;padding:0 6px;font-size:12px;margin:1px 2px 1px 0}
+.chip.user::before{content:"✎ "}
+.chip.assumed::before{content:"≈ "}
+.chip.unknown::before{content:"? "}
+.chip.derived::before{content:"ƒ "}
+.chip.na::before{content:"– "}
+.chip.locked::before{content:"🔒 "}
+.chip.conflict,.chip.blocked{border-color:var(--bad);color:var(--bad)}
+.chip.conflict::before{content:"✕ "}
+.chip.blocked::before{content:"⛔ "}
+.chip.stale{border-color:var(--warn);color:var(--warn)}
+.chip.stale::before{content:"⟳ "}
+.chip.changed::before{content:"Δ "}
+.chip.unchanged::before{content:"= "}
+.chip.ce::before{content:"◔ "}
+.chip.ne::before{content:"○ "}
+.chip.unverified::before{content:"? "}
+.summary{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 8px}
+.summary span{border:1px solid var(--line);padding:1px 8px;border-radius:3px;background:var(--panel);font-size:13px}
+.label{font-weight:600;border:2px solid var(--fg);display:inline-block;padding:2px 8px;margin:4px 0 6px;font-size:13px}
 .scroll{overflow-x:auto}
 table{border-collapse:collapse;width:100%;font-size:14px}
-th,td{border-bottom:1px solid var(--line);padding:6px 8px;text-align:left;vertical-align:top}
-th{font-weight:600;background:var(--chip)}
-td.num{font-variant-numeric:tabular-nums;white-space:nowrap}
-.chip{display:inline-block;border:1px solid var(--line);background:var(--chip);border-radius:3px;padding:0 6px;font-size:12px;white-space:nowrap}
-.chip.l0::before{content:"○ "}
-.chip.l1::before{content:"◔ "}
-.chip.l2::before{content:"◑ "}
-.chip.l3::before{content:"● "}
-.chip.assumed::before{content:"≈ "}
-.chip.supplied::before{content:"✎ "}
-.chip.derived::before{content:"ƒ "}
-.chip.locked::before{content:"🔒 "}
-.chip.conflict{border-color:var(--bad);color:var(--bad)}
-.chip.conflict::before{content:"✕ "}
-.chip.changed::before{content:"Δ "}
-.chip.unknown::before{content:"? "}
-.chip.unchanged::before{content:"= "}
-.summary{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 10px}
-.summary span{border:1px solid var(--line);padding:2px 8px;border-radius:3px;background:var(--panel);font-size:13px}
-.label{font-weight:600;border:2px solid var(--fg);display:inline-block;padding:2px 8px;margin:4px 0 8px;font-size:13px;letter-spacing:.02em}
-pre{white-space:pre-wrap;background:var(--chip);padding:10px;border-radius:4px;font-size:13px;overflow-x:auto}
-details{margin:2px 0 2px 14px}
-summary{cursor:pointer}
-.conflictbox{border:2px solid var(--bad);padding:10px 12px;border-radius:4px;background:var(--panel)}
-.btn{font:inherit;font-size:14px;border:1px solid var(--accent);color:var(--accent);background:transparent;padding:4px 10px;border-radius:4px;cursor:pointer;margin:2px 4px 2px 0}
-.btn.primary{background:var(--accent);color:var(--bg)}
-.pager{display:flex;justify-content:space-between;margin-top:16px}
-input[type=search],select{font:inherit;padding:4px 6px;border:1px solid var(--line);background:var(--panel);color:var(--fg);border-radius:3px}
-.filters{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:6px 0}
-.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
-.later{opacity:.85;border-style:dashed}
+th,td{border-bottom:1px solid var(--line);padding:5px 7px;text-align:left;vertical-align:top}
+thead th{font-weight:600;background:var(--chip)}
+tbody th{font-weight:600}
+td.num{font-variant-numeric:tabular-nums}
+tr.stale>*{background:var(--stale)}
+.field{border-top:1px solid var(--line);padding:8px 0}
+.field:first-child{border-top:0}
+.field label.main{font-weight:600;display:block}
+.field select,.field input[type=number],.field input[type=text],.field textarea,input[type=search],.inl select,.inl input{font:inherit;padding:3px 6px;border:1px solid var(--line);background:var(--panel);color:var(--fg);border-radius:3px;max-width:100%}
+.field select{width:100%}
+.field textarea{width:100%;min-height:52px}
+.meta{margin-top:3px;font-size:13px}
+.err{color:var(--bad);font-size:13px}
+details.sec{border:1px solid var(--line);border-radius:4px;margin:6px 0;padding:0 10px;background:var(--panel)}
+details.sec>summary{cursor:pointer;padding:7px 0;font-weight:600}
+details.sec>summary .note{font-weight:400}
+details.sec[open]>summary{border-bottom:1px solid var(--line);margin-bottom:4px}
+.sug{border:1px solid var(--line);border-left:4px solid var(--accent);padding:6px 10px;margin:8px 0;border-radius:4px}
+.sug ol{margin:4px 0;padding-left:20px}
+[role=tablist]{display:flex;flex-wrap:wrap;gap:4px;border-bottom:1px solid var(--line);margin:10px 0}
+[role=tab]{font:inherit;font-size:14px;border:1px solid var(--line);border-bottom:0;background:var(--chip);color:var(--fg);padding:4px 10px;border-radius:4px 4px 0 0;cursor:pointer}
+[role=tab][aria-selected=true]{background:var(--panel);font-weight:600;box-shadow:inset 0 3px 0 var(--accent)}
+.status{display:grid;gap:4px}
+.conflictbox{border:2px solid var(--bad);padding:8px 12px;border-radius:4px;background:var(--panel);margin:8px 0}
+.trace ul{list-style:none;margin:2px 0 2px 8px;padding-left:12px;border-left:2px solid var(--line)}
+.trace>ul{border-left:0;margin-left:0;padding-left:0}
+.trace li{margin:3px 0}
+textarea.copy{width:100%;min-height:120px;font:13px/1.4 ui-monospace,Menlo,monospace;background:var(--chip);color:var(--fg);border:1px solid var(--line)}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.cards{display:grid;gap:10px;grid-template-columns:repeat(auto-fill,minmax(250px,1fr))}
+.inl{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:6px 0}
+fieldset{border:1px solid var(--line);border-radius:4px;margin:8px 0}
+.later{border-style:dashed}
+.box{border:1px solid var(--line);padding:8px 10px;border-radius:4px}
+details.demo{margin-top:6px}
+details.demo>summary{cursor:pointer;font-size:14px}
+.skip a{margin-right:10px}
 </style>
 </head>
 <body>
 <header class="top">
-  <h1>hh-aid BOM-first walkthrough (low fidelity)</h1>
-  <span class="note">Buttons other than navigation, answers and filters are inert in this mock · Synthetic fixture F1 · hypothetical hardware · no generation runs here · not a production UI · D02 #9 draft</span>
+  <h1>hh-aid planning workspace — low-fidelity prototype</h1>
+  <p class="note" style="margin:2px 0">D02 #9 revision 2 · synthetic fixtures and <b>hypothetical hardware only</b> · the calculations are three small illustrative planning policies, not a solver · release rows are placeholders · not a production UI · saved only in this browser</p>
+  <details class="demo">
+    <summary>Facilitator demo script (optional; the workspace itself has no required order)</summary>
+    <div class="note" style="font-size:14px;color:var(--fg)">
+      <p>This sequence is for a moderated walkthrough only. Every detail section and every output tab is reachable at any time, in any order.</p>
+      <ol>
+        <li><b>Session 1 — sparse input to first output.</b> Projects → “Start from example: rail-based servers” → the starter asks only for the approach, count and endpoint profile → “Create workspace and generate first BOM”. Select any quantity to see why. “Save and close”.</li>
+        <li><b>Session 2 — return and refine in another section.</b> Resume the project. Open “Failure and oversubscription” directly, or type “spine” in “Find a detail”. Set full bandwidth after a spine failure. Affected lines turn stale. Generate: a conflict is explained and the other lines stay. Preview a relaxation, apply it as your answer, generate again, then open Changes.</li>
+        <li><b>Session 3 — commitments and growth.</b> On the BOM, record leaves and spines as ordered. Save and close; resume. In “Quantity” change 128 → 136. Generate: ordered parts are kept and the spine-port conflict is shown.</li>
+        <li><b>Breadth.</b> Start the rack-based and redundant-endpoint examples through the same starter and workspace.</li>
+        <li><b>Latest release.</b> Release tab → record a placeholder target → review → revalidate into a new revision.</li>
+      </ol>
+      <p>Load a prepared state: <button class="btn small" data-act="preset" data-x="s1">End of session 1</button><button class="btn small" data-act="preset" data-x="s2">Start of session 2</button><button class="btn small" data-act="preset" data-x="s3">Session 3, before regenerating</button><button class="btn small" data-act="reset">Reset all prototype data</button></p>
+    </div>
+  </details>
 </header>
-<div class="wrap">
-  <div class="project" aria-label="Project context">
-    <div><b>Project:</b> Example-A (synthetic) · <b>Visible to:</b> Hedgehog only <span class="chip">scope</span></div>
-    <div><b>Installing on:</b> latest Hedgehog release — <em>currentness unknown</em> (placeholder &lt;TARGET&gt;, pending #3)</div>
-    <div><b>This revision built from evidence:</b> <span id="rev">revision 1</span> · research snapshot 26.05 (fabric v0.144.1, fabricator v0.51.4) · rules R04@49e6079 · catalog hypothetical-H400@fixture-1</div>
-    <div class="banner" role="note">This revision was built from older or unverified evidence than the installation target. Review release impact (step 8) before treating it as current.</div>
-  </div>
-
-  <nav class="steps" aria-label="Walkthrough steps"><ol id="stepnav"></ol></nav>
-  <div id="live" class="sr" aria-live="polite"></div>
-
-  <!-- 1 -->
-  <section class="screen" data-title="1 Intent">
-    <h2>Step 1 · Capture the request</h2>
-    <div class="grid">
-      <div class="box">
-        <label for="req"><b>Customer request</b> (paste or type)</label><br>
-        <input id="req" type="search" value="128 B200 HGX servers" style="width:100%;margin:6px 0" aria-describedby="reqhelp">
-        <div id="reqhelp" class="note">hh-aid proposes structured answers. You confirm or change each one. The source text is kept.</div>
-        <h3>Proposed answers</h3>
-        <div class="scroll"><table>
-          <thead><tr><th scope="col">Input</th><th scope="col">Value</th><th scope="col">State</th></tr></thead>
-          <tbody>
-            <tr><td>Endpoint class</td><td>B200 HGX (sponsor profile)</td><td><span class="chip supplied">supplied</span></td></tr>
-            <tr><td>Endpoint count</td><td>128</td><td><span class="chip supplied">supplied</span></td></tr>
-          </tbody></table></div>
-      </div>
-      <div class="box">
-        <h3 style="margin-top:0">Defaults that will apply</h3>
-        <ul>
-          <li>8 rails × 400 Gb/s per server <span class="chip assumed">assumed · sponsor B200 profile</span></li>
-          <li>Backend scale-out only <span class="chip assumed">assumed</span></li>
-          <li>1 plane <span class="chip assumed">assumed</span></li>
-          <li>One leaf per rail per first-hop group <span class="chip assumed">assumed · R04 S02/S03</span></li>
-          <li>Leaf: hypothetical H400 (32 cages 2×400G endpoint, 32 × 800G uplink) <span class="chip assumed">assumed</span></li>
-          <li>Spine: hypothetical 64 × 800G <span class="chip assumed">assumed</span></li>
-          <li>D/U ≤ 1 in normal state; uniform leaf–spine links <span class="chip assumed">assumed</span></li>
-        </ul>
-        <button class="btn primary" data-go="1">Show first BOM</button>
-      </div>
-    </div>
-  </section>
-
-  <!-- 2 -->
-  <section class="screen" data-title="2 First BOM">
-    <h2>Step 2 · First useful BOM</h2>
-    <div class="label">Conditional estimate — assumptions listed — not a design, not orderable</div>
-    <div class="summary" aria-label="BOM summary">
-      <span>10 lines</span><span>0 qualified</span><span>2 not estimated</span><span>7 assumptions in use</span><span>0 conflicts</span>
-    </div>
-    <div class="grid">
-      <div class="box scroll">
-        <table>
-          <caption class="sr">Backend BOM lines, revision 1</caption>
-          <thead><tr><th scope="col">Line</th><th scope="col">Quantity</th><th scope="col">Precision · claim</th><th scope="col">Rests on</th></tr></thead>
-          <tbody>
-            <tr><th scope="row">Backend rail leaf switches (H400-class)</th><td class="num">16 <span class="note">(alternative: 32 if 2 planes)</span></td><td>exact · <span class="chip l1">conditional estimate</span></td><td>5 assumptions: server profile, planes, leaf-per-rail, leaf profile, D/U policy</td></tr>
-            <tr><th scope="row">Backend spine switches (64×800G class)</th><td class="num"><button class="btn" data-go="2" aria-label="8 spines: explain">8</button></td><td>exact · <span class="chip l1">conditional estimate</span></td><td>3 assumptions: spine failure policy, spine ports, uniform links</td></tr>
-            <tr><th scope="row">Server→leaf logical links, 400G</th><td class="num">1,024</td><td>exact · <span class="chip l1">conditional estimate</span></td><td>rails × rate (assumed)</td></tr>
-            <tr><th scope="row">Leaf endpoint cages, 2×400G mode</th><td class="num">512</td><td>exact · <span class="chip l1">conditional estimate</span></td><td>as above + leaf profile</td></tr>
-            <tr><th scope="row">Leaf→spine logical links, 800G</th><td class="num">512 <span class="note">(4 per pair)</span></td><td>exact · <span class="chip l1">conditional estimate</span></td><td>spine policy</td></tr>
-            <tr><th scope="row">Endpoint cable construction</th><td>either <b>512</b> integrated 2×400G split assemblies<br><i>or</i> <b>512</b> twin-port modules + <b>1,024</b> modules + <b>1,024</b> fibers</td><td>exact per alternative · <span class="chip l1">conditional estimate</span></td><td>construction unknown</td></tr>
-            <tr><th scope="row">Leaf–spine cable construction</th><td>either <b>512</b> integrated cables<br><i>or</i> <b>1,024</b> modules + <b>512</b> fibers</td><td>exact per alternative · <span class="chip l1">conditional estimate</span></td><td>reach / construction unknown</td></tr>
-            <tr><th scope="row">Switch OOB management ports</th><td class="num">24 needed</td><td>exact · <span class="chip l1">conditional estimate</span> <span class="chip">external</span></td><td>OOB network is an external dependency</td></tr>
-            <tr><th scope="row">Frontend, storage, in-band mgmt, BMC</th><td>Not estimated</td><td><span class="chip l0">unresolved</span></td><td>question 4 not answered</td></tr>
-            <tr><th scope="row">Control node, gateways</th><td>Not estimated</td><td><span class="chip l0">unresolved</span></td><td>not asked yet</td></tr>
-          </tbody>
-        </table>
-        <p class="note">Construction alternatives are never summed into one "cables" total. Unestimated categories are never shown as 0.</p>
-      </div>
-      <div class="box">
-        <h3 style="margin-top:0">How to read a line</h3>
-        <ul>
-          <li><b>Precision</b>: <i>exact</i> under the stated assumptions, <i>bounded</i>, or <span class="chip l0">unresolved</span> (never shown as 0)</li>
-          <li><b>Claim</b>: <span class="chip l1">conditional estimate</span> = counts under assumptions, part class only. <span class="chip l3">qualified quantity scope</span> = exact parts with compatibility evidence.</li>
-          <li><b>Rests on</b>: the assumptions you have not yet confirmed</li>
-          <li>Orderable is a <b>package</b> state (procurement-candidate, then procurement-approved on its hash)</li>
-        </ul>
-        <button class="btn primary" data-go="3">Next useful question</button>
-      </div>
-    </div>
-  </section>
-
-  <!-- 3 -->
-  <section class="screen" data-title="3 Why?">
-    <h2>Step 3 · Why 8 spines?</h2>
-    <div class="box" aria-label="Derivation of 8 spines">
-      <div><b>8 spines</b> · exact · <span class="chip l1">conditional estimate</span></div>
-      <details open><summary>= smallest S with 64·S ≥ 512 leaf uplinks and S divides 32 <span class="chip">R04 T07 + uniform-links policy</span> <span class="chip assumed">assumed</span></summary>
-        <details open><summary>512 leaf uplinks = 16 leaves × 32 uplink cages <span class="chip assumed">H400 mode · assumed</span></summary>
-          <button class="btn" aria-label="Change H400 uplink mode">Change</button>
-          <details open><summary>16 leaves = 2 first-hop groups × 8 rails <span class="chip assumed">one leaf per rail per group · assumed</span></summary>
-            <button class="btn" aria-label="Change leaf-per-rail policy">Change</button>
-            <details open><summary>2 groups = ceil(128 servers ÷ 64 endpoint slots per leaf)</summary>
-              <div>128 servers <span class="chip supplied">supplied</span> · 64 slots per leaf <span class="chip assumed">H400 · assumed</span></div>
-            </details>
-          </details>
-        </details>
-        <details open><summary>64 ports per spine <span class="chip assumed">hypothetical spine · assumed</span></summary>
-          <button class="btn" aria-label="Change spine port count">Change</button></details>
-      </details>
-      <p><b>Counts:</b> spine requirement (stable demand ID), not yet expanded to instances. <b>Catalog:</b> hypothetical-H400@fixture-1. <b>Rules:</b> R04@49e6079.</p>
-      <p><b>What would change it:</b> spine failure policy (question 3) · spine port count · leaf uplink split.</p>
-      <button class="btn">Copy as text with assumptions</button>
-      <button class="btn primary" data-go="3">Back to questions</button>
-    </div>
-  </section>
-
-  <!-- 4 -->
-  <section class="screen" data-title="4 Next question">
-    <h2>Step 4 · Next useful question</h2>
-    <p class="note">Ranked by how much an answer could move quantities, and whether it unblocks a readiness level. Not in form order.</p>
-    <div class="box scroll">
-      <table>
-        <thead><tr><th scope="col">#</th><th scope="col">Question</th><th scope="col">Why now</th><th scope="col">Answer</th></tr></thead>
-        <tbody>
-          <tr><td>1</td><td>Exact server and NIC configuration?</td><td>Could double leaves (16 ↔ 32) and links</td><td><select aria-label="Server configuration"><option>B200, 8 × 1×400G (sponsor profile)</option><option>B300-style 8 × 2×400G</option><option>I don't know</option></select></td></tr>
-          <tr><td>2</td><td>One plane or two?</td><td>Leaves and spines ×1 or ×2; sets failure policy</td><td><select aria-label="Planes"><option>1 plane</option><option>2 planes</option><option>I don't know</option></select></td></tr>
-          <tr><td>3</td><td>What must survive one spine failure?</td><td>Sets spine count; may be impossible</td><td><select id="q3" aria-label="Spine failure requirement"><option value="relax">Accept D/U ≤ 8/7 after one spine loss</option><option value="full">Full remote bandwidth (D/U ≤ 1)</option><option value="dk">I don't know</option></select></td></tr>
-          <tr><td>4</td><td>Include frontend, storage, management?</td><td>4 networks not estimated</td><td><button class="btn">Skip for now</button></td></tr>
-          <tr><td>5</td><td>Cable construction and placement</td><td>Needed for qualified / orderable cable lines</td><td><button class="btn">Skip for now</button></td></tr>
-        </tbody>
-      </table>
-      <p><b>Preview before apply:</b> <span id="preview">leaves 16 → 16 · spines 8 → 8 · switch and link lines then rest only on the hypothetical leaf/spine profiles</span></p>
-      <button class="btn primary" id="apply">Apply answers</button>
-      <button class="btn">Export open questions for the customer</button>
-    </div>
-  </section>
-
-  <!-- 5 -->
-  <section class="screen" data-title="5 Refined BOM">
-    <h2>Step 5 · Refined, scoped BOM (revision 2)</h2>
-    <div class="label">Conditional estimate · backend switch and link counts exact, resting only on hypothetical leaf and spine profiles · parts unqualified · cables by construction alternative · 2 lines not estimated</div>
-    <div class="box scroll">
-      <table>
-        <thead><tr><th scope="col">Line</th><th scope="col">Quantity</th><th scope="col">Precision · claim</th><th scope="col">Rests on</th></tr></thead>
-        <tbody>
-          <tr><th scope="row">Backend rail leaf switches</th><td class="num">16</td><td>exact · <span class="chip l1">conditional estimate</span></td><td>leaf profile (assumed). Candidate <code>celestica-ds5000</code>: static mode/budget match only (R05 §3), not qualified.</td></tr>
-          <tr><th scope="row">Backend spine switches</th><td class="num">8</td><td>exact · <span class="chip l1">conditional estimate</span></td><td>spine profile (assumed)</td></tr>
-          <tr><th scope="row">Server→leaf links, 400G</th><td class="num">1,024</td><td>exact · <span class="chip l1">conditional estimate</span></td><td>leaf profile (assumed)</td></tr>
-          <tr><th scope="row">Leaf→spine links, 800G</th><td class="num">512</td><td>exact · <span class="chip l1">conditional estimate</span></td><td>leaf and spine profiles (assumed)</td></tr>
-          <tr><th scope="row">Endpoint / leaf–spine cables</th><td>by construction alternative (see revision 1)</td><td>exact per alternative · <span class="chip l1">conditional estimate</span></td><td>construction, reach, placement</td></tr>
-          <tr><th scope="row">Frontend, storage, mgmt, BMC</th><td>Not estimated</td><td><span class="chip l0">unresolved</span></td><td>question 4</td></tr>
-        </tbody>
-      </table>
-      <p class="note">What changed from revision 1: no claim changed; the switch and link lines now rest only on the hypothetical leaf and spine profiles (previously up to 5 assumptions per line). Approval, if recorded, applies to this exact revision hash and does not change any claim. Connection map and installation are later, separate predicates, not prerequisites for this BOM.</p>
-    </div>
-  </section>
-
-  <!-- 6 -->
-  <section class="screen" data-title="6 Impossible">
-    <h2>Step 6 · Impossible request explained</h2>
-    <p>Answer recorded: question 3 = <b>full remote bandwidth after any one spine failure</b> <span class="chip supplied">supplied · hard</span></p>
-    <div class="conflictbox" role="alert" aria-labelledby="c1">
-      <h3 id="c1" style="margin-top:0"><span class="chip conflict">conflict</span> Cannot satisfy: keep D/U ≤ 1 after one spine failure <span class="chip">demonstrated infeasible under these inputs</span></h3>
-      <p class="note">D/U = a leaf's server-facing bandwidth (D) divided by its working uplink bandwidth (U). Above 1, servers can send more than the uplinks can carry.</p>
-      <p><b>Because:</b> each leaf has D = 64 × 400 Gb/s = 25.6 Tb/s and U = 32 × 800 Gb/s = 25.6 Tb/s (H400 32/32 split, <span class="chip assumed">assumed</span>). Losing 1 of S spines leaves U·(S−1)/S, which is below D for every S. Routing cannot add missing cut capacity (R04 T06, N04).</p>
-      <p><b>Conflicting inputs:</b> failure policy <span class="chip supplied">supplied</span> · H400 cage split <span class="chip assumed">assumed</span> · 64 endpoints per leaf <span class="chip derived">derived</span></p>
-      <h3>Candidate relaxations (nothing relaxed automatically; not checked for minimality)</h3>
-      <ol>
-        <li>Accept D/U ≤ S/(S−1) after a spine loss: 8 spines → 8/7; 16 spines → 16/15 (2 links per pair). <button class="btn">Preview</button></li>
-        <li>Fewer endpoint cages per leaf. Changes group size and leaf count; needs recompute. <button class="btn">Preview</button></li>
-        <li>A leaf profile with more uplink capacity. Needs catalog evidence. <button class="btn">Browse catalog</button></li>
-      </ol>
-    </div>
-    <div class="box scroll" style="margin-top:10px">
-      <table>
-        <caption class="sr">BOM while the conflict is open</caption>
-        <thead><tr><th scope="col">Line</th><th scope="col">Quantity</th><th scope="col">Status</th></tr></thead>
-        <tbody>
-          <tr><th scope="row">Backend spine switches</th><td>— (suspended)</td><td><span class="chip conflict">conflict</span> resolve above</td></tr>
-          <tr><th scope="row">Leaf→spine links, 800G</th><td>— (suspended)</td><td><span class="chip conflict">conflict</span> depends on spine count</td></tr>
-          <tr><th scope="row">Backend rail leaf switches</th><td class="num">16</td><td>exact · <span class="chip l1">conditional estimate</span> kept</td></tr>
-          <tr><th scope="row">Server→leaf links, 400G</th><td class="num">1,024</td><td>exact · <span class="chip l1">conditional estimate</span> kept</td></tr>
-          <tr><th scope="row">Switch OOB management ports</th><td>24 or more</td><td>bounded (<b>lower bound</b>) · <span class="chip l1">conditional estimate</span> while spine count is open</td></tr>
-        </tbody>
-      </table>
-    </div>
-  </section>
-
-  <!-- 7 -->
-  <section class="screen" data-title="7 Change + ordered">
-    <h2>Step 7 · Ordered parts, then an input change (revision 3)</h2>
-    <p>Locked: <span class="chip locked">16 ordered · 0 delivered</span> rail leaves, <span class="chip locked">8 ordered · 0 delivered</span> spines (synthetic order reference). Customer changes servers 128 → 136.</p>
-    <div class="summary"><span>+8 leaves</span><span>+64 links</span><span>+32 cages</span><span class="chip conflict">1 conflict</span><span>1,024 existing links keep their IDs</span></div>
-    <div class="box scroll">
-      <table>
-        <caption class="sr">Changes from revision 2 to revision 3</caption>
-        <thead><tr><th scope="col">Change</th><th scope="col">Before → after</th><th scope="col">Detail</th></tr></thead>
-        <tbody>
-          <tr><td>Servers</td><td class="num">128 → 136</td><td><span class="chip supplied">supplied</span></td></tr>
-          <tr><td>First-hop groups</td><td class="num">2 → 3</td><td>third group: 8 servers (full-rail-per-group, R04 P02)</td></tr>
-          <tr><td>Rail leaves</td><td class="num">16 → 24</td><td>new leaves carry 8 endpoints each; 28 of 32 endpoint cages unused (intentional)</td></tr>
-          <tr><td>Server→leaf links</td><td class="num">1,024 → 1,088</td><td>+64 new IDs; existing IDs retained</td></tr>
-          <tr><td>Spines</td><td class="num">8 <span class="chip locked">ordered</span></td><td><span class="chip conflict">conflict</span> 512 locked spine ports already used by the 16 existing leaves. New leaves need ≥ 32 for D/U ≤ 1 (4 × 800G each).</td></tr>
-        </tbody>
-      </table>
-    </div>
-    <div class="conflictbox" style="margin-top:10px">
-      <b>Candidate relaxations</b> (ordered spines are never removed or re-optimised; cancelling an order would be an explicit disposition):
-      <ol>
-        <li>Add spine capacity and rebalance existing leaf–spine links. Changes approved, and possibly installed, cabling, so it needs a design-change approval (R06 class T2).</li>
-        <li>Take 2 uplinks from each existing leaf. Their normal D/U becomes 16/15, which breaks your D/U ≤ 1 policy.</li>
-        <li>A different packing policy for the small group. Changes failure domains.</li>
-      </ol>
-      <p class="note">Approvals recorded on revision 2 apply to revision 2, not revision 3. Revision 2 stays read-only and can be compared or restored as a new revision.</p>
-    </div>
-  </section>
-
-  <!-- 8 -->
-  <section class="screen" data-title="8 Release">
-    <h2>Step 8 · Latest-release impact review</h2>
-    <p><b>Installing on:</b> &lt;TARGET&gt; (placeholder TargetObservation, pending #3) · <b>Built from evidence:</b> research snapshot 26.05 · <span class="chip">review pending</span></p>
-    <p class="note"><b>Example rows only — not real release findings.</b></p>
-    <div class="summary"><span class="chip changed">1 changed</span><span class="chip unchanged">3 unchanged with evidence</span><span class="chip unknown">1 unknown/uncovered</span><span class="chip conflict">1 blocked</span></div>
-    <div class="box scroll">
-      <table>
-        <thead><tr><th scope="col">Area (compat #3 screen)</th><th scope="col">Result</th><th scope="col">Affects</th><th scope="col">Readiness effect</th></tr></thead>
-        <tbody>
-          <tr><td>Connection and domain semantics</td><td><span class="chip unchanged">unchanged with evidence</span></td><td>—</td><td>none</td></tr>
-          <tr><td>Switch roles, modes, profile budgets</td><td><span class="chip changed">changed (example)</span></td><td>16 rail leaves (candidate profile)</td><td>recheck mode/budget; counts kept if the recheck passes, otherwise flagged stale</td></tr>
-          <tr><td>Validation, config, import contract</td><td><span class="chip unchanged">unchanged with evidence</span></td><td>—</td><td>none</td></tr>
-          <tr><td>Operational constraints</td><td><span class="chip unchanged">unchanged with evidence</span></td><td>—</td><td>none</td></tr>
-          <tr><td>hh-aid catalog / compatibility evidence</td><td><span class="chip unknown">unknown/uncovered</span> <span class="chip conflict">blocked</span></td><td>cable lines</td><td>no line may claim qualified quantity scope for &lt;TARGET&gt; until checked</td></tr>
-        </tbody>
-      </table>
-      <p><button class="btn">Acknowledge 3 unchanged with evidence</button> <button class="btn">Review changed</button> <button class="btn primary">Revalidate into revision 4</button></p>
-      <p class="note">Ordered lines carry forward unchanged. If the target makes one incompatible, it becomes a conflict, not a substitution. Revision 3 remains reproducible.</p>
-    </div>
-  </section>
-
-  <!-- 9 -->
-  <section class="screen" data-title="9 Scale review">
-    <h2>Step 9 · Reviewing 1,088 links without a giant graph</h2>
-    <div class="filters">
-      <label>Find server <input id="srv" type="search" inputmode="numeric" placeholder="0–135" size="6"></label>
-      <label>rail <select id="rail"></select></label>
-      <span id="srvout" aria-live="polite"></span>
-    </div>
-    <div class="filters">
-      <label>Group <select id="fg"><option value="">all</option><option>A</option><option>B</option><option>C</option></select></label>
-      <label><input id="fchg" type="checkbox"> changed in revision 3 only</label>
-      <label><input id="fexp" type="checkbox"> expand unchanged patterns</label>
-    </div>
-    <div class="conflictbox" style="margin-bottom:10px"><b>Exceptions first:</b> <span class="chip conflict">1 conflict</span> spine ports for the 8 new leaves (step 7) · <span class="chip changed">8 new patterns</span> · <span class="chip">224 intentional unused endpoint cages</span> on new leaves</div>
-    <div class="box scroll">
-      <table>
-        <caption class="sr">Server-to-leaf link patterns</caption>
-        <thead><tr><th scope="col">Pattern</th><th scope="col">Leaf</th><th scope="col">Links</th><th scope="col">Cages · lanes</th><th scope="col">Status</th></tr></thead>
-        <tbody id="pat"></tbody>
-      </table>
-    </div>
-    <p class="note">One row per link pattern; each expands to per-link rows on demand (not built in this low-fidelity mock). Any filtered view exports to CSV.</p>
-    <div class="box later">
-      <b>Later stages (context, not prerequisites for the BOM):</b> connection map (port-to-port), package procurement (orderable per declared package), installation design package, site binding and acceptance (R06 I5–I9).
-    </div>
-  </section>
-
-  <div class="pager">
-    <button class="btn" id="prev">← Previous</button>
-    <button class="btn primary" id="next">Next →</button>
-  </div>
-</div>
+<main id="app" class="wrap"></main>
+<div id="live" class="sr" aria-live="polite"></div>
 <script>
 (function(){
-  var screens=[].slice.call(document.querySelectorAll('section.screen'));
-  var nav=document.getElementById('stepnav'), live=document.getElementById('live');
-  var cur=0, revs=['revision 1','revision 1','revision 1','revision 1','revision 2','revision 2 (conflict open)','revision 3','revision 3','revision 3'];
-  screens.forEach(function(s,i){
-    var li=document.createElement('li'), b=document.createElement('button');
-    b.textContent=s.dataset.title; b.addEventListener('click',function(){show(i,true)});
-    li.appendChild(b); nav.appendChild(li);
+'use strict';
+/* ---------- scenario and profile data (interchangeable; synthetic) ---------- */
+var NETS={backend:'Backend scale-out',frontend:'Frontend',storage:'Storage',mgmt:'In-band management'};
+var KINDS={servers:'Servers by count, rail-based',racks:'Racks with placement (rack-scale systems)',endpoints:'Redundant endpoints on leaf-spine or mesh'};
+var PROF={
+  b200:{n:'B200 HGX-class server (sponsor profile: 8 × 400G scale-out links)',links:8,rate:400,kinds:['servers'],src:'sponsor B200 profile (product-context)'},
+  nvl72:{n:'NVL72-style compute tray (4 × 400G; tray generation unverified)',links:4,rate:400,kinds:['racks'],src:'R04 S06-1 assumptions'},
+  gen25:{n:'General server (2 × 25G)',links:2,rate:25,kinds:['endpoints'],src:'synthetic fixture profile'},
+  custom:{n:'Custom endpoint profile (any vendor or endpoint type)',links:null,rate:null,kinds:['servers','racks','endpoints'],src:'user-defined'}
+};
+var LEAF={
+  h400:{n:'Hypothetical H400 leaf: 32 endpoint cages (2 × 400G or 1 × 800G) + 32 × 800G uplinks',kinds:['servers','racks'],cages:32,u:32,ur:800,per:{400:2,800:1}},
+  h48:{n:'Hypothetical H48 leaf: 48 × 25G endpoint ports + 8 × 100G uplinks',kinds:['endpoints'],cages:48,u:8,ur:100,per:{25:1}},
+  other:{n:'Other leaf profile (needs catalog evidence)',kinds:['servers','racks','endpoints']}
+};
+var SPN={
+  s64:{n:'Hypothetical 64 × 800G spine',kinds:['servers','racks'],ports:64},
+  s32:{n:'Hypothetical 32 × 100G spine',kinds:['endpoints'],ports:32},
+  other:{n:'Other spine profile (needs catalog evidence)',kinds:['servers','racks','endpoints']}
+};
+var EV0='research snapshot 26.05 (fabric v0.144.1, fabricator v0.51.4) · rules R04@49e6079 · catalog hypothetical-fixture-2';
+var EVT='<snapshot-target> (placeholder — example only, not from #3)';
+function any(k){return !!k}
+function profDef(f){return function(k,p){var pr=PROF[eff(p,'profile').v];return pr&&pr[f]!=null?{v:f==='rate'?String(pr[f]):pr[f],src:pr.src}:null}}
+var SECS=[
+  {id:'scope',t:'Request and scope',ap:function(){return true}},
+  {id:'endpoints',t:'Endpoint profile',ap:any},
+  {id:'quantity',t:'Quantity',ap:any},
+  {id:'rails',t:'Rails and planes',ap:function(k){return k==='servers'},na:'used only by rail-based server planning'},
+  {id:'racks',t:'Racks and placement',ap:function(k){return k==='racks'},na:'used only by rack-scale placement planning'},
+  {id:'redund',t:'Redundancy and topology',ap:function(k){return k==='endpoints'},na:'used only by redundant-endpoint planning'},
+  {id:'switches',t:'Switch profiles',ap:any},
+  {id:'policy',t:'Failure and oversubscription',ap:any},
+  {id:'cabling',t:'Cabling',ap:any},
+  {id:'target',t:'Installation target and evidence',ap:any}
+];
+var D=[
+  {id:'kind',sec:'scope',l:'Planning approach',sh:'planning approach',type:'sel',opts:function(){return Object.keys(KINDS).map(function(x){return [x,KINDS[x]]})},ap:function(){return true},h:'Selects the planning policy and which detail sections apply. Changing it later keeps your other answers.'},
+  {id:'nets',sec:'scope',l:'Networks in scope',sh:'network scope',type:'multi',opts:function(){return Object.keys(NETS).map(function(x){return [x,NETS[x]]})},ap:any,def:function(k){return {v:[k==='endpoints'?'frontend':'backend'],src:'approach default: only the network this approach plans'}},h:'An explicit scope choice, not the application’s identity. Added networks show “Not estimated” until their details exist.'},
+  {id:'req',sec:'scope',l:'Customer request, as written',type:'text',ap:function(){return true},nostate:true,h:'Kept as the source of supplied answers.'},
+  {id:'profile',sec:'endpoints',l:'Endpoint profile',sh:'endpoint profile',type:'sel',opts:function(k){return Object.keys(PROF).filter(function(x){return PROF[x].kinds.indexOf(k)>=0}).map(function(x){return [x,PROF[x].n]})},ap:any,h:'Profiles are replaceable data. A custom profile covers any vendor or endpoint type.'},
+  {id:'links',sec:'endpoints',l:'Fabric links per endpoint',sh:'links per endpoint',type:'num',min:1,max:16,ap:any,def:profDef('links')},
+  {id:'rate',sec:'endpoints',l:'Link rate',sh:'link rate',type:'sel',opts:function(){return [['25','25 Gb/s'],['100','100 Gb/s'],['200','200 Gb/s'],['400','400 Gb/s'],['800','800 Gb/s']]},ap:any,def:profDef('rate')},
+  {id:'count',sec:'quantity',l:'Number of endpoints',sh:'endpoint count',type:'num',min:1,max:4096,ap:function(k){return k==='servers'||k==='endpoints'}},
+  {id:'racks',sec:'quantity',l:'Number of racks',sh:'rack count',type:'num',min:1,max:64,ap:function(k){return k==='racks'}},
+  {id:'trays',sec:'quantity',l:'Compute trays per rack',sh:'trays per rack',type:'num',min:1,max:64,ap:function(k){return k==='racks'},def:function(k,p){return eff(p,'profile').v==='nvl72'?{v:18,src:'NVL72-style profile (R04 S06-1)'}:null}},
+  {id:'planes',sec:'rails',l:'Planes',sh:'plane count',type:'sel',opts:function(){return [['1','1 plane'],['2','2 planes']]},ap:function(k){return k==='servers'},def:function(){return {v:'1',src:'synthetic default'}}},
+  {id:'leafpol',sec:'rails',l:'Leaf packing policy',sh:'leaf-per-rail policy',type:'sel',opts:function(){return [['rail','One leaf per rail per first-hop group'],['other','Other packing policy (not in this prototype)']]},ap:function(k){return k==='servers'},def:function(){return {v:'rail',src:'R04 S02/S03 witness'}}},
+  {id:'lpr',sec:'racks',l:'Leaves per rack',sh:'leaves per rack',type:'num',min:1,max:16,ap:function(k){return k==='racks'},def:function(k,p){var v=eff(p,'links').v;return v?{v:v,src:'one rack-local leaf per rail (R04 S06-1)'}:null}},
+  {id:'upl',sec:'racks',l:'Active uplinks per leaf',sh:'uplinks per leaf',type:'num',min:1,max:32,ap:function(k){return k==='racks'},def:function(){return {v:10,src:'R04 S06-2, no growth reservation'}},h:'Set 32 to reserve every uplink for growth.'},
+  {id:'homing',sec:'redund',l:'Endpoint redundancy',sh:'endpoint redundancy',type:'sel',opts:function(){return [['eslag','Dual-homed: ESLAG across a leaf pair'],['single','Single-homed to one leaf']]},ap:function(k){return k==='endpoints'},def:function(){return {v:'eslag',src:'synthetic fixture; ESLAG is conditional (R02 C03)'}}},
+  {id:'topo',sec:'redund',l:'Inter-switch topology',sh:'topology',type:'sel',opts:function(){return [['mesh','Mesh between leaves (no spines)'],['ls','Leaf-spine']]},ap:function(k){return k==='endpoints'},h:'Unknown is fine: both alternatives are shown as separate totals.'},
+  {id:'minsp',sec:'redund',l:'Minimum spines (leaf-spine)',sh:'minimum spines',type:'num',min:1,max:8,ap:function(k){return k==='endpoints'},def:function(){return {v:2,src:'synthetic default'}}},
+  {id:'leaf',sec:'switches',l:'Leaf profile',sh:'leaf profile',type:'sel',opts:function(k){return Object.keys(LEAF).filter(function(x){return LEAF[x].kinds.indexOf(k)>=0}).map(function(x){return [x,LEAF[x].n]})},ap:any,def:function(k){return {v:k==='endpoints'?'h48':'h400',src:'hypothetical fixture hardware'}}},
+  {id:'spine',sec:'switches',l:'Spine profile',sh:'spine profile',type:'sel',opts:function(k){return Object.keys(SPN).filter(function(x){return SPN[x].kinds.indexOf(k)>=0}).map(function(x){return [x,SPN[x].n]})},ap:any,def:function(k){return {v:k==='endpoints'?'s32':'s64',src:'hypothetical fixture hardware'}}},
+  {id:'du',sec:'policy',l:'Maximum D/U in normal operation',sh:'D/U limit',type:'sel',opts:function(){return [['1','1 (no oversubscription)'],['2','2'],['3','3']]},ap:any,def:function(k){return k==='endpoints'?null:{v:'1',src:'R04 S03 witness policy'}},h:'D/U = a leaf’s endpoint-facing bandwidth divided by its working uplink bandwidth. Above 1, endpoints can send more than the uplinks carry.'},
+  {id:'loss',sec:'policy',l:'After one spine failure',sh:'spine-failure policy',type:'sel',opts:function(){return [['none','No requirement'],['8/7','D/U at most 8/7'],['1','Full bandwidth: D/U at most 1']]},ap:any,def:function(){return {v:'none',src:'synthetic default — ask the customer'}}},
+  {id:'cons',sec:'cabling',l:'Cable construction',sh:'cable construction',type:'sel',opts:function(){return [['int','Integrated cables or split assemblies'],['opt','Optical modules plus fibers']]},ap:any,h:'Unknown is fine: both constructions are shown as separate totals, never summed.'},
+  {id:'reach',sec:'cabling',l:'Placement and reach',sh:'placement and reach',type:'sel',opts:function(){return [['row','Same row, short reach'],['rows','Across rows']]},ap:any,h:'Needed later for cable lengths and SKUs. It does not change counts here.'}
+];
+var DM={};D.forEach(function(d){DM[d.id]=d});
+var LOCKNAME={'lock:leaves':'order record: leaf switches','lock:spines':'order record: spine switches','target':'installation target'};
+
+/* ---------- helpers ---------- */
+function $(s,r){return (r||document).querySelector(s)}
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+function fmt(n){return Number(n).toLocaleString('en')}
+function cdiv(a,b){return Math.floor((a+b-1)/b)}
+function gcd(a,b){while(b){var t=b;b=a%b;a=t}return a}
+function frac(n,d){var g=gcd(n,d);n/=g;d/=g;return d===1?String(n):n+'/'+d}
+function sum(a){return a.reduce(function(x,y){return x+y},0)}
+function uniq(a){return a.filter(function(x,i){return a.indexOf(x)===i})}
+function clone(x){return JSON.parse(JSON.stringify(x))}
+function parseF(s){if(!s||s==='none')return null;var a=String(s).split('/');return [+a[0],+(a[1]||1)]}
+function gl(i){return i<26?'ABCDEFGHIJKLMNOPQRSTUVWXYZ'[i]:'G'+(i+1)}
+function plural(n,w){return fmt(n)+' '+w+(n===1?'':'s')}
+function label(id){return DM[id]?DM[id].sh||DM[id].l.toLowerCase():(LOCKNAME[id]||id)}
+function optLabel(id,v,k){var d=DM[id];if(!d)return String(v);if(d.type==='multi')return (v||[]).map(function(x){return NETS[x]}).join(', ')||'none';if(id==='profile'&&PROF[v])return PROF[v].n;if(id==='leaf'&&LEAF[v])return LEAF[v].n;if(id==='spine'&&SPN[v])return SPN[v].n;if(id==='kind'&&KINDS[v])return KINDS[v];if(d.type==='sel'){var o=d.opts(k).filter(function(x){return x[0]===String(v)})[0];if(o)return o[1]}return String(v)}
+
+/* ---------- storage (per-browser convenience; failure-safe) ---------- */
+var KEY='hh-aid-d02-workspace-v2', storageOK=true, store={projects:{},order:[]};
+try{var raw=localStorage.getItem(KEY);if(raw)store=JSON.parse(raw)}catch(e){storageOK=false}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(store));storageOK=true}catch(e){storageOK=false}}
+
+var ui={screen:'home',pid:null,tab:'bom',open:{},trace:null,view:null,cmpA:null,cmpB:null,find:'',hideSug:false,patq:'',patchg:false,patexp:false,srv:'',rail:'0',st:null,prev:null,copy:null,lockForm:null,resume:null,errs:{}};
+function P(){return store.projects[ui.pid]}
+
+/* ---------- answers and effective values ---------- */
+function kindOf(p){return p.ans.kind?p.ans.kind.v:null}
+function eff(p,id){
+  var d=DM[id],k=kindOf(p);
+  if(id!=='kind'&&d.ap&&!d.ap(k))return {v:null,o:'na'};
+  var a=p.ans[id];
+  if(a){if(a.unknown)return {v:null,o:'unknown',marked:true};return {v:a.v,o:'user'}}
+  var df=d.def?d.def(k,p):null;
+  if(df&&df.v!=null)return {v:df.v,o:'assumed',src:df.src};
+  return {v:null,o:'unknown'};
+}
+function ORG(o){return {user:'supplied',assumed:'assumed',unknown:'unknown',derived:'derived',na:'not applicable'}[o]||o}
+function chipO(o){return '<span class="chip '+o+'">'+ORG(o)+'</span>'}
+function showV(p,id,e){e=e||eff(p,id);if(e.o==='na')return 'not applicable';if(e.v==null)return 'unknown';return optLabel(id,e.v,kindOf(p))}
+function snap(p){var i={};D.forEach(function(d){if(d.nostate)return;var e=eff(p,d.id);i[d.id]={v:e.v,o:e.o}});return {i:i,l:clone(p.locks),t:p.target.label}}
+function setAns(p,id,a,why){
+  var before=eff(p,id),prev=p.ans[id]?clone(p.ans[id]):null;
+  if(a===null)delete p.ans[id];else p.ans[id]=a;
+  var after=eff(p,id);
+  if(JSON.stringify(prev)===JSON.stringify(p.ans[id]||null))return false;
+  p.inputRev++;
+  p.hist.unshift({r:p.inputRev,s:p.session,id:id,prev:prev,next:p.ans[id]?clone(p.ans[id]):null,bv:showV(p,id,before)+' ('+ORG(before.o)+')',av:showV(p,id,after)+' ('+ORG(after.o)+')',why:why||''});
+  save();
+  if(!DM[id].nostate)announce(DM[id].l+': '+showV(p,id,after)+', '+ORG(after.o)+'. Saved; not yet in an output.');
+  return true;
+}
+function setLock(p,key,val,why){
+  var prev=p.locks[key]?clone(p.locks[key]):null;
+  if(val)p.locks[key]=val;else delete p.locks[key];
+  p.inputRev++;
+  var nm=LOCKNAME['lock:'+key];
+  p.hist.unshift({r:p.inputRev,s:p.session,id:'lock:'+key,lock:key,prev:prev,next:val?clone(val):null,bv:prev?prev.q+' ordered':'no order record',av:val?val.q+' ordered · '+val.del+' delivered':'no order record',why:why||''});
+  save();announce(nm+(val?': '+val.q+' ordered recorded.':' removed.')+' Saved; not yet in an output.');
+}
+
+/* ---------- planning policies (pluggable per approach) ---------- */
+function T(t,ids,kids){return {t:t,ids:ids||[],kids:kids||[]}}
+function solve(leafD,u,ur,ports,minS,du,loss){
+  var U=u*ur,maxD=Math.max.apply(null,leafD),L=leafD.length,portsOK=false;
+  if(du&&maxD*du[1]>du[0]*U)return {fail:'du',U:U,maxD:maxD};
+  for(var s=Math.max(1,minS);s<=u;s++){
+    if(u%s)continue; if(ports*s<L*u)continue; portsOK=true;
+    if(loss){if(s<2)continue;if(maxD*s*loss[1]>loss[0]*U*(s-1))continue}
+    return {s:s,per:u/s,U:U,maxD:maxD};
+  }
+  if(!portsOK)return {fail:'ports',U:U,maxD:maxD};
+  if(loss&&maxD*loss[1]>=loss[0]*U)return {fail:'loss-proven',U:U,maxD:maxD};
+  return {fail:'loss-uniform',U:U,maxD:maxD};
+}
+function epCons(cages,links,per,rate){
+  return per>1?[{a:'Integrated',q:fmt(cages)+' integrated '+per+' × '+rate+'G split assemblies'},{a:'Optical',q:fmt(cages)+' '+per+'-port leaf modules + '+fmt(links)+' endpoint modules + '+fmt(links)+' fibers'}]
+              :[{a:'Integrated',q:fmt(links)+' integrated cables'},{a:'Optical',q:fmt(2*links)+' modules + '+fmt(links)+' fibers'}];
+}
+function isCons(links,pre){return [{a:(pre||'')+'Integrated',q:fmt(links)+' integrated cables'},{a:(pre||'')+'Optical',q:fmt(2*links)+' modules + '+fmt(links)+' fibers'}]}
+function pickCons(alts,cons){if(!cons)return alts;return alts.filter(function(a){return /Integrated$/.test(a.a)?cons==='int':cons==='opt'})}
+
+function gen(p){
+  var E=function(id){return eff(p,id)},V=function(id){return E(id).v};
+  var k=V('kind'),o={lines:[],conf:[],pats:[],exc:[],excluded:[],kind:k};
+  var add=function(l){o.lines.push(l);return l};
+  var unk=function(ids){return ids.filter(function(id){var e=E(id);return e.v==null||e.v==='other'})};
+  var ne=function(key,l,deps,need,reason){return add({key:key,l:l,st:'ne',deps:deps,need:need||[],reason:reason||null})};
+  if(!k){ne('fabric','Fabric switches and links',['kind'],['kind']);return fin(p,o)}
+  var nets=V('nets')||[];
+  var role=k==='endpoints'?(['frontend','storage','mgmt'].filter(function(n){return nets.indexOf(n)>=0})[0]||'frontend'):'backend';
+  Object.keys(NETS).forEach(function(n){if(nets.indexOf(n)<0)o.excluded.push(NETS[n])});
+  if(nets.indexOf(role)<0){ne('fabric',NETS[role]+' fabric',['nets'],[],'This approach plans the '+NETS[role].toLowerCase()+' network, which is not in scope. Add it in “Request and scope”.')}
+  else if(k==='servers')genRail(p,o,E,V,unk,add,ne,NETS[role]);
+  else if(k==='racks')genRack(p,o,E,V,unk,add,ne,NETS[role]);
+  else genEndpoints(p,o,E,V,unk,add,ne,NETS[role]);
+  nets.filter(function(n){return n!==role}).forEach(function(n){ne('net-'+n,NETS[n]+' network',['nets'],[],'In scope, but its detail section is not part of this prototype yet. Never shown as 0.')});
+  return fin(p,o);
+}
+function lockLeaves(p,leaves){
+  var lk=p.locks.leaves;if(!lk)return null;
+  if(leaves>lk.q)return fmt(lk.q)+' ordered + '+fmt(leaves-lk.q)+' proposed';
+  if(leaves<lk.q)return fmt(lk.q)+' ordered; requirement is '+fmt(leaves)+'. '+fmt(lk.q-leaves)+' surplus need an explicit disposition (never removed automatically)';
+  return fmt(lk.q)+' ordered · '+fmt(lk.del)+' delivered';
+}
+function spineStage(p,o,ctx){
+  // ctx: {leafD,lf,sp,du,loss,minS,NET,leaves,deps,opt,traceBase,relax}
+  var lockS=p.locks.spines,r,res={};
+  if(lockS){
+    var Sx=lockS.q,cap=Sx*ctx.sp.ports;
+    var mins=ctx.leafD.map(function(d){return ctx.du?Math.min(ctx.lf.u,cdiv(d*ctx.du[1],ctx.du[0]*ctx.lf.ur)):ctx.lf.u});
+    var need=sum(mins),groups={};mins.forEach(function(m){groups[m]=(groups[m]||0)+1});
+    var br=Object.keys(groups).sort(function(a,b){return b-a}).map(function(m){return plural(groups[m],'leaf').replace(/leafs$/,'leaves')+' × '+m}).join(' + ');
+    if(need>cap){
+      o.conf.push({id:'C-lock',kind:'proven',t:'The ordered spines cannot connect every leaf at the required D/U',
+        because:fmt(Sx)+' ordered spines × '+ctx.sp.ports+' ports = '+fmt(cap)+' ports, all of which are needed. Keeping every leaf at D/U ≤ '+(ctx.du?frac(ctx.du[0],ctx.du[1]):'—')+' needs '+br+' = '+fmt(need)+' uplink ports: '+fmt(need-cap)+' more than the locked spines have.',
+        inputs:['lock:spines','lock:leaves','count','du'],
+        relax:[{t:'Add spine capacity and rebalance existing leaf–spine links. Changes approved, and possibly installed, cabling, so it needs a design-change approval (R06 class T2). Requires an explicit change to the spine order record.',go:'lock:spines'},
+               {t:'Take uplinks from existing leaves (for example 2 each, giving D/U 16/15). Breaks your D/U ≤ 1 policy. Not modelled in this prototype.'},
+               {t:'A different packing policy for the small group. Changes failure domains. Not modelled in this prototype.'}],
+        aff:['spines','lslinks','lscab','oob']});
+      return {conflict:'C-lock'};
+    }
+    if(ctx.loss){var U=ctx.lf.u*ctx.lf.ur,mx=Math.max.apply(null,ctx.leafD);if(mx*Sx*ctx.loss[1]>ctx.loss[0]*U*(Sx-1)){o.conf.push({id:'C-lockloss',kind:'proven',t:'The ordered spine count does not meet the spine-failure policy',because:'With '+Sx+' spines, losing one leaves D/U '+frac(mx*Sx,U*(Sx-1))+'.',inputs:['lock:spines','loss'],relax:[{t:'Relax the spine-failure policy',go:'loss'}],aff:['spines','lslinks','lscab','oob']});return {conflict:'C-lockloss'}}}
+    return {s:Sx,ls:need,per:null,locked:true,tr:T(fmt(Sx)+' spines: ordered quantity (locked). '+fmt(need)+' of '+fmt(cap)+' spine ports used ('+br+')',['lock:spines','du'])};
+  }
+  r=solve(ctx.leafD,ctx.lf.u,ctx.lf.ur,ctx.sp.ports,ctx.minS||1,ctx.du,ctx.loss);
+  if(r.s){
+    var lossTxt=ctx.loss?'; after one spine loss D/U = '+frac(r.maxD*r.s,r.U*(r.s-1))+' ≤ '+frac(ctx.loss[0],ctx.loss[1]):'';
+    return {s:r.s,per:r.per,ls:ctx.leafD.length*ctx.lf.u,tr:T(fmt(r.s)+' spines = smallest S that divides '+ctx.lf.u+' uplinks per leaf evenly, with '+ctx.sp.ports+'·S ≥ '+fmt(ctx.leafD.length*ctx.lf.u)+' leaf uplinks'+(ctx.minS>1?' and S ≥ '+ctx.minS:'')+lossTxt,['spine','loss'].concat(ctx.minS>1?['minsp']:[]),[ctx.traceBase,T(ctx.sp.ports+' ports per spine',['spine']),T('normal D/U on the busiest leaf = '+frac(r.maxD,r.U),['du'])])};
+  }
+  var c={id:'C-spine',aff:['spines','lslinks','lscab','oob']};
+  var mx=r.maxD,U=r.U,lossTxt2=ctx.loss?frac(ctx.loss[0],ctx.loss[1]):'';
+  if(r.fail==='du'){c.kind='proven';c.t='Cannot satisfy: normal-state D/U ≤ '+frac(ctx.du[0],ctx.du[1]);c.because='The busiest leaf has D = '+fmt(mx)+' Gb/s and at most U = '+fmt(U)+' Gb/s of uplinks (leaf profile), so D/U = '+frac(mx,U)+' with any spine count.';c.inputs=['du','leaf','count'];c.relax=[{t:'Raise the D/U limit to '+(frac(mx,U).indexOf('/')<0?frac(mx,U):String(Math.ceil(mx/U))),set:{du:String(Math.min(3,Math.ceil(mx/U)))}},{t:'A leaf profile with more uplink capacity (needs catalog evidence)',go:'leaf'}]}
+  else if(r.fail==='loss-proven'){c.kind='proven';c.t='Cannot satisfy: D/U ≤ '+lossTxt2+' after one spine failure';c.because='Each full leaf has D = '+fmt(mx)+' Gb/s and U = '+fmt(U)+' Gb/s (leaf profile and uplinks, assumed). Losing 1 of S spines leaves U·(S−1)/S, so D/U after the loss exceeds '+lossTxt2+' for every S. Routing cannot add missing cut capacity (R04 T06, N04).';c.inputs=['loss','leaf'].concat(ctx.extraIn||[]);c.relax=[];if(V2(p,'loss')!=='8/7'&&8*U>=7*mx)c.relax.push({t:'Accept D/U ≤ 8/7 after a spine loss',set:{loss:'8/7'}});c.relax.push({t:'No spine-failure requirement',set:{loss:'none'}});(ctx.relax||[]).forEach(function(x){c.relax.push(x)});c.relax.push({t:'A leaf profile with more uplink capacity (needs catalog evidence)',go:'leaf'})}
+  else if(r.fail==='loss-uniform'){c.kind='notshown';c.t='Not shown to be possible: D/U ≤ '+lossTxt2+' after one spine failure';c.because='No spine count that divides the '+ctx.lf.u+' uplinks per leaf evenly meets the policy within the spine port limit. Non-uniform allocations were not searched.';c.inputs=['loss','spine'].concat(ctx.extraIn||[]);c.relax=[{t:'Relax the spine-failure policy',go:'loss'}].concat(ctx.relax||[])}
+  else {c.kind='notshown';c.t='Not shown to be possible: one spine layer for '+fmt(ctx.leafD.length*ctx.lf.u)+' leaf uplinks';c.because='No spine count that divides the uplinks evenly has enough ports with this spine profile. Larger designs need another topology rule, not modelled here.';c.inputs=['spine','count'];c.relax=[{t:'A spine profile with more ports (needs catalog evidence)',go:'spine'}]}
+  o.conf.push(c);return {conflict:c.id};
+}
+function V2(p,id){return eff(p,id).v}
+function switchLines(p,o,add,ne,NET,lf,base,leaves,sres,sDeps,sOpt){
+  if(sres.conflict){
+    ['spines','lslinks','lscab'].forEach(function(key){add({key:key,l:{spines:NET+' spine switches',lslinks:'Leaf-to-spine links',lscab:'Leaf-to-spine cable construction'}[key],st:'cf',cid:sres.conflict,deps:sDeps,opt:sOpt,locks:['lock:spines','lock:leaves']})});
+    add({key:'oob',l:'Switch out-of-band management ports',q:leaves,bound:true,deps:sDeps,opt:sOpt,locks:['lock:spines','lock:leaves'],note:'lower bound while the spine count is open; OOB network is an external dependency',tr:T('at least '+fmt(leaves)+' = one per leaf; spines add more once resolved',[])});
+    return;
+  }
+  var S=sres.s,ls=sres.ls;
+  add({key:'spines',l:NET+' spine switches',q:S,deps:sDeps,opt:sOpt,locks:['lock:spines','lock:leaves'],lock:p.locks.spines?fmt(p.locks.spines.q)+' ordered · '+fmt(p.locks.spines.del)+' delivered':null,tr:sres.tr});
+  add({key:'lslinks',l:'Leaf-to-spine links ('+lf.ur+'G)',q:ls,deps:sDeps,opt:sOpt,locks:['lock:spines','lock:leaves'],note:sres.per?sres.per+' per leaf–spine pair':null,tr:T(fmt(ls)+' links = '+(sres.locked?'uplinks needed per leaf, summed':fmt(leaves)+' leaves × '+lf.u+' uplinks'),['leaf'],[sres.tr])});
+  var cons=V2(p,'cons'),alts=pickCons(isCons(ls),cons);
+  add({key:'lscab',l:'Leaf-to-spine cable construction',alts:alts,deps:sDeps,opt:sOpt.concat(['cons','reach']),locks:['lock:spines','lock:leaves'],tr:T((alts.length>1?'separate totals, one per construction (never summed): ':'')+alts.map(function(a){return a.q}).join(' | '),['cons'],[T(fmt(ls)+' leaf-to-spine links',[])])});
+  add({key:'oob',l:'Switch out-of-band management ports',q:leaves+S,deps:sDeps,opt:sOpt,locks:['lock:spines','lock:leaves'],note:'OOB network is an external dependency (R06 O1)',tr:T(fmt(leaves+S)+' = '+fmt(leaves)+' leaves + '+fmt(S)+' spines, one management port each',[])});
+  o.pats.push({key:'ls',grp:'leaf-spine',kind:'is',t:'each of '+fmt(leaves)+' leaves → each of '+fmt(S)+' spines',n:ls,d:sres.per?sres.per+' links per pair':'per-leaf uplinks as needed',un:0});
+}
+function genRail(p,o,E,V,unk,add,ne,NET){
+  var N=V('count'),Lk=V('links'),R=+V('rate'),pl=+V('planes'),lf=LEAF[V('leaf')],sp=SPN[V('spine')],du=parseF(V('du')),loss=parseF(V('loss'));
+  var eDeps=['count','links','rate'],u=unk(eDeps);
+  if(u.length)ne('eplinks',NET+' endpoint-to-leaf links',eDeps,u);
+  else add({key:'eplinks',l:NET+' endpoint-to-leaf links ('+R+'G)',q:N*Lk,deps:eDeps,tr:T(fmt(N*Lk)+' links = '+fmt(N)+' endpoints × '+Lk+' links per endpoint',['count','links'],[T(R+' Gb/s per link',['rate'])])});
+  var lDeps=['count','links','rate','planes','leafpol','leaf'],u2=unk(lDeps),why=null;
+  if(!u2.length){if(pl!==1)why='Two planes need each rail to reach both planes. This endpoint profile has one link per rail, so it needs breakout or assembly evidence and a plane-assignment rule (R04 S05, S06-4). Not modelled in this prototype.';else if(!lf.per[R])why='This leaf profile has no '+R+' Gb/s endpoint mode.'}
+  if(u2.length||why){['leaves','cages','epcab'].forEach(function(key){ne(key,{leaves:NET+' leaf switches',cages:'Leaf endpoint cages',epcab:'Endpoint cable construction'}[key],lDeps,u2,why)});['spines','lslinks','lscab','oob'].forEach(function(key){ne(key,{spines:NET+' spine switches',lslinks:'Leaf-to-spine links',lscab:'Leaf-to-spine cable construction',oob:'Switch out-of-band management ports'}[key],lDeps.concat(['spine']),u2,why)});return}
+  var per=lf.per[R],slots=lf.cages*per,groups=cdiv(N,slots),gs=[];
+  for(var g=0;g<groups;g++)gs.push(Math.min(slots,N-g*slots));
+  var leaves=groups*Lk,leafD=[];gs.forEach(function(n){for(var r=0;r<Lk;r++)leafD.push(n*R)});
+  var used=gs.map(function(n){return cdiv(n,per)}),cages=Lk*sum(used),unused=Lk*sum(used.map(function(c){return lf.cages-c}));
+  var tGroups=T(groups+' first-hop group'+(groups>1?'s':'')+' = ceil('+fmt(N)+' endpoints ÷ '+slots+' endpoint slots per leaf)',['count'],[T(slots+' slots per leaf = '+lf.cages+' cages × '+per+' per cage at '+R+' Gb/s',['leaf','rate'])]);
+  var tLeaves=T(fmt(leaves)+' leaves = '+groups+' group'+(groups>1?'s':'')+' × '+Lk+' rails (one leaf per rail per group)',['leafpol','links','planes'],[tGroups]);
+  add({key:'leaves',l:NET+' leaf switches',q:leaves,deps:lDeps,locks:['lock:leaves'],lock:lockLeaves(p,leaves),tr:tLeaves});
+  add({key:'cages',l:'Leaf endpoint cages ('+(per>1?per+' × '+R+'G mode':R+'G')+')',q:cages,deps:lDeps,note:unused?fmt(unused)+' intentionally unused on partly filled leaves':null,tr:T(fmt(cages)+' cages = '+Lk+' rails × ('+used.join(' + ')+') cages per group',['leaf'],[tGroups])});
+  if(unused)o.exc.push(fmt(unused)+' intentionally unused endpoint cages on partly filled leaves');
+  var alts=pickCons(epCons(cages,N*Lk,per,R),V('cons'));
+  add({key:'epcab',l:'Endpoint cable construction',alts:alts,deps:lDeps,opt:['cons','reach'],tr:T((alts.length>1?'separate totals, one per construction (never summed): ':'')+alts.map(function(a){return a.q}).join(' | '),['cons'],[T(fmt(cages)+' cages, '+fmt(N*Lk)+' endpoint links',[])])});
+  gs.forEach(function(n,g){for(var r=0;r<Lk;r++)o.pats.push({key:'g'+g+'r'+r,grp:'group '+gl(g),kind:'ep',t:'group '+gl(g)+' (endpoints '+(g*slots)+'–'+(g*slots+n-1)+'), rail '+r+' → leaf-'+gl(g)+'-r'+r,n:n,d:'cages 1–'+cdiv(n,per)+(per>1?' · lanes 1–'+per:''),un:lf.cages-cdiv(n,per)})});
+  var sDeps=lDeps.concat(['spine']),sOpt=['du','loss'];
+  if(unk(['spine']).length){['spines','lslinks','lscab'].forEach(function(key){ne(key,{spines:NET+' spine switches',lslinks:'Leaf-to-spine links',lscab:'Leaf-to-spine cable construction'}[key],sDeps,['spine'])});add({key:'oob',l:'Switch out-of-band management ports',q:leaves,bound:true,deps:sDeps,note:'lower bound until the spine profile is known',tr:T('at least '+fmt(leaves)+' leaves',[])});return}
+  var sres=spineStage(p,o,{leafD:leafD,lf:lf,sp:sp,du:du,loss:loss,minS:1,NET:NET,traceBase:tLeaves,relax:[{t:'Fewer endpoint cages per leaf (changes group size and leaf count). Not modelled in this prototype.'}]});
+  switchLines(p,o,add,ne,NET,lf,null,leaves,sres,sDeps,sOpt);
+  o.locator={slots:slots,per:per,rails:Lk,N:N};
+}
+function genRack(p,o,E,V,unk,add,ne,NET){
+  var Rk=V('racks'),Tr=V('trays'),Lk=V('links'),R=+V('rate'),lpr=V('lpr'),up=V('upl'),lf=LEAF[V('leaf')],sp=SPN[V('spine')],du=parseF(V('du')),loss=parseF(V('loss'));
+  var eDeps=['racks','trays','links','rate'],u=unk(eDeps);
+  if(u.length)ne('eplinks',NET+' tray-to-leaf links',eDeps,u);
+  else add({key:'eplinks',l:NET+' tray-to-leaf links ('+R+'G)',q:Rk*Tr*Lk,deps:eDeps,tr:T(fmt(Rk*Tr*Lk)+' links = '+Rk+' racks × '+Tr+' trays × '+Lk+' links per tray',['racks','trays','links'])});
+  var lDeps=['racks','trays','links','rate','lpr','upl','leaf'],u2=unk(lDeps),why=null;
+  if(!u2.length){if(lpr!==Lk)why='This prototype models one rack-local leaf per rail (leaves per rack = links per tray). Two rails per leaf (R04 S06-5) or two planes (S06-4) are separate policies and are not modelled.';else if(!lf.per[R])why='This leaf profile has no '+R+' Gb/s endpoint mode.';else if(Tr>lf.cages*lf.per[R])why='More trays per rack than endpoint slots on one leaf.';else if(up>lf.u)why='More active uplinks than the leaf profile has.'}
+  if(u2.length||why){['leaves','cages','epcab'].forEach(function(key){ne(key,{leaves:NET+' rack-local leaf switches',cages:'Leaf endpoint cages',epcab:'Endpoint cable construction'}[key],lDeps,u2,why)});['spines','lslinks','lscab','oob'].forEach(function(key){ne(key,{spines:NET+' spine switches',lslinks:'Leaf-to-spine links',lscab:'Leaf-to-spine cable construction',oob:'Switch out-of-band management ports'}[key],lDeps.concat(['spine']),u2,why)});return}
+  var per=lf.per[R],leaves=Rk*lpr,cpl=cdiv(Tr,per),cages=leaves*cpl,unused=leaves*(lf.cages-cpl),leafD=[];
+  for(var i=0;i<leaves;i++)leafD.push(Tr*R);
+  var tLeaves=T(fmt(leaves)+' leaves = '+Rk+' racks × '+lpr+' rack-local leaves (one per rail)',['racks','lpr'],[T('placement overrides port minimisation: leaves are intentionally underfilled (R04 S06-1)',['lpr'])]);
+  add({key:'leaves',l:NET+' rack-local leaf switches',q:leaves,deps:lDeps,locks:['lock:leaves'],lock:lockLeaves(p,leaves),tr:tLeaves});
+  add({key:'cages',l:'Leaf endpoint cages ('+(per>1?per+' × '+R+'G mode':R+'G')+')',q:cages,deps:lDeps,note:fmt(unused)+' growth-reserved ('+(lf.cages-cpl)+' per leaf)',tr:T(fmt(cages)+' cages = '+fmt(leaves)+' leaves × ceil('+Tr+' trays ÷ '+per+')',['trays','leaf'])});
+  o.exc.push(fmt(unused)+' endpoint cages intentionally unused (growth reserve on rack-local leaves)');
+  var alts=pickCons(epCons(cages,Rk*Tr*Lk,per,R),V('cons'));
+  add({key:'epcab',l:'Endpoint cable construction',alts:alts,deps:lDeps,opt:['cons','reach'],tr:T((alts.length>1?'separate totals (never summed): ':'')+alts.map(function(a){return a.q}).join(' | '),['cons'])});
+  for(var rk=0;rk<Rk;rk++)for(var r=0;r<lpr;r++)o.pats.push({key:'k'+rk+'r'+r,grp:'rack '+(rk+1),kind:'ep',t:'rack '+(rk+1)+', trays 1–'+Tr+', rail '+r+' → leaf-R'+(rk+1)+'-r'+r,n:Tr,d:'cages 1–'+cpl+(per>1?' · lanes 1–'+per:''),un:lf.cages-cpl});
+  var sDeps=lDeps.concat(['spine']),sOpt=['du','loss'];
+  var flf={u:up,ur:lf.ur};
+  if(unk(['spine']).length){['spines','lslinks','lscab'].forEach(function(key){ne(key,{spines:NET+' spine switches',lslinks:'Leaf-to-spine links',lscab:'Leaf-to-spine cable construction'}[key],sDeps,['spine'])});return}
+  var sres=spineStage(p,o,{leafD:leafD,lf:flf,sp:sp,du:du,loss:loss,minS:1,NET:NET,traceBase:tLeaves,extraIn:['upl'],relax:[{t:'Activate more uplinks per leaf',go:'upl'}]});
+  switchLines(p,o,add,ne,NET,flf,null,leaves,sres,sDeps,sOpt);
+}
+function genEndpoints(p,o,E,V,unk,add,ne,NET){
+  var N=V('count'),Lk=V('links'),R=+V('rate'),hm=V('homing'),tp=V('topo'),ms=V('minsp')||1,lf=LEAF[V('leaf')],sp=SPN[V('spine')],du=parseF(V('du')),loss=parseF(V('loss'));
+  var eDeps=['count','links','rate'],u=unk(eDeps);
+  if(u.length)ne('eplinks',NET+' endpoint-to-leaf links',eDeps,u);
+  else add({key:'eplinks',l:NET+' endpoint-to-leaf links ('+R+'G)',q:N*Lk,deps:eDeps,tr:T(fmt(N*Lk)+' links = '+fmt(N)+' endpoints × '+Lk+' links',['count','links'])});
+  var lDeps=['count','links','rate','homing','leaf'],u2=unk(lDeps),why=null;
+  if(!u2.length){if(hm==='eslag'&&Lk!==2)why='In this prototype ESLAG splits exactly two links across a leaf pair. Other link counts are not modelled.';else if(!lf.per[R])why='This leaf profile has no '+R+' Gb/s endpoint mode.'}
+  var all=['leaves','ports','epcab','spines','islinks','iscab','oob'],LB={leaves:NET+' leaf switches',ports:'Leaf endpoint ports',epcab:'Endpoint cable construction',spines:NET+' spine switches',islinks:'Inter-switch links',iscab:'Inter-switch cable construction',oob:'Switch out-of-band management ports'};
+  if(u2.length||why){all.forEach(function(key){ne(key,LB[key],lDeps,u2,why)});return}
+  var leafD=[],leaves,grpTxt,tLeaves;
+  if(hm==='eslag'){var pairs=cdiv(N,lf.cages);leaves=2*pairs;for(var i=0;i<pairs;i++){var n=Math.min(lf.cages,N-i*lf.cages);leafD.push(n*R,n*R);o.pats.push({key:'p'+i,grp:'pair '+(i+1),kind:'ep',t:'endpoints '+(i*lf.cages)+'–'+(i*lf.cages+n-1)+' → leaf pair '+(i+1)+' (ESLAG, one link to each leaf)',n:2*n,d:'ports 1–'+n+' on each leaf',un:2*(lf.cages-n)})}
+    tLeaves=T(fmt(leaves)+' leaves = 2 × '+pairs+' redundancy pair'+(pairs>1?'s':''),['homing'],[T(pairs+' pair'+(pairs>1?'s':'')+' = ceil('+fmt(N)+' endpoints ÷ '+lf.cages+' ports per leaf)',['count','leaf'])])}
+  else {var spl=Math.floor(lf.cages/Lk);leaves=cdiv(N,spl);for(var j=0;j<leaves;j++){var m=Math.min(spl,N-j*spl);leafD.push(m*Lk*R);o.pats.push({key:'s'+j,grp:'leaf '+(j+1),kind:'ep',t:'endpoints '+(j*spl)+'–'+(j*spl+m-1)+' → leaf '+(j+1)+' (single-homed)',n:m*Lk,d:'ports 1–'+m*Lk,un:lf.cages-m*Lk})}
+    tLeaves=T(fmt(leaves)+' leaves = ceil('+fmt(N)+' endpoints ÷ '+spl+' endpoints per leaf)',['homing','count','leaf'])}
+  var ports=N*Lk,unused=leaves*lf.cages-ports;
+  add({key:'leaves',l:NET+' leaf switches',q:leaves,deps:lDeps,locks:['lock:leaves'],lock:lockLeaves(p,leaves),flags:hm==='eslag'?['ESLAG on this leaf profile: unverified (R02 C03, K09)']:[],tr:tLeaves});
+  add({key:'ports',l:'Leaf endpoint ports ('+R+'G)',q:ports,deps:lDeps,note:unused?fmt(unused)+' unused':null,tr:T(fmt(ports)+' ports = '+fmt(N)+' endpoints × '+Lk+' links',['count','links'])});
+  var alts=pickCons(epCons(ports,ports,1,R),V('cons'));
+  add({key:'epcab',l:'Endpoint cable construction',alts:alts,deps:lDeps,opt:['cons','reach'],tr:T(alts.map(function(a){return a.q}).join(' | '),['cons'])});
+  var maxD=Math.max.apply(null,leafD),res={};
+  if(tp!=='ls'){
+    if(leaves<2)res.mesh={fail:'A mesh needs at least two leaves.'};
+    else {var pp=Math.floor(lf.u/(leaves-1));if(!pp)res.mesh={fail:'Too many leaves for a full mesh with '+lf.u+' uplinks each.'};else{var Um=(leaves-1)*pp*lf.ur;if(du&&maxD*du[1]>du[0]*Um)res.mesh={fail:'Normal D/U '+frac(maxD,Um)+' exceeds the limit '+frac(du[0],du[1])+'.',du:true};else res.mesh={s:0,links:leaves*(leaves-1)/2*pp,per:pp,du:frac(maxD,Um)}}}
+  }
+  if(tp!=='mesh'){
+    if(unk(['spine']).length)res.ls={fail:'Spine profile unknown.'};
+    else{var r=solve(leafD,lf.u,lf.ur,sp.ports,ms,du,loss);res.ls=r.s?{s:r.s,links:leaves*lf.u,per:r.per,du:frac(r.maxD,r.U),after:loss?frac(r.maxD*r.s,r.U*(r.s-1)):null}:{fail:r.fail==='du'?'Normal D/U '+frac(r.maxD,r.U)+' exceeds the limit '+frac(du[0],du[1])+'.':r.fail==='loss-proven'?'The spine-failure policy cannot be met for any spine count (D ≥ the policy times U).':'No even spine allocation meets the policy.',du:r.fail==='du'}}
+  }
+  var names={mesh:'Mesh',ls:'Leaf-spine'},keys=Object.keys(res),ok=keys.filter(function(x){return res[x].s!=null});
+  keys.forEach(function(x){if(res[x].fail){o.conf.push({id:'C-'+x,kind:res[x].du?'proven':'notshown',t:(res[x].du?'Cannot satisfy':'Not shown to be possible')+' — '+names[x]+' alternative',because:res[x].fail,inputs:x==='mesh'?['topo','du','leaf']:['topo','du','loss','spine'],relax:[res[x].du?{t:'Raise the D/U limit',go:'du'}:{t:'Review the topology choice',go:'topo'}].concat(keys.length>1?[{t:'The other alternative remains available; choose a topology',go:'topo'}]:[]),aff:keys.length>1?[]:['spines','islinks','iscab','oob']})}});
+  var sDeps=lDeps.concat(['topo']),sOpt=['du','minsp','loss','spine'];
+  if(!ok.length){['spines','islinks','iscab'].forEach(function(key){add({key:key,l:LB[key],st:'cf',cid:'C-'+keys[0],deps:sDeps,opt:sOpt})});add({key:'oob',l:LB.oob,q:leaves,bound:true,deps:sDeps,note:'lower bound',tr:T('at least '+fmt(leaves)+' leaves',[])});return}
+  var one=ok.length===1;
+  var A=function(f){return ok.map(function(x){return {a:names[x],q:f(res[x],x)}})};
+  var spAlts=A(function(r){return r.s===0?'0 (no spines)':fmt(r.s)});
+  add({key:'spines',l:LB.spines,alts:one?null:spAlts,q:one?res[ok[0]].s:null,note:one&&ok[0]==='mesh'?'mesh: no spines (a real zero, not an unknown)':null,deps:sDeps,opt:sOpt,locks:['lock:spines'],tr:T(ok.map(function(x){var r=res[x];return names[x]+': '+(x==='mesh'?'no spines; each leaf pair has '+r.per+' direct links (small mesh, conditional R02 C07)':fmt(r.s)+' spines = smallest S ≥ '+ms+' dividing '+lf.u+' uplinks with '+sp.ports+'·S ≥ '+fmt(leaves*lf.u))+'; normal D/U '+r.du+(r.after?', after one spine loss '+r.after:'')}).join(' | '),['topo','minsp','spine','du'],[tLeaves])});
+  add({key:'islinks',l:LB.islinks+' ('+lf.ur+'G)',alts:one?null:A(function(r,x){return fmt(r.links)+(x==='mesh'?' mesh links':' leaf-to-spine links')}),q:one?res[ok[0]].links:null,note:one?(ok[0]==='mesh'?res.mesh.per+' per leaf pair (mesh)':res.ls.per+' per leaf–spine pair'):null,deps:sDeps,opt:sOpt,tr:T(ok.map(function(x){return names[x]+': '+fmt(res[x].links)+' links'}).join(' | '),['topo'])});
+  var ic=[];ok.forEach(function(x){pickCons(isCons(res[x].links,one?'':names[x]+' · '),V('cons')).forEach(function(a){ic.push(a)})});
+  add({key:'iscab',l:LB.iscab,alts:ic,deps:sDeps,opt:sOpt.concat(['cons','reach']),tr:T('separate totals per topology and construction (never summed): '+ic.map(function(a){return a.a+' '+a.q}).join(' | '),['topo','cons'])});
+  add({key:'oob',l:LB.oob,alts:one?null:A(function(r){return fmt(leaves+r.s)}),q:one?leaves+res[ok[0]].s:null,deps:sDeps,opt:sOpt,note:'OOB network is an external dependency',tr:T('leaves + spines, one management port each',[])});
+  if(ok.indexOf('ls')>=0)o.pats.push({key:'ls',grp:'leaf-spine',kind:'is',t:(one?'':'[leaf-spine alternative] ')+'each of '+leaves+' leaves → each of '+res.ls.s+' spines',n:res.ls.links,d:res.ls.per+' links per pair',un:0});
+  if(ok.indexOf('mesh')>=0)o.pats.push({key:'mesh',grp:'mesh',kind:'is',t:(one?'':'[mesh alternative] ')+'every leaf pair, direct',n:res.mesh.links,d:res.mesh.per+' links per leaf pair',un:0});
+}
+function fin(p,o){
+  o.lines.forEach(function(l){
+    var all=(l.deps||[]).concat(l.opt||[]);
+    l.rest=uniq(all.filter(function(id){return DM[id]&&eff(p,id).o==='assumed'}));
+    l.nchk=uniq((l.opt||[]).filter(function(id){return DM[id]&&eff(p,id).o==='unknown'}));
+    l.need=l.need||[];
+    l.prec=l.st==='ne'?'unresolved':l.st==='cf'?'suspended by conflict':l.alts&&l.alts.length>1?'exact per alternative':l.bound?'bounded (lower bound)':'exact under stated assumptions';
+    l.flags=l.flags||[];
+    if(p.relBlocked&&/cab$/.test(l.key))l.flags.push('blocked for qualification on <TARGET>: compatibility evidence unknown (example)');
+    if(l.alts&&l.alts.length===1){l.qs=l.alts[0].q;l.alts=null}
   });
-  function show(i,focus){
-    cur=Math.max(0,Math.min(screens.length-1,i));
-    screens.forEach(function(s,j){s.classList.toggle('active',j===cur)});
-    [].forEach.call(nav.querySelectorAll('button'),function(b,j){
-      if(j===cur)b.setAttribute('aria-current','step');else b.removeAttribute('aria-current')});
-    document.getElementById('rev').textContent=revs[cur];
-    document.getElementById('prev').disabled=cur===0;
-    document.getElementById('next').disabled=cur===screens.length-1;
-    live.textContent='Step '+(cur+1)+' of '+screens.length+': '+screens[cur].querySelector('h2').textContent;
-    if(focus){var h=screens[cur].querySelector('h2'); h.tabIndex=-1; h.focus();}
+  return o;
+}
+
+/* ---------- derived views ---------- */
+function qtext(l){if(l.st==='ne')return 'Not estimated';if(l.st==='cf')return '— suspended';if(l.alts)return l.alts.map(function(a){return a.a+': '+a.q}).join(' | ');if(l.qs)return l.qs;return (l.bound?'≥ ':'')+fmt(l.q)}
+function qfull(l){return qtext(l)+(l.lock?' ['+l.lock+']':'')}
+function latest(p){return p.revs[p.revs.length-1]||null}
+function changedSince(p,rev){
+  var now=snap(p),ids=[];
+  Object.keys(now.i).forEach(function(id){if(JSON.stringify(now.i[id])!==JSON.stringify(rev.snap.i[id]||null))ids.push(id)});
+  ['leaves','spines'].forEach(function(x){if(JSON.stringify(now.l[x]||null)!==JSON.stringify(rev.snap.l[x]||null))ids.push('lock:'+x)});
+  if(now.t!==rev.snap.t)ids.push('target');
+  return ids;
+}
+function lineStale(l,ch){if(ch.indexOf('kind')>=0)return ['planning approach'];var all=(l.deps||[]).concat(l.opt||[]).concat(l.locks||[]);return ch.filter(function(id){return all.indexOf(id)>=0}).map(label)}
+function generate(p,ev,why){
+  var out=gen(p),prev=latest(p);
+  p.revs.push({n:p.revs.length+1,s:p.session,ir:p.inputRev,ev:ev||(prev?prev.ev:EV0),tgt:p.target.label,snap:snap(p),out:out,why:why||''});
+  ui.view=null;ui.trace=null;ui.prev=null;save();
+  var r=latest(p),pv=r.n>1?p.revs[r.n-2]:null,dd=pv?diff(pv,r):null;
+  announce('Revision '+r.n+' generated from details r'+r.ir+': '+(dd?dd.rows.filter(function(x){return x.ch}).length+' lines changed, ':'')+out.conf.length+' conflict'+(out.conf.length===1?'':'s')+'.');
+}
+function diff(a,b){
+  var ka={},kb={},rows=[];a.out.lines.forEach(function(l){ka[l.key]=l});b.out.lines.forEach(function(l){kb[l.key]=l});
+  uniq(b.out.lines.map(function(l){return l.key}).concat(a.out.lines.map(function(l){return l.key}))).forEach(function(k){
+    var x=ka[k],y=kb[k],tx=x?qfull(x):'—',ty=y?qfull(y):'—';
+    var ch=!x||!y||tx!==ty||x.st!==y.st||x.prec!==y.prec||JSON.stringify(x.rest)!==JSON.stringify(y.rest)||JSON.stringify(x.flags)!==JSON.stringify(y.flags);
+    var dl=x&&y&&x.q!=null&&y.q!=null&&x.st!==y.st?null:(x&&y&&x.q!=null&&y.q!=null&&!x.alts&&!y.alts?y.q-x.q:null);
+    rows.push({k:k,l:(y||x).l,tx:tx,ty:ty,ch:ch,dl:dl,x:x,y:y});
+  });
+  var inp=[];Object.keys(b.snap.i).forEach(function(id){var u=a.snap.i[id]||{},v=b.snap.i[id];if(JSON.stringify(u)!==JSON.stringify(v))inp.push({id:id,f:fmtSnap(id,u,b),t:fmtSnap(id,v,b)})});
+  ['leaves','spines'].forEach(function(x){var u=a.snap.l[x],v=b.snap.l[x];if(JSON.stringify(u||null)!==JSON.stringify(v||null))inp.push({id:'lock:'+x,f:u?u.q+' ordered':'none',t:v?v.q+' ordered':'none'})});
+  if(a.snap.t!==b.snap.t)inp.push({id:'target',f:a.snap.t,t:b.snap.t});
+  var ca=a.out.conf.map(function(c){return c.id}),cb=b.out.conf.map(function(c){return c.id});
+  return {rows:rows,inp:inp,newC:b.out.conf.filter(function(c){return ca.indexOf(c.id)<0}),resC:a.out.conf.filter(function(c){return cb.indexOf(c.id)<0}),ev:a.ev!==b.ev?[a.ev,b.ev]:null};
+}
+function fmtSnap(id,s,rev){if(!s||s.o==null)return '—';if(s.o==='na')return 'not applicable';return (s.v==null?'unknown':optLabel(id,s.v,rev.snap.i.kind&&rev.snap.i.kind.v))+' ('+ORG(s.o)+')'}
+var SWING={count:5,racks:5,trays:3,planes:3,loss:3,cons:3,topo:3,upl:2,du:2,homing:2,nets:2,links:1,rate:1,leafpol:1,leaf:1,spine:1,lpr:1,minsp:1,reach:1,profile:2,kind:5};
+function suggestions(p,out){
+  if(!kindOf(p))return [{id:'kind',why:'Nothing can be estimated until an approach is chosen.'}];
+  var sc={},blk={},rst={},nc={};
+  out.lines.forEach(function(l){l.need.forEach(function(id){sc[id]=(sc[id]||0)+10;blk[id]=(blk[id]||0)+1});l.rest.forEach(function(id){sc[id]=(sc[id]||0)+(SWING[id]||1);rst[id]=(rst[id]||0)+1});l.nchk.forEach(function(id){sc[id]=(sc[id]||0)+2*(SWING[id]||1);nc[id]=(nc[id]||0)+1})});
+  out.conf.forEach(function(c){c.inputs.forEach(function(id){if(DM[id])sc[id]=(sc[id]||0)+5})});
+  return Object.keys(sc).filter(function(id){var e=eff(p,id);return e.o!=='user'&&e.o!=='na'}).sort(function(a,b){return sc[b]-sc[a]}).slice(0,4).map(function(id){
+    var w=[];if(blk[id])w.push('blocks '+plural(blk[id],'line'));if(rst[id])w.push(plural(rst[id],'line')+' rest on this assumption');if(nc[id])w.push('not yet checked by '+plural(nc[id],'line'));if(!w.length)w.push('feeds an open conflict');
+    return {id:id,why:w.join('; ')};
+  });
+}
+function preview(p,set){
+  var q=clone(p);Object.keys(set).forEach(function(id){q.ans[id]={v:set[id]}});
+  var a=gen(p),b=gen(q),ka={};a.lines.forEach(function(l){ka[l.key]=l});
+  var ch=b.lines.filter(function(l){var x=ka[l.key];return !x||qfull(x)!==qfull(l)}).map(function(l){return l.l+': '+(ka[l.key]?qfull(ka[l.key]):'—')+' → '+qfull(l)});
+  return (ch.length?ch.join(' · '):'no quantity change')+(b.conf.length?' · still '+plural(b.conf.length,'conflict'):' · no conflicts');
+}
+function tally(p){var t={user:0,assumed:0,unknown:0};D.forEach(function(d){if(d.nostate)return;var e=eff(p,d.id);if(t[e.o]!=null)t[e.o]++});return t}
+
+/* ---------- presets and examples ---------- */
+function newProject(name,id){id=id||('p'+Date.now().toString(36)+Math.floor(Math.random()*1e4));var p={id:id,name:name,ans:{},locks:{},inputRev:0,hist:[],revs:[],session:1,closed:false,target:{label:'latest Hedgehog release',curr:'unknown'},rel:null,relBlocked:false,vis:'Hedgehog only'};store.projects[id]=p;store.order=[id].concat(store.order.filter(function(x){return x!==id}));save();return p}
+var EXAMPLES={
+  rail:{name:'Example-Rail (synthetic)',kind:'servers',req:'128 B200 HGX servers',count:128,profile:'b200'},
+  rack:{name:'Example-Racks (synthetic)',kind:'racks',req:'eight NVL72 racks',racks:8,profile:'nvl72'},
+  mesh:{name:'Example-Redundant (synthetic)',kind:'endpoints',req:'40 general-purpose servers, dual-homed, 2 × 25G each',count:40,profile:'gen25'}
+};
+function createFrom(st,gen1){
+  var p=newProject(st.name||'Untitled project',st.id);
+  if(st.kind)setAns(p,'kind',{v:st.kind},'starter');
+  if(st.req)setAns(p,'req',{v:st.req},'starter');
+  if(st.profile)setAns(p,'profile',{v:st.profile},'starter');
+  if(st.kind==='racks'&&st.racks)setAns(p,'racks',{v:+st.racks},'starter');
+  if(st.kind!=='racks'&&st.count)setAns(p,'count',{v:+st.count},'starter');
+  if(st.profile==='custom'){if(st.links)setAns(p,'links',{v:+st.links},'starter');if(st.rate)setAns(p,'rate',{v:String(st.rate)},'starter')}
+  if(gen1&&st.kind)generate(p,null,'first output from starter');
+  return p;
+}
+function preset(x){
+  var p=createFrom({id:'demo-rail',name:'Example-Rail (synthetic, demo)',kind:'servers',req:'128 B200 HGX servers',count:128,profile:'b200'},true);
+  if(x==='s1'){openP(p.id,false);return}
+  p.closed=true;p.session=2;p.closed=false;ui.resume=resumeInfo(p,1);
+  if(x==='s3'){
+    setAns(p,'loss',{v:'1'},'customer: full bandwidth after spine failure');generate(p);
+    setAns(p,'loss',{v:'8/7'},'relaxation chosen by SE');generate(p);
+    setLock(p,'leaves',{q:16,del:0},'synthetic order reference');setLock(p,'spines',{q:8,del:0},'synthetic order reference');
+    p.session=3;ui.resume=resumeInfo(p,2);
+    setAns(p,'count',{v:136},'customer growth');
   }
-  document.getElementById('prev').onclick=function(){show(cur-1,true)};
-  document.getElementById('next').onclick=function(){show(cur+1,true)};
-  [].forEach.call(document.querySelectorAll('[data-go]'),function(b){
-    b.addEventListener('click',function(){show(+b.dataset.go,true)})});
-  var q3=document.getElementById('q3'), pv=document.getElementById('preview');
-  q3.onchange=function(){
-    pv.textContent = q3.value==='full' ? 'conflict: requirement cannot be met with current assumptions (see step 6)'
-      : q3.value==='dk' ? 'no change; spine line still rests on the assumed failure policy'
-      : 'leaves 16 → 16 · spines 8 → 8 · switch and link lines then rest only on the hypothetical leaf/spine profiles';
-  };
-  document.getElementById('apply').onclick=function(){show(q3.value==='full'?5:4,true)};
-  // Scale review: F1 + 136-server change, R04 S03 allocation formulas.
-  var rail=document.getElementById('rail');
-  for(var r=0;r<8;r++){var o=document.createElement('option');o.textContent=r;rail.appendChild(o)}
-  var groups=[{g:'A',n:64,chg:false},{g:'B',n:64,chg:false},{g:'C',n:8,chg:true}];
-  function render(){
-    var fg=document.getElementById('fg').value, fc=document.getElementById('fchg').checked, rows='';
-    var ex=document.getElementById('fexp').checked, collapsed=[];
-    groups.slice().sort(function(a,b){return b.chg-a.chg}).forEach(function(G){
-      if(fg&&fg!==G.g)return; if(fc&&!G.chg)return;
-      if(!G.chg&&!ex){collapsed.push(G);return}
-      for(var r=0;r<8;r++){
-        var cages=Math.ceil(G.n/2);
-        rows+='<tr><td>group '+G.g+', rail '+r+'</td><td>leaf-'+G.g+'-r'+r+'</td><td class="num">'+G.n+
-          '</td><td>cages 1–'+cages+' · lanes 1–2</td><td>'+(G.chg?'<span class="chip changed">new in rev 3</span>':'<span class="chip unchanged">unchanged</span>')+
-          (G.chg?' <span class="note">'+(32-cages)+' endpoint cages unused (intentional)</span>':'')+'</td></tr>';
-      }
-    });
-    if(collapsed.length){var t=0;collapsed.forEach(function(G){t+=G.n*8});
-      rows+='<tr><td colspan="5"><span class="chip unchanged">unchanged</span> '+collapsed.length*8+' patterns, '+t.toLocaleString('en')+' links (group '+collapsed.map(function(G){return G.g}).join(', ')+'), collapsed. Tick "expand unchanged patterns" to list them.</td></tr>';}
-    document.getElementById('pat').innerHTML=rows||'<tr><td colspan="5">No patterns match these filters.</td></tr>';
+  save();openP(p.id,false,true);
+}
+function resumeInfo(p,last){var r=latest(p);return {s:p.session,last:last,rev:r?r.n:null,ir:r?r.ir:null,edits:r?p.inputRev-r.ir:p.inputRev}}
+
+/* ---------- rendering ---------- */
+var live=$('#live');
+function announce(t){live.textContent='';setTimeout(function(){live.textContent=t},30)}
+function render(){
+  var fid=document.activeElement&&document.activeElement.getAttribute('data-fid');
+  var dp=$('.dpanel'),dps=dp?dp.scrollTop:0;
+  var app=$('#app');
+  if(ui.screen==='home')app.innerHTML=renderHome();
+  else if(ui.screen==='start')app.innerHTML=renderStart();
+  else app.innerHTML=renderWS();
+  var ndp=$('.dpanel');if(ndp)ndp.scrollTop=dps;
+  if(fid){var el=document.querySelector('[data-fid="'+fid+'"]');if(el){el.focus();if(el.type==='search'||el.type==='text'){try{el.setSelectionRange(el.value.length,el.value.length)}catch(e){}}}}
+}
+function renderHome(){
+  var h='<h2>Projects</h2><p class="note">Projects are saved in this browser'+(storageOK?'':' — <b>storage is blocked here, so work lasts only while this tab is open</b>')+'. Closing a project never finishes it; resume any time and keep refining.</p>';
+  var ids=store.order.filter(function(id){return store.projects[id]});
+  if(!ids.length)h+='<p>No projects yet.</p>';
+  else{h+='<div class="scroll"><table><caption class="sr">Saved projects</caption><thead><tr><th scope="col">Project</th><th scope="col">Approach</th><th scope="col">Latest output</th><th scope="col">Detail edits since</th><th scope="col">Actions</th></tr></thead><tbody>';
+    ids.forEach(function(id){var p=store.projects[id],r=latest(p),k=kindOf(p);h+='<tr><th scope="row">'+esc(p.name)+'<div class="note">session '+p.session+'</div></th><td>'+(k?esc(KINDS[k]):'not chosen')+'</td><td>'+(r?'BOM revision '+r.n+' (details r'+r.ir+')':'none yet')+'</td><td class="num">'+(r?p.inputRev-r.ir:p.inputRev)+'</td><td><button class="btn" data-act="open" data-pid="'+esc(id)+'" data-fid="open-'+esc(id)+'">Resume</button><button class="btn" data-act="del" data-pid="'+esc(id)+'">Delete</button></td></tr>'});
+    h+='</tbody></table></div>'}
+  h+='<h2 style="margin-top:18px">Start something</h2><div class="cards">';
+  h+='<div class="panel"><h3 style="margin-top:0">New project</h3><p class="note">A short starter asks only the minimum for the approach you pick. You can also open an empty workspace.</p><button class="btn primary" data-act="new" data-fid="new">New project</button></div>';
+  [['rail','Rail-based servers','“128 B200 HGX servers” — server count with rails (B200 is one replaceable profile)'],['rack','Rack-based placement','“eight NVL72 racks” — racks with rack-local leaves'],['mesh','Redundant endpoints','“40 general-purpose servers, dual-homed” — leaf pair with mesh or leaf-spine']].forEach(function(x){
+    h+='<div class="panel"><h3 style="margin-top:0">Start from example: '+x[1]+'</h3><p class="note">'+esc(x[2])+'. Synthetic; opens the same starter and workspace.</p><button class="btn" data-act="example" data-x="'+x[0]+'" data-fid="ex-'+x[0]+'">Use this example</button></div>'});
+  return h+'</div>';
+}
+function renderStart(){
+  var s=ui.st,k=s.kind;
+  var h='<h2>New project — the minimum for a first output</h2><p class="note">This is the only guided step. It asks only what the chosen approach needs to produce something useful. Everything else lives in the details panel, in any order, any time. Finishing the starter does not finish the project.</p>';
+  h+='<div class="panel" style="max-width:760px"><div class="field"><label class="main" for="st-name">Project name</label><input id="st-name" type="text" data-st="name" value="'+esc(s.name)+'" style="width:100%"></div>';
+  h+='<fieldset><legend>What do you know now?</legend>';
+  Object.keys(KINDS).concat(['']).forEach(function(x){h+='<div><label><input type="radio" name="st-kind" data-st="kind" value="'+x+'" data-fid="stk-'+(x||'none')+'"'+(k===x||(!k&&!x)?' checked':'')+'> '+(x?esc(KINDS[x]):'Not sure yet — open an empty workspace')+'</label></div>'});
+  h+='</fieldset>';
+  h+='<div class="field"><label class="main" for="st-req">Customer request (optional, kept as written)</label><textarea id="st-req" data-st="req">'+esc(s.req)+'</textarea></div>';
+  if(k){
+    if(k==='racks')h+='<div class="field"><label class="main" for="st-racks">Number of racks</label><input id="st-racks" type="number" min="1" max="64" data-st="racks" value="'+esc(s.racks||'')+'"><div class="note">Leave blank if unknown; the first output will say what it needs.</div></div>';
+    else h+='<div class="field"><label class="main" for="st-count">Number of endpoints</label><input id="st-count" type="number" min="1" max="4096" data-st="count" value="'+esc(s.count||'')+'"><div class="note">Leave blank if unknown; the first output will say what it needs.</div></div>';
+    h+='<div class="field"><label class="main" for="st-prof">Endpoint profile</label><select id="st-prof" data-st="profile" data-fid="st-prof"><option value="">Unknown</option>'+Object.keys(PROF).filter(function(x){return PROF[x].kinds.indexOf(k)>=0}).map(function(x){return '<option value="'+x+'"'+(s.profile===x?' selected':'')+'>'+esc(PROF[x].n)+'</option>'}).join('')+'</select></div>';
+    if(s.profile==='custom')h+='<div class="field"><label class="main" for="st-links">Fabric links per endpoint</label><input id="st-links" type="number" min="1" max="16" data-st="links" value="'+esc(s.links||'')+'"></div><div class="field"><label class="main" for="st-rate">Link rate (Gb/s)</label><select id="st-rate" data-st="rate"><option value="">Unknown</option>'+['25','100','200','400','800'].map(function(r){return '<option'+(String(s.rate)===r?' selected':'')+'>'+r+'</option>'}).join('')+'</select></div>';
   }
-  function find(){
-    var v=document.getElementById('srv').value.trim(), out=document.getElementById('srvout');
-    if(v===''){out.textContent='';return}
-    var n=+v; if(!(n>=0&&n<=135&&Math.floor(n)===n)){out.textContent='Enter a server number from 0 to 135.';return}
-    var r=+rail.value, d=Math.floor(n/64), j=n%64, g='ABC'[d];
-    out.textContent='server '+n+' rail '+r+' → leaf-'+g+'-r'+r+' cage '+(1+Math.floor(j/2))+' lane '+(1+j%2)+' (group '+g+')';
+  h+='<p>'+(k?'<button class="btn primary" data-act="st-create" data-gen="1">Create workspace and generate first BOM</button>':'')+'<button class="btn'+(k?'':' primary')+'" data-act="st-create" data-gen="0">Create workspace'+(k?' without generating':'')+'</button><button class="btn" data-act="home">Cancel</button></p></div>';
+  return h;
+}
+function renderWS(){
+  var p=P(),r=latest(p),vr=ui.view?p.revs[ui.view-1]:r,cur=gen(p);
+  var h='<div class="projhdr" aria-label="Project context"><div><b>'+esc(p.name)+'</b> · Visible to: '+esc(p.vis)+' · Session '+p.session+' · <span class="note">'+(storageOK?'All edits saved in this browser':'Saving blocked — kept only in this tab')+'</span> <button class="btn small" data-act="close" data-fid="close">Save and close</button></div>';
+  h+='<div><b>Installing on:</b> '+esc(p.target.label)+' — <em>currentness '+esc(p.target.curr)+'</em>'+(p.target.label.indexOf('<')<0?' (placeholder; pending #3)':'')+'</div>';
+  h+='<div><b>Shown output built from evidence:</b> '+(vr?'revision '+vr.n+' · '+esc(vr.ev):'no output yet')+'</div>';
+  if(vr&&vr.tgt!==p.target.label)h+='<div class="banner" role="note">This revision was built for “'+esc(vr.tgt)+'”, not the current installation target. Review release impact before treating it as current.</div>';
+  else if(vr&&vr.ev===EV0)h+='<div class="banner" role="note">Built from a research snapshot; the installation target’s currentness is unknown. Do not treat this output as current for installation.</div>';
+  h+='</div>';
+  if(ui.resume){var rs=ui.resume;h+='<div class="banner info" role="status"><b>Welcome back — session '+rs.s+'.</b> '+(rs.rev?'Latest output: BOM revision '+rs.rev+' (details r'+rs.ir+'). ':'No output yet. ')+(rs.edits?rs.edits+' detail edit'+(rs.edits>1?'s':'')+' not yet in an output. ':'No detail edits since that output. ')+'Pick up anywhere; nothing needs finishing. <button class="btn small" data-act="dismiss-resume">Dismiss</button></div>'}
+  h+='<p class="skip note">Jump to: <a href="#details-h">Details</a> <a href="#outputs-h">Outputs</a></p>';
+  h+='<div class="ws"><aside class="panel dpanel" aria-labelledby="details-h">'+renderDetails(p,cur)+'</aside><section class="panel" aria-labelledby="outputs-h">'+renderOutputs(p,r,vr,cur)+'</section></div>';
+  return h;
+}
+function renderDetails(p,live){
+  var k=kindOf(p),t=tally(p),h='<h2 id="details-h" tabindex="-1">Project details</h2>';
+  h+='<p class="note">Answer in any order. Unknown is a normal saved state. Edits save immediately and reach outputs when you generate.</p>';
+  h+='<p style="font-size:13px"><b>Details recorded:</b> '+t.user+' supplied · '+t.assumed+' assumed · '+t.unknown+' unknown<br><span class="note">This records what hh-aid knows. It is not a readiness score; output readiness is shown per output.</span></p>';
+  h+='<label for="find" style="font-weight:600">Find a detail</label><br><input id="find" type="search" data-fid="find" placeholder="e.g. spine, rack, cable" value="'+esc(ui.find)+'" style="width:100%">';
+  if(ui.find.trim()){var q=ui.find.trim().toLowerCase(),res=D.filter(function(d){var s=SECS.filter(function(x){return x.id===d.sec})[0];return (d.l+' '+(d.h||'')+' '+s.t).toLowerCase().indexOf(q)>=0});
+    h+='<ul aria-label="Matching details" style="margin:4px 0;padding-left:18px">'+(res.length?res.map(function(d){var ap=d.id==='kind'||d.ap(k);return '<li><button class="link" data-act="go" data-id="'+d.id+'">'+esc(d.l)+'</button> <span class="note">in '+esc(SECS.filter(function(x){return x.id===d.sec})[0].t)+(ap?'':' — not applicable to this approach')+'</span></li>'}).join(''):'<li class="note">No matching detail.</li>')+'</ul>'}
+  var sg=suggestions(p,live);
+  if(!ui.hideSug&&sg.length){h+='<div class="sug"><b>Suggested questions</b> <span class="note">(optional help; skip or ignore freely)</span><ol>'+sg.map(function(s){return '<li><button class="link" data-act="go" data-id="'+s.id+'">'+esc(DM[s.id].l)+'</button> <span class="note">— '+esc(s.why)+'</span></li>'}).join('')+'</ol><span class="note">Ranked here by the lines an answer would unblock or stop resting on an assumption, weighted by a hand-set estimate of how far each answer could move quantities. A prototype approximation of D02 §5.5, not a tested ranking.</span><br><button class="btn small" data-act="hide-sug">Hide suggestions</button> <button class="btn small" data-act="copy-q">Copy open questions for the customer</button></div>'}
+  else if(ui.hideSug)h+='<p><button class="btn small" data-act="show-sug">Show suggested questions</button></p>';
+  if(ui.copy&&ui.copy.where==='q')h+='<label class="note" for="copyq">Open questions (select and copy)</label><textarea id="copyq" class="copy" readonly>'+esc(ui.copy.text)+'</textarea>';
+  var confIn={};live.conf.forEach(function(c){c.inputs.forEach(function(id){confIn[id]=1})});
+  var na=[];
+  SECS.forEach(function(s){
+    if(!s.ap(k)){if(k&&s.na)na.push(s);return}
+    var fs=D.filter(function(d){return d.sec===s.id&&(d.id==='kind'||d.ap(k))}),c={user:0,assumed:0,unknown:0};
+    fs.forEach(function(d){if(d.nostate)return;var e=eff(p,d.id);if(c[e.o]!=null)c[e.o]++});
+    var st=[c.user?c.user+' supplied':'',c.assumed?c.assumed+' assumed':'',c.unknown?c.unknown+' unknown':''].filter(Boolean).join(' · ');
+    h+='<details class="sec" data-sec="'+s.id+'"'+(ui.open[s.id]?' open':'')+'><summary data-fid="sec-'+s.id+'">'+esc(s.t)+(st?' <span class="note">— '+st+'</span>':'')+'</summary>';
+    if(s.id==='target')h+=targetSec(p);
+    fs.forEach(function(d){h+=fieldHTML(p,d,k,confIn[d.id])});
+    h+='</details>';
+  });
+  if(na.length)h+='<p class="note">Not applicable to this approach: '+na.map(function(s){return esc(s.t)+' ('+s.na+')'}).join('; ')+'. Your answers there are kept if you change approach.</p>';
+  return h;
+}
+function targetSec(p){var r=latest(p);return '<div class="field"><div><b>Installing on:</b> '+esc(p.target.label)+' — currentness '+esc(p.target.curr)+'</div><div><b>Latest output built from:</b> '+(r?esc(r.ev):'no output yet')+'</div><div class="note">Evidence is kept per revision for reproducibility; it is not the installation target.</div><button class="btn small" data-act="tab" data-tab="rel">Open release review</button></div>'}
+function fieldHTML(p,d,k,conf){
+  var e=eff(p,d.id),id='in-'+d.id,h='<div class="field" id="f-'+d.id+'"><label class="main" for="'+id+'">'+esc(d.l)+'</label>';
+  if(d.type==='sel'){var opts=d.opts(k).slice();if(e.v!=null&&!opts.some(function(o){return o[0]===String(e.v)}))opts.push([String(e.v),optLabel(d.id,e.v,k)+' — not offered for this approach']);h+='<select id="'+id+'" data-in="'+d.id+'" data-fid="'+id+'"><option value="">Unknown — don’t assume</option>'+opts.map(function(o){return '<option value="'+o[0]+'"'+(String(e.v)===o[0]?' selected':'')+'>'+esc(o[1])+'</option>'}).join('')+'</select>'}
+  else if(d.type==='num')h+='<input id="'+id+'" type="number" min="'+d.min+'" max="'+d.max+'" step="1" data-in="'+d.id+'" data-fid="'+id+'" value="'+(e.v==null?'':e.v)+'" aria-describedby="m-'+d.id+'">';
+  else if(d.type==='multi')h+='<div role="group" aria-labelledby="lbl-'+d.id+'" id="'+id+'"><span id="lbl-'+d.id+'" class="sr">'+esc(d.l)+'</span>'+d.opts(k).map(function(o){return '<label style="display:block"><input type="checkbox" data-in="'+d.id+'" data-fid="'+id+'-'+o[0]+'" value="'+o[0]+'"'+((e.v||[]).indexOf(o[0])>=0?' checked':'')+'> '+esc(o[1])+'</label>'}).join('')+'</div>';
+  else h+='<textarea id="'+id+'" data-in="'+d.id+'" data-fid="'+id+'">'+esc(e.v||'')+'</textarea>';
+  if(ui.errs[d.id])h+='<div class="err" role="alert">'+esc(ui.errs[d.id])+'</div>';
+  if(!d.nostate){
+    h+='<div class="meta" id="m-'+d.id+'">'+chipO(e.o)+(conf?'<span class="chip conflict">conflicting</span>':'')+(e.src?' <span class="note">'+esc(e.src)+'</span>':'');
+    var df=d.def?d.def(k,p):null;
+    if(e.o==='assumed')h+=' <button class="btn small" data-act="confirm" data-id="'+d.id+'" aria-label="Confirm assumed '+esc(d.l)+'">Confirm</button><button class="btn small" data-act="unknown" data-id="'+d.id+'" aria-label="Mark '+esc(d.l)+' unknown">Don’t assume</button>';
+    if((e.o==='user'||e.marked)&&df&&df.v!=null)h+=' <button class="btn small" data-act="usedef" data-id="'+d.id+'" aria-label="Use default for '+esc(d.l)+'">Use default</button>';
+    h+='</div>';
   }
-  ['fg','fchg','fexp'].forEach(function(id){document.getElementById(id).addEventListener('change',render)});
-  document.getElementById('srv').addEventListener('input',find); rail.addEventListener('change',find);
-  var m=/^#step-(\d+)$/.exec(location.hash);
-  render(); show(m?(+m[1])-1:0);
+  if(d.h)h+='<div class="note">'+esc(d.h)+'</div>';
+  return h+'</div>';
+}
+var TABS=[['bom','BOM'],['chg','Changes'],['revs','Revisions and history'],['links','Links'],['rel','Release'],['later','Later stages']];
+function renderOutputs(p,r,vr,live){
+  var ch=r?changedSince(p,r):[],h='<h2 id="outputs-h" tabindex="-1">Generated outputs</h2>';
+  h+='<div class="status box" aria-label="Output status">';
+  if(!r)h+='<div>No output yet. Generate whenever you like — unknown details appear as “Not estimated” or as separate alternatives, never as invented numbers.</div>';
+  else{var ls=r.out.lines,ne=ls.filter(function(l){return l.st==='ne'}).length,cf=ls.filter(function(l){return l.st==='cf'}).length,ce=ls.length-ne-cf,stl=ls.filter(function(l){return lineStale(l,ch).length}).length;
+    h+='<div><b>Latest output:</b> BOM revision '+r.n+' · session '+r.s+' · from details r'+r.ir+'</div>';
+    h+='<div><b>Output readiness</b> (per output, not per questionnaire): BOM — '+ce+' line'+(ce===1?'':'s')+' conditional estimate · 0 qualified quantity scope · '+ne+' not estimated · '+cf+' suspended by conflict. Procurement package — none declared. Connection map — later stage, not started.</div>';
+    h+='<div>'+(ch.length?'<span class="chip stale">'+(r.ir<p.inputRev?(p.inputRev-r.ir)+' edit'+(p.inputRev-r.ir>1?'s':'')+' since this output':'changed since this output')+'</span> '+esc(ch.map(label).join(', '))+' — '+plural(stl,'line')+' marked stale; the other lines are unaffected.':'Up to date with the current details.')+'</div>'}
+  h+='<div><button class="btn primary" data-act="gen" data-fid="gen"'+(!kindOf(p)?' disabled':'')+'>'+(r?(ch.length?'Generate revision '+(r.n+1)+' from current details':'Regenerate (no detail changes)'):'Generate first output')+'</button>'+(!kindOf(p)?' <span class="note">Choose a planning approach first (Request and scope).</span>':'')+'</div></div>';
+  h+='<div role="tablist" aria-label="Outputs">'+TABS.map(function(t){var s=ui.tab===t[0];return '<button role="tab" id="tab-'+t[0]+'" aria-controls="tp" aria-selected="'+s+'" tabindex="'+(s?0:-1)+'" data-act="tab" data-tab="'+t[0]+'" data-fid="tab-'+t[0]+'">'+t[1]+'</button>'}).join('')+'</div>';
+  h+='<div role="tabpanel" id="tp" aria-labelledby="tab-'+ui.tab+'" tabindex="0">';
+  if(ui.tab==='bom')h+=tabBOM(p,r,vr,ch);
+  else if(ui.tab==='chg')h+=tabChanges(p);
+  else if(ui.tab==='revs')h+=tabRevs(p);
+  else if(ui.tab==='links')h+=tabLinks(p,vr,ch);
+  else if(ui.tab==='rel')h+=tabRel(p);
+  else h+=tabLater(p,r);
+  return h+'</div>';
+}
+function tabBOM(p,r,vr,ch){
+  if(!vr)return '<p>No BOM yet.</p>';
+  var ro=vr!==r,h='';
+  if(ro)h+='<div class="banner info"><b>Read-only: revision '+vr.n+'</b> (session '+vr.s+', details r'+vr.ir+'). Revisions are never overwritten. <button class="btn small" data-act="view" data-n="">Back to latest</button></div>';
+  h+='<div class="label">Conditional estimate — assumptions listed — hypothetical hardware — not a design, not orderable</div>';
+  var ls=vr.out.lines,ne=ls.filter(function(l){return l.st==='ne'}).length,cf=ls.filter(function(l){return l.st==='cf'}).length,asm=uniq([].concat.apply([],ls.map(function(l){return l.rest})));
+  h+='<div class="summary" aria-label="BOM summary"><span>'+ls.length+' lines</span><span>0 qualified</span><span>'+ne+' not estimated</span><span>'+cf+' suspended</span><span>'+asm.length+' assumptions in use</span><span>'+vr.out.conf.length+' conflicts</span></div>';
+  vr.out.conf.forEach(function(c){h+=conflictHTML(p,c,ro)});
+  h+='<div class="scroll"><table><caption class="sr">BOM lines, revision '+vr.n+'</caption><thead><tr><th scope="col">Line</th><th scope="col">Quantity (select for why)</th><th scope="col">Precision · claim</th><th scope="col">Rests on / needs</th></tr></thead><tbody>';
+  ls.forEach(function(l){
+    var st=ro?[]:lineStale(l,ch),q;
+    if(l.alts)q='<button class="qty" data-act="trace" data-k="'+l.key+'" data-fid="q-'+l.key+'" aria-label="'+esc(l.l)+': '+esc(qtext(l))+'. Explain">'+l.alts.map(function(a){return '<span style="display:block"><i>'+esc(a.a)+':</i> '+esc(a.q)+'</span>'}).join('')+'</button><div class="note">separate totals, never summed</div>';
+    else q='<button class="qty" data-act="trace" data-k="'+l.key+'" data-fid="q-'+l.key+'" aria-label="'+esc(l.l)+': '+esc(qtext(l))+'. Explain">'+esc(qtext(l))+'</button>';
+    if(l.lock)q+='<div><span class="chip locked">'+esc(l.lock)+'</span></div>';
+    if(l.note)q+='<div class="note">'+esc(l.note)+'</div>';
+    if(!ro&&(l.key==='leaves'||l.key==='spines')&&l.st==='ok'&&l.q!=null){
+      var lk=p.locks[l.key];
+      if(ui.lockForm===l.key)q+='<div class="inl"><label>Ordered <input type="number" min="1" id="lk-q" data-fid="lk-q" value="'+(lk?lk.q:l.q)+'" style="width:5em"></label><label>Delivered <input type="number" min="0" id="lk-d" value="'+(lk?lk.del:0)+'" style="width:5em"></label><button class="btn small primary" data-act="lock-save" data-k="'+l.key+'">Record</button><button class="btn small" data-act="lock-cancel">Cancel</button></div>';
+      else q+='<div><button class="btn small" data-act="lock-form" data-k="'+l.key+'" data-fid="lf-'+l.key+'">'+(lk?'Change order record':'Record order')+'</button>'+(lk?'<button class="btn small" data-act="unlock" data-k="'+l.key+'">Remove order record…</button>':'')+'</div>';
+    }
+    var claim=l.st==='ne'?'<span class="chip ne">unresolved</span>':l.st==='cf'?'<span class="chip conflict">suspended</span>':esc(l.prec)+' · <span class="chip ce">conditional estimate</span>';
+    var rest='';
+    if(l.st==='ne')rest=(l.need.length?'<b>Needs:</b> '+l.need.map(function(id){return '<button class="link" data-act="go" data-id="'+id+'">'+esc(label(id))+'</button> '+chipO('unknown')}).join(' '):'')+(l.reason?'<div>'+esc(l.reason)+'</div>':'');
+    else if(l.st==='cf')rest='Resolve <a href="#cf-'+l.cid+'">the conflict</a>.';
+    else rest=(l.rest.length?'<b>Rests on '+plural(l.rest.length,'assumption')+':</b> '+l.rest.map(function(id){return '<button class="link" data-act="go" data-id="'+id+'">'+esc(label(id))+'</button>'}).join(', '):'No open assumptions in this line’s inputs (hardware still hypothetical)')+(l.nchk.length?'<div><b>Not checked:</b> '+l.nchk.map(function(id){return '<button class="link" data-act="go" data-id="'+id+'">'+esc(label(id))+'</button> (unknown)'}).join(', ')+'</div>':'');
+    l.flags.forEach(function(f){rest+='<div><span class="chip '+(/^blocked/.test(f)?'blocked':'unverified')+'">'+esc(f)+'</span></div>'});
+    if(st.length)rest+='<div><span class="chip stale">stale — changed: '+esc(st.join(', '))+'</span></div>';
+    if(!ro&&r.tgt!==p.target.label)rest+='<div><span class="chip stale">release review pending</span></div>';
+    h+='<tr class="'+(st.length?'stale':'')+'"><th scope="row">'+esc(l.l)+'</th><td class="num">'+q+'</td><td>'+claim+'</td><td>'+rest+'</td></tr>';
+    if(ui.trace===l.key)h+='<tr><td colspan="4">'+traceHTML(p,vr,l)+'</td></tr>';
+  });
+  h+='</tbody></table></div>';
+  if(vr.out.excluded.length)h+='<p class="note"><b>Out of scope'+(eff(p,'nets').o==='assumed'?' (assumed — change in Request and scope)':' by your choice')+':</b> '+esc(vr.out.excluded.join(', '))+'. Shown as out of scope, never as 0.</p>';
+  h+='<p class="note">Qualified quantity scope needs qualified parts and target applicability; this prototype has only hypothetical hardware, so no line can reach it. Unestimated categories are never shown as 0, and alternatives are never summed.</p>';
+  return h;
+}
+function conflictHTML(p,c,ro){
+  var h='<div class="conflictbox" id="cf-'+c.id+'" role="group" aria-labelledby="cft-'+c.id+'"><h3 id="cft-'+c.id+'" style="margin-top:0"><span class="chip conflict">conflict</span> '+esc(c.t)+' <span class="chip">'+(c.kind==='proven'?'demonstrated infeasible under these inputs':'not proven feasible: search or evidence incomplete')+'</span></h3>';
+  h+='<p><b>Because:</b> '+esc(c.because)+'</p><p><b>Conflicting inputs:</b> '+c.inputs.map(function(id){if(!DM[id])return esc(LOCKNAME[id]||id)+(p.locks[id.replace('lock:','')]?' <span class="chip locked">locked</span>':'');var e=eff(p,id);return '<button class="link" data-act="go" data-id="'+id+'">'+esc(label(id))+'</button> '+chipO(e.o)}).join(' · ')+'</p>';
+  h+='<b>Candidate relaxations</b> <span class="note">(nothing is relaxed automatically; not checked for minimality)</span><ol>';
+  c.relax.forEach(function(x,i){h+='<li>'+esc(x.t);if(!ro&&x.set){h+=' <button class="btn small" data-act="preview" data-c="'+c.id+'" data-i="'+i+'" data-fid="pv-'+c.id+i+'">Preview</button><button class="btn small" data-act="apply" data-c="'+c.id+'" data-i="'+i+'">Use as my answer</button>';if(ui.prev&&ui.prev.c===c.id&&ui.prev.i===i)h+='<div class="note" role="status">Preview: '+esc(ui.prev.text)+'</div>'}else if(!ro&&x.go){h+=' <button class="btn small" data-act="go" data-id="'+x.go+'">Go to detail</button>'}h+='</li>'});
+  h+='</ol>';
+  var AF={spines:'spine switches',lslinks:'leaf-to-spine links',lscab:'leaf-to-spine cables',oob:'OOB ports (now a lower bound)',islinks:'inter-switch links',iscab:'inter-switch cables'};if(c.aff.length)h+='<p class="note">Suspended lines: '+esc(c.aff.map(function(k){return AF[k]||k}).join(', '))+'. Every other line keeps its value.</p>';
+  return h+'</div>';
+}
+function traceHTML(p,vr,l){
+  var ro=vr!==latest(p),h='<section class="trace" aria-labelledby="trh" tabindex="-1" id="trace"><h3 id="trh" style="margin-top:0">Why '+esc(qtext(l))+'? — '+esc(l.l)+'</h3>';
+  if(l.st==='ne')h+='<p>Not estimated. '+(l.need.length?'Missing: '+l.need.map(function(id){return '<button class="link" data-act="go" data-id="'+id+'">'+esc(label(id))+'</button>'}).join(', ')+'. ':'')+esc(l.reason||'')+' hh-aid does not invent a quantity when inputs are insufficient.</p>';
+  else if(l.st==='cf')h+='<p>Suspended by <a href="#cf-'+l.cid+'">a conflict</a>. Resolve it to get a value.</p>';
+  else h+='<ul>'+node(p,l.tr,ro)+'</ul>';
+  h+='<p class="note"><b>Counts:</b> requirement <code>dem:'+esc(l.key)+'</code> (stable aggregate demand ID across revisions; not yet expanded to instances). <b>Revision:</b> '+vr.n+' · <b>Evidence:</b> '+esc(vr.ev)+'.</p>';
+  var w=uniq((l.rest||[]).concat(l.nchk||[]));
+  if(w.length)h+='<p><b>What would change it:</b> '+w.map(function(id){return '<button class="link" data-act="go" data-id="'+id+'">'+esc(label(id))+'</button>'}).join(' · ')+'</p>';
+  h+='<button class="btn small" data-act="copy-t" data-k="'+l.key+'">Copy as text with assumptions</button><button class="btn small" data-act="trace" data-k="'+l.key+'">Close explanation</button>';
+  if(ui.copy&&ui.copy.where==='t'+l.key)h+='<label class="note" for="copyt" style="display:block">Explanation text (select and copy)</label><textarea id="copyt" class="copy" readonly>'+esc(ui.copy.text)+'</textarea>';
+  return h+'</section>';
+}
+function node(p,n,ro){
+  if(!n)return '';
+  var ids=n.ids.filter(function(id){return DM[id]}),h='<li>'+esc(n.t);
+  ids.forEach(function(id){var e=eff(p,id);h+=' '+chipO(e.o)+'<span class="note">'+esc(label(id))+'</span>'+(!ro?' <button class="btn small" data-act="go" data-id="'+id+'" aria-label="Change '+esc(label(id))+'">Change</button>':'')});
+  if(n.kids.length)h+='<ul>'+n.kids.map(function(k){return node(p,k,ro)}).join('')+'</ul>';
+  return h+'</li>';
+}
+function traceText(p,l,vr){
+  var out=[l.l+': '+qtext(l)+' ['+l.prec+(l.st==='ok'?' · conditional estimate':'')+']'];
+  (function walk(n,d){if(!n)return;out.push(new Array(d+1).join('  ')+'- '+n.t+(n.ids.filter(function(i){return DM[i]}).length?' ('+n.ids.filter(function(i){return DM[i]}).map(function(i){return label(i)+': '+ORG(eff(p,i).o)}).join('; ')+')':''));n.kids.forEach(function(k){walk(k,d+1)})})(l.tr,1);
+  if(l.rest.length)out.push('Rests on assumptions: '+l.rest.map(label).join(', '));
+  if(l.nchk.length)out.push('Not checked: '+l.nchk.map(label).join(', '));
+  if(l.st==='ne')out.push('Not estimated: needs '+(l.need.map(label).join(', ')||'')+' '+(l.reason||''));
+  out.push('Revision '+vr.n+'; evidence '+vr.ev+'. Hypothetical hardware; not orderable.');
+  return out.join('\n');
+}
+function tabChanges(p){
+  if(p.revs.length<2)return '<p>Generate a second revision to compare. Every revision is kept with the details revision it came from.</p>';
+  var b=ui.cmpB||p.revs.length,a=ui.cmpA||b-1;if(a>=b)a=b-1;
+  var A=p.revs[a-1],B=p.revs[b-1],d=diff(A,B);
+  var opts=function(sel,nm){return '<select data-act2="cmp" data-w="'+nm+'" data-fid="cmp-'+nm+'" aria-label="'+(nm==='a'?'Compare from':'Compare to')+'">'+p.revs.map(function(r){return '<option value="'+r.n+'"'+(r.n===sel?' selected':'')+'>revision '+r.n+' (session '+r.s+')</option>'}).join('')+'</select>'};
+  var h='<div class="inl">Compare '+opts(a,'a')+' → '+opts(b,'b')+'</div>';
+  var chs=d.rows.filter(function(x){return x.ch}),un=d.rows.length-chs.length;
+  var chips=chs.filter(function(x){return x.dl}).map(function(x){return '<span>'+(x.dl>0?'+':'')+fmt(x.dl)+' '+esc(x.l.toLowerCase())+'</span>'});
+  h+='<div class="summary" aria-label="Change summary">'+chips.join('')+'<span>'+plural(chs.length,'line')+' changed</span><span>'+un+' unchanged</span>'+(d.newC.length?'<span class="chip conflict">'+plural(d.newC.length,'new conflict')+'</span>':'')+(d.resC.length?'<span>'+plural(d.resC.length,'conflict')+' resolved</span>':'')+'</div>';
+  h+='<h3>Detail changes (details r'+A.ir+' → r'+B.ir+')</h3>'+(d.inp.length?'<ul>'+d.inp.map(function(x){return '<li><b>'+esc(label(x.id))+':</b> '+esc(x.f)+' → '+esc(x.t)+'</li>'}).join('')+'</ul>':'<p class="note">No detail changes.</p>');
+  if(d.ev)h+='<p><b>Evidence:</b> '+esc(d.ev[0])+' → '+esc(d.ev[1])+'</p>';
+  h+='<h3>Changed lines</h3>'+(chs.length?'<div class="scroll"><table><caption class="sr">Changed lines</caption><thead><tr><th scope="col">Line</th><th scope="col">Revision '+a+'</th><th scope="col">Revision '+b+'</th><th scope="col">Why</th></tr></thead><tbody>'+chs.map(function(x){var why=[];if(x.x&&x.y&&x.x.st!==x.y.st)why.push(x.y.st==='cf'?'suspended by conflict':x.y.st==='ne'?'now not estimated':'now estimated');if(x.x&&x.y&&JSON.stringify(x.x.rest)!==JSON.stringify(x.y.rest))why.push('rests on '+x.x.rest.length+' → '+x.y.rest.length+' assumptions');if(!x.x)why.push('new line');if(!x.y)why.push('line removed');if(x.x&&x.y&&JSON.stringify(x.x.flags)!==JSON.stringify(x.y.flags))why.push('flags changed');return '<tr><th scope="row">'+esc(x.l)+'</th><td>'+esc(x.tx)+'</td><td>'+esc(x.ty)+'</td><td>'+esc(why.join('; ')||'quantity changed')+'</td></tr>'}).join('')+'</tbody></table></div>':'<p class="note">No line changed.</p>');
+  if(un)h+='<details><summary>'+un+' unchanged lines</summary><ul>'+d.rows.filter(function(x){return !x.ch}).map(function(x){return '<li>'+esc(x.l)+': '+esc(x.ty)+'</li>'}).join('')+'</ul></details>';
+  h+='<p class="note">Existing planning IDs are kept; only added or removed demand appears as new or removed lines and patterns. Ordered quantities are never re-optimised. No approvals are recorded in this prototype; in the product, an approval on revision '+a+' applies to that revision’s hash only and shows as retained within unchanged scope, needs review, or invalidated for revision '+b+'.</p>';
+  return h;
+}
+function tabRevs(p){
+  var h='<h3 style="margin-top:0">Revisions</h3>';
+  if(!p.revs.length)h+='<p>No revisions yet.</p>';
+  else h+='<div class="scroll"><table><caption class="sr">Revisions</caption><thead><tr><th scope="col">Revision</th><th scope="col">Session</th><th scope="col">From details</th><th scope="col">Evidence</th><th scope="col">Result</th><th scope="col">Actions</th></tr></thead><tbody>'+p.revs.slice().reverse().map(function(r){var ne=r.out.lines.filter(function(l){return l.st==='ne'}).length;return '<tr><th scope="row">'+r.n+(r.n===p.revs.length?' (latest)':'')+'</th><td>'+r.s+'</td><td>r'+r.ir+'</td><td>'+esc(r.ev)+'</td><td>'+r.out.lines.length+' lines · '+ne+' not estimated · '+r.out.conf.length+' conflicts</td><td><button class="btn small" data-act="view" data-n="'+r.n+'">View</button>'+(r.n>1?'<button class="btn small" data-act="cmp-prev" data-n="'+r.n+'">Compare with previous</button>':'')+'</td></tr>'}).join('')+'</tbody></table></div>';
+  h+='<h3>Detail history</h3><p class="note">Every answer change is kept with its session. Undo creates a new details revision; nothing is erased.</p>';
+  if(!p.hist.length)h+='<p>No edits yet.</p>';
+  else h+='<div class="scroll"><table><caption class="sr">Detail history</caption><thead><tr><th scope="col">Details rev</th><th scope="col">Session</th><th scope="col">Detail</th><th scope="col">Change</th><th scope="col"></th></tr></thead><tbody>'+p.hist.slice(0,40).map(function(x,i){return '<tr><td>r'+x.r+'</td><td>'+x.s+'</td><td>'+esc(label(x.id))+(x.why?'<div class="note">'+esc(x.why)+'</div>':'')+'</td><td>'+esc(x.bv)+' → '+esc(x.av)+'</td><td><button class="btn small" data-act="undo" data-i="'+i+'">Undo</button></td></tr>'}).join('')+'</tbody></table></div>';
+  return h;
+}
+function tabLinks(p,vr,ch){
+  if(!vr)return '<p>No output yet.</p>';
+  var r=latest(p),pv=vr.n>1?p.revs[vr.n-2]:null,pk={};if(pv)pv.out.pats.forEach(function(x){pk[x.key]=x.n});
+  var pats=vr.out.pats.map(function(x){return {x:x,chg:pv?(pk[x.key]!==x.n):false}});
+  var q=ui.patq.trim().toLowerCase(),rows=pats.filter(function(o){return !q||o.x.t.toLowerCase().indexOf(q)>=0||o.x.grp.toLowerCase().indexOf(q)>=0});
+  if(ui.patchg)rows=rows.filter(function(o){return o.chg});
+  rows.sort(function(a,b){return b.chg-a.chg});
+  var shown=rows.filter(function(o){return o.chg||ui.patexp||!pv}),coll=rows.filter(function(o){return !(o.chg||ui.patexp||!pv)});
+  var total=sum(vr.out.pats.map(function(x){return x.n}));
+  var h='<h3 style="margin-top:0">Reviewing '+fmt(total)+' links without a giant graph</h3>';
+  var stl=vr===r?vr.out.lines.filter(function(l){return lineStale(l,ch).length}).length:0;
+  h+='<div class="conflictbox" style="border-width:1px"><b>Exceptions first:</b> '+[vr.out.conf.length?'<span class="chip conflict">'+plural(vr.out.conf.length,'conflict')+'</span>':'',stl?'<span class="chip stale">'+plural(stl,'stale line')+'</span>':'',pv?'<span class="chip changed">'+pats.filter(function(o){return o.chg}).length+' changed patterns since revision '+pv.n+'</span>':''].concat(vr.out.exc.map(function(e){return '<span class="chip">'+esc(e)+'</span>'})).filter(Boolean).join(' ')+(vr.out.conf.length||stl||vr.out.exc.length?'':' none')+'</div>';
+  if(vr.out.locator){var L=vr.out.locator;h+='<div class="inl"><label>Find endpoint <input id="srv" type="search" inputmode="numeric" placeholder="0–'+(L.N-1)+'" size="6" data-fid="srv" value="'+esc(ui.srv)+'"></label><label>rail <select id="rail" data-fid="rail">'+Array.apply(null,{length:L.rails}).map(function(_,i){return '<option'+(String(i)===ui.rail?' selected':'')+'>'+i+'</option>'}).join('')+'</select></label><span role="status">'+esc(locate(L))+'</span></div>'}
+  h+='<div class="inl"><label>Filter patterns <input id="patq" type="search" data-fid="patq" value="'+esc(ui.patq)+'" placeholder="e.g. group C, rack 3, leaf-spine"></label>'+(pv?'<label><input type="checkbox" id="patchg" data-fid="patchg"'+(ui.patchg?' checked':'')+'> changed since revision '+pv.n+' only</label><label><input type="checkbox" id="patexp" data-fid="patexp"'+(ui.patexp?' checked':'')+'> expand unchanged patterns</label>':'')+'</div>';
+  h+='<div class="scroll"><table><caption class="sr">Link patterns, revision '+vr.n+'</caption><thead><tr><th scope="col">Pattern</th><th scope="col">Links</th><th scope="col">Ports</th><th scope="col">Status</th></tr></thead><tbody>';
+  h+=shown.slice(0,120).map(function(o){return '<tr><td>'+esc(o.x.t)+'</td><td class="num">'+fmt(o.x.n)+'</td><td>'+esc(o.x.d)+'</td><td>'+(o.chg?'<span class="chip changed">changed in revision '+vr.n+'</span>':pv?'<span class="chip unchanged">unchanged</span>':'')+(o.x.un?' <span class="note">'+o.x.un+' unused (intentional)</span>':'')+'</td></tr>'}).join('');
+  if(shown.length>120)h+='<tr><td colspan="4">'+fmt(shown.length-120)+' more patterns — narrow the filter or export.</td></tr>';
+  if(coll.length)h+='<tr><td colspan="4"><span class="chip unchanged">unchanged</span> '+plural(coll.length,'pattern')+', '+fmt(sum(coll.map(function(o){return o.x.n})))+' links, collapsed. Tick “expand unchanged patterns” to list them.</td></tr>';
+  if(!rows.length)h+='<tr><td colspan="4">No patterns match these filters.</td></tr>';
+  h+='</tbody></table></div><p class="note">One row per link pattern. Per-link rows and CSV export of any filtered view are proposed (D02 §7) but not built in this prototype.</p>';
+  return h;
+}
+function locate(L){var v=ui.srv.trim();if(v==='')return '';var n=+v;if(!(n>=0&&n<L.N&&Math.floor(n)===n))return 'Enter an endpoint number from 0 to '+(L.N-1)+'.';var r=+ui.rail,d=Math.floor(n/L.slots),j=n%L.slots;return 'endpoint '+n+' rail '+r+' → leaf-'+gl(d)+'-r'+r+' cage '+(1+Math.floor(j/L.per))+(L.per>1?' lane '+(1+j%L.per):'')+' (group '+gl(d)+')'}
+var RELROWS=[
+  {a:'Connection and domain semantics',res:'unchanged',aff:'—',eff:'none'},
+  {a:'Switch roles, modes, profile budgets',res:'changed',aff:'leaf switch lines (candidate profile)',eff:'recheck mode/budget; counts kept if the recheck passes'},
+  {a:'Validation, config, import contract',res:'unchanged',aff:'—',eff:'none'},
+  {a:'Operational constraints',res:'unchanged',aff:'—',eff:'none'},
+  {a:'hh-aid catalog / compatibility evidence',res:'unknown',blocked:true,aff:'cable lines',eff:'no line may claim qualified quantity scope for <TARGET> until checked'}
+];
+function tabRel(p){
+  var r=latest(p),h='<h3 style="margin-top:0">Latest-release impact review</h3>';
+  h+='<p><b>Installing on:</b> '+esc(p.target.label)+' — currentness '+esc(p.target.curr)+'<br><b>Latest output built from evidence:</b> '+(r?esc(r.ev):'no output yet')+'</p>';
+  if(!p.rel){h+='<p>No new installation target has been recorded. Until compat’s release screen (#3) reports, the target’s currentness is unknown and no output is described as current.</p><button class="btn" data-act="rel-start" data-fid="rel-start">Simulate: record a new target observation (placeholder)</button><p class="note">The simulation only demonstrates the review interaction. Its rows are examples, not release findings.</p>';return h}
+  var R=p.rel;
+  h+='<p class="note"><b>Example rows only — not real release findings.</b></p><div class="summary"><span class="chip changed">1 changed</span><span class="chip unchanged">3 unchanged with evidence</span><span class="chip unknown">1 unknown/uncovered</span><span class="chip blocked">1 blocked</span></div>';
+  h+='<div class="scroll"><table><caption class="sr">Release impact (example)</caption><thead><tr><th scope="col">Area (compat #3 screen)</th><th scope="col">Result</th><th scope="col">Affects</th><th scope="col">Effect</th><th scope="col">Review</th></tr></thead><tbody>'+RELROWS.map(function(x,i){var st=R.rev[i];return '<tr><td>'+esc(x.a)+'</td><td><span class="chip '+x.res+'">'+(x.res==='unchanged'?'unchanged with evidence':x.res==='unknown'?'unknown/uncovered':'changed (example)')+'</span>'+(x.blocked?' <span class="chip blocked">blocked</span>':'')+'</td><td>'+esc(x.aff)+'</td><td>'+esc(x.eff)+'</td><td>'+(x.res==='unchanged'?(R.ack?'acknowledged':'—'):(st?'reviewed':'<button class="btn small" data-act="rel-rev" data-i="'+i+'">Mark reviewed</button>'))+'</td></tr>'}).join('')+'</tbody></table></div>';
+  var ready=R.ack&&RELROWS.every(function(x,i){return x.res==='unchanged'||R.rev[i]});
+  h+='<p>'+(R.ack?'':'<button class="btn" data-act="rel-ack" data-fid="rel-ack">Acknowledge 3 unchanged with evidence</button>')+'<button class="btn primary" data-act="rel-go" data-fid="rel-go"'+(ready&&!R.done?'':' disabled')+'>Revalidate into revision '+(p.revs.length+1)+'</button>'+(R.done?' <span class="chip">done: revision '+R.done+'</span>':'')+'</p>';
+  h+='<p class="note">Changed and unknown items need individual review; unchanged items are acknowledged together but stay listed. Ordered lines carry forward unchanged; if the target made one incompatible it would be a conflict, not a substitution. Earlier revisions stay reproducible. The blocked item gates only the claims that depend on it.</p>';
+  return h;
+}
+function tabLater(p,r){
+  return '<div class="cards"><div class="panel later"><h3 style="margin-top:0">Connection map</h3><p>Later stage: port-to-port realisation of the BOM’s link patterns. Needs cable construction, placement and port assignment. <b>Not a prerequisite for the BOM.</b></p><p class="note">Every BOM line counts stable demand IDs, so the map will reconcile to it line by line.</p></div><div class="panel later"><h3 style="margin-top:0">Procurement package</h3><p>None declared. A package needs qualified quantity scope for its lines (exact SKUs, lengths, compatibility for the target), then procurement-candidate, then a named approver. '+(r?'Currently 0 of '+r.out.lines.length+' lines are qualified (hypothetical hardware).':'')+'</p></div><div class="panel later"><h3 style="margin-top:0">Installation package</h3><p>Later stage: wiring export, site binding and acceptance (R06 I5–I9). Separate predicates from the BOM.</p></div></div>';
+}
+
+/* ---------- events ---------- */
+function openP(id,newSession,keepResume){
+  var p=store.projects[id];if(!p)return;
+  if(newSession&&p.closed){var last=p.session;p.session++;p.closed=false;ui.resume=resumeInfo(p,last)}else if(!keepResume)ui.resume=null;
+  p.closed=false;save();
+  ui.pid=id;ui.screen='ws';ui.tab='bom';ui.view=null;ui.trace=null;ui.prev=null;ui.copy=null;ui.lockForm=null;ui.errs={};ui.find='';
+  render();var hd=$('#outputs-h');if(hd)hd.focus();
+}
+function goField(id){
+  if(!DM[id]){if(/^lock:/.test(id)){ui.tab='bom';ui.lockForm=id.replace('lock:','');render();var b=$('#lk-q');if(b)b.focus()}return}
+  ui.open[DM[id].sec]=true;render();
+  var el=$('#in-'+id)||$('#f-'+id+' input');var f=$('#f-'+id);
+  if(f&&f.scrollIntoView)f.scrollIntoView({block:'center'});if(el)el.focus();
+  announce('Opened '+DM[id].l+' in '+SECS.filter(function(s){return s.id===DM[id].sec})[0].t+'.');
+}
+document.addEventListener('click',function(ev){
+  var b=ev.target.closest('[data-act]');if(!b)return;
+  var a=b.getAttribute('data-act'),p=P();
+  if(b.tagName==='INPUT'||b.tagName==='SELECT')return;
+  if(a==='preset'){preset(b.getAttribute('data-x'));return}
+  if(a==='reset'){if(confirm('Delete all prototype projects saved in this browser?')){store={projects:{},order:[]};save();ui.screen='home';render()}return}
+  if(a==='home'){ui.screen='home';render();return}
+  if(a==='new'){ui.st={name:'Untitled project',kind:'',req:'',count:'',racks:'',profile:''};ui.screen='start';render();var n=$('#st-name');if(n)n.focus();return}
+  if(a==='example'){var x=EXAMPLES[b.getAttribute('data-x')];ui.st={name:x.name,kind:x.kind,req:x.req,count:x.count||'',racks:x.racks||'',profile:x.profile};ui.screen='start';render();var hh=$('h2');if(hh){hh.tabIndex=-1;hh.focus()}return}
+  if(a==='st-create'){var np=createFrom(ui.st,b.getAttribute('data-gen')==='1');openP(np.id,false);return}
+  if(a==='open'){openP(b.getAttribute('data-pid'),true);return}
+  if(a==='del'){var dp=store.projects[b.getAttribute('data-pid')];if(dp&&confirm('Delete '+dp.name+' and all its revisions from this browser?')){delete store.projects[dp.id];save();render()}return}
+  if(!p)return;
+  if(a==='close'){p.closed=true;save();ui.screen='home';ui.resume=null;render();announce(p.name+' saved and closed. Resume it any time.');var o=$('[data-fid="open-'+p.id+'"]');if(o)o.focus();return}
+  if(a==='dismiss-resume'){ui.resume=null;render();return}
+  if(a==='gen'){generate(p);ui.tab='bom';render();return}
+  if(a==='tab'){ui.tab=b.getAttribute('data-tab');ui.copy=null;render();var t=$('#tab-'+ui.tab);if(t)t.focus();return}
+  if(a==='go'){goField(b.getAttribute('data-id'));return}
+  if(a==='confirm'){var id=b.getAttribute('data-id');setAns(p,id,{v:eff(p,id).v},'confirmed assumed value');render();return}
+  if(a==='unknown'){setAns(p,b.getAttribute('data-id'),{unknown:true},'marked unknown');render();return}
+  if(a==='usedef'){setAns(p,b.getAttribute('data-id'),null,'restored default');render();return}
+  if(a==='hide-sug'){ui.hideSug=true;render();return}
+  if(a==='show-sug'){ui.hideSug=false;render();return}
+  if(a==='copy-q'){var sg=suggestions(p,gen(p)),opn=D.filter(function(d){return !d.nostate&&(d.id==='kind'||d.ap(kindOf(p)))&&eff(p,d.id).o!=='user'});ui.copy={where:'q',text:'Open questions for '+p.name+':\n'+opn.map(function(d){var e=eff(p,d.id);return '- '+d.l+'? (currently '+(e.o==='assumed'?'assumed: '+showV(p,d.id,e):'unknown')+')'}).join('\n')+(sg.length?'\nMost useful first: '+sg.map(function(s){return DM[s.id].l}).join('; '):'')};render();var c=$('#copyq');if(c){c.focus();c.select()}return}
+  if(a==='trace'){var k=b.getAttribute('data-k');ui.trace=ui.trace===k?null:k;ui.copy=null;render();var tr=$('#trace');if(tr)tr.focus();else{var q=$('[data-fid="q-'+k+'"]');if(q)q.focus()}return}
+  if(a==='copy-t'){var vr=ui.view?p.revs[ui.view-1]:latest(p),l=vr.out.lines.filter(function(x){return x.key===b.getAttribute('data-k')})[0];ui.copy={where:'t'+l.key,text:traceText(p,l,vr)};render();var ct=$('#copyt');if(ct){ct.focus();ct.select()}return}
+  if(a==='preview'||a==='apply'){var cv=latest(p).out.conf.filter(function(c){return c.id===b.getAttribute('data-c')})[0],rl=cv&&cv.relax[+b.getAttribute('data-i')];if(!rl)return;
+    if(a==='preview'){ui.prev={c:cv.id,i:+b.getAttribute('data-i'),text:preview(p,rl.set)};render();announce('Preview: '+ui.prev.text)}
+    else{Object.keys(rl.set).forEach(function(id){setAns(p,id,{v:rl.set[id]},'relaxation chosen from conflict')});ui.prev=null;render();announce('Answer recorded. Generate when ready; the conflict stays until you do.')}return}
+  if(a==='lock-form'){ui.lockForm=b.getAttribute('data-k');render();var lq=$('#lk-q');if(lq)lq.focus();return}
+  if(a==='lock-cancel'){var lkf=ui.lockForm;ui.lockForm=null;render();var bb=$('[data-fid="lf-'+lkf+'"]');if(bb)bb.focus();return}
+  if(a==='lock-save'){var kk=b.getAttribute('data-k'),qq=parseInt($('#lk-q').value,10),dd=parseInt($('#lk-d').value,10)||0;if(!(qq>0)||dd<0||dd>qq){announce('Enter an ordered quantity of at least 1 and a delivered quantity between 0 and the ordered quantity.');return}setLock(p,kk,{q:qq,del:dd},'order recorded');ui.lockForm=null;render();return}
+  if(a==='unlock'){var uk=b.getAttribute('data-k');if(confirm('Remove the order record for '+uk+'? Lines that depend on it (switch counts, leaf-to-spine links, cables, OOB ports) become stale. The record stays in history and can be undone.')){setLock(p,uk,null,'order record removed');render()}return}
+  if(a==='view'){var n=b.getAttribute('data-n');ui.view=n?+n:null;if(ui.view===p.revs.length)ui.view=null;ui.tab='bom';ui.trace=null;render();var tb=$('#tab-bom');if(tb)tb.focus();return}
+  if(a==='cmp-prev'){var m=+b.getAttribute('data-n');ui.cmpA=m-1;ui.cmpB=m;ui.tab='chg';render();var tc=$('#tab-chg');if(tc)tc.focus();return}
+  if(a==='undo'){var hi=p.hist[+b.getAttribute('data-i')];if(hi.lock)setLock(p,hi.lock,hi.prev,'undo of details r'+hi.r);else setAns(p,hi.id,hi.prev,'undo of details r'+hi.r);render();return}
+  if(a==='rel-start'){p.target={label:'<TARGET>',curr:'placeholder observation — example only, not from #3'};p.inputRev++;p.hist.unshift({r:p.inputRev,s:p.session,id:'target',prev:null,next:null,bv:'latest Hedgehog release (currentness unknown)',av:'<TARGET> (placeholder)',why:'simulated target observation'});p.rel={ack:false,rev:{},done:null};save();render();announce('Placeholder target recorded. Release review opened; outputs marked review pending.');return}
+  if(a==='rel-ack'){p.rel.ack=true;save();render();var rg=$('[data-fid="rel-go"]');if(rg)rg.focus();return}
+  if(a==='rel-rev'){p.rel.rev[+b.getAttribute('data-i')]=true;save();render();return}
+  if(a==='rel-go'){p.relBlocked=true;generate(p,EVT,'revalidated against placeholder target');p.rel.done=p.revs.length;save();ui.tab='bom';render();return}
+});
+document.addEventListener('change',function(ev){
+  var t=ev.target,p=P();
+  if(t.hasAttribute('data-st')){var f=t.getAttribute('data-st');ui.st[f]=t.value;if(f==='kind'||f==='profile')render();return}
+  if(t.getAttribute('data-act2')==='cmp'){if(t.getAttribute('data-w')==='a')ui.cmpA=+t.value;else ui.cmpB=+t.value;render();return}
+  if(!p)return;
+  if(t.id==='rail'){ui.rail=t.value;render();return}
+  if(t.id==='patchg'){ui.patchg=t.checked;render();return}
+  if(t.id==='patexp'){ui.patexp=t.checked;render();return}
+  var id=t.getAttribute('data-in');if(!id)return;var d=DM[id];delete ui.errs[id];
+  if(d.type==='multi'){var vals=[].slice.call(document.querySelectorAll('input[data-in="'+id+'"]')).filter(function(x){return x.checked}).map(function(x){return x.value});setAns(p,id,{v:vals})}
+  else if(d.type==='num'){var v=t.value.trim();if(v===''){setAns(p,id,d.def&&d.def(kindOf(p),p)?{unknown:true}:null)}else{var n=Number(v);if(!(Math.floor(n)===n&&n>=d.min&&n<=d.max)){ui.errs[id]='Enter a whole number from '+d.min+' to '+d.max+'. Nothing was saved.';render();return}setAns(p,id,{v:n})}}
+  else if(d.type==='sel'){if(t.value==='')setAns(p,id,(d.def&&d.def(kindOf(p),p))?{unknown:true}:null);else setAns(p,id,{v:t.value})}
+  else setAns(p,id,t.value?{v:t.value}:null);
+  render();
+});
+document.addEventListener('input',function(ev){
+  var t=ev.target;
+  if(t.hasAttribute('data-st')&&t.getAttribute('data-st')!=='kind'){ui.st[t.getAttribute('data-st')]=t.value;return}
+  if(t.id==='find'){ui.find=t.value;render();return}
+  if(t.id==='patq'){ui.patq=t.value;render();return}
+  if(t.id==='srv'){ui.srv=t.value;render();return}
+});
+document.addEventListener('toggle',function(ev){var t=ev.target;if(t.classList&&t.classList.contains('sec'))ui.open[t.getAttribute('data-sec')]=t.open},true);
+document.addEventListener('keydown',function(ev){
+  var t=ev.target;if(t.getAttribute('role')!=='tab')return;
+  var i=TABS.map(function(x){return x[0]}).indexOf(t.getAttribute('data-tab')),n=null;
+  if(ev.key==='ArrowRight')n=(i+1)%TABS.length;else if(ev.key==='ArrowLeft')n=(i-1+TABS.length)%TABS.length;else if(ev.key==='Home')n=0;else if(ev.key==='End')n=TABS.length-1;
+  if(n==null)return;ev.preventDefault();ui.tab=TABS[n][0];render();$('#tab-'+ui.tab).focus();
+});
+/* ---------- start ---------- */
+var hsh=location.hash;
+if(hsh==='#demo-s1')preset('s1');else if(hsh==='#demo-s2')preset('s2');else if(hsh==='#demo-s3')preset('s3');
+else if(/^#example-(rail|rack|mesh)$/.test(hsh)){var ex=EXAMPLES[hsh.slice(9)];ui.st={name:ex.name,kind:ex.kind,req:ex.req,count:ex.count||'',racks:ex.racks||'',profile:ex.profile};ui.screen='start';render()}
+else render();
+window.__proto={gen:gen,eff:eff,store:function(){return store},createFrom:createFrom,generate:generate,setAns:setAns,setLock:setLock,diff:diff,P:P};
 })();
 </script>
 </body>

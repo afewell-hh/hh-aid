@@ -2,7 +2,8 @@
 
 Standard library only. Run: python3 -I fixture-check.py
 Checks logical counts under the stated hypothetical assumptions (R04 H400 and
-a 64-port 800G spine). It does not check hardware, upstream validation or
+a 64-port 800G spine, plus the hypothetical 48 x 25G leaf and 32 x 100G spine
+of the redundant-endpoint fixture). It does not check hardware, upstream validation or
 physical compatibility.
 """
 from fractions import Fraction as F
@@ -58,5 +59,57 @@ assert (8 * 18, 8 * 18 * 4, 8 * 4, 8 * 18 * 4 * 400) == \
 
 # R04 N01: 33 nodes, two rails per leaf, four H400 leaves.
 assert 33 * 2 > 64 and 33 * 8 > 4 * 64
+
+
+# --- Revision 2: same workspace, three structurally different fixtures. ---
+def spines(leaves, u, ports, min_s=1, d=None, U=None, loss=None):
+    """Smallest S dividing u with ports*S >= leaves*u (uniform policy)."""
+    for s in range(max(1, min_s), u + 1):
+        if u % s or ports * s < leaves * u:
+            continue
+        if loss is not None and (s < 2 or F(d * s, U * (s - 1)) > loss):
+            continue
+        return s
+    return None
+
+
+# F1 locked-spine variant (136 nodes, 8 spines ordered): per-leaf minimum
+# uplinks for D/U <= 1 are 32 on the 16 full leaves and 4 on the 8 new ones.
+assert 16 * 32 + 8 * ceil_div(8 * 400, 800) == 544 > 8 * 64
+assert new_cages == 32 and 512 + 32 == 544                # prototype cage line
+
+# Custom profile: 64 endpoints x 4 links x 800G on H400 native 800G cages.
+slots800 = 32
+assert (64 * 4, ceil_div(64, slots800) * 4, 4 * (32 + 32)) == (256, 8, 256)
+
+# F2: eight NVL72-style racks, R04 S06-1/S06-2 assumptions, 10 uplinks/leaf.
+R, TR, RL = 8, 18, 4
+leaves_r = R * RL
+cpl = ceil_div(TR, 2)
+assert (R * TR * RL, leaves_r, leaves_r * cpl, leaves_r * (32 - cpl)) == \
+    (576, 32, 288, 736)
+d_r, u_r = TR * 400, 10 * 800
+assert F(d_r, u_r) == F(9, 10)
+s_r = spines(leaves_r, 10, 64)
+assert (s_r, 10 // s_r, leaves_r * 10, leaves_r + s_r) == (5, 2, 320, 37)
+assert spines(leaves_r, 10, 64, d=d_r, U=u_r, loss=1) == 10   # feasible
+assert spines(2 * RL, 10, 64) == 2                              # R04 S06-2
+assert (288, 2 * 288, 2 * 288) == (cpl * leaves_r, 576, 576)    # optical alt
+
+# F3: 40 dual-homed endpoints (ESLAG pair), hypothetical 48 x 25G + 8 x 100G
+# leaves; topology unknown, so mesh and leaf-spine are separate totals.
+def f3(n):
+    pairs = ceil_div(n, 48)
+    lv = 2 * pairs
+    d = min(n, 48) * 25
+    mesh_per = 8 // (lv - 1)
+    mesh_links = lv * (lv - 1) // 2 * mesh_per
+    s = spines(lv, 8, 32, min_s=2)
+    return lv, n * 2, mesh_links, F(d, (lv - 1) * mesh_per * 100), s, \
+        lv * 8, F(d, 800)
+assert f3(40) == (2, 80, 8, F(5, 4), 2, 16, F(5, 4))
+assert 2 * 48 - 80 == 16                                        # unused ports
+assert (2 + 0, 2 + 2) == (2, 4)                                 # OOB mesh | ls
+assert f3(60)[:5] == (4, 120, 12, F(2, 1), 2)
 
 print("D02 fixture arithmetic passed")
