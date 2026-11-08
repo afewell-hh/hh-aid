@@ -27,7 +27,7 @@ Incomplete plans must remain useful but visibly provisional. Never silently inve
 
 ## Working practice
 
-Sponsor UX direction: use a short minimum-input starter only if needed, then a persistent editable details panel and repeated generate/refine/regenerate workspace. Do not frame the full questionnaire as a wizard to finish or hard-code the product around B200. See docs/product-context.md for the actual walkthrough feedback.
+Sponsor UX direction: use a short minimum-input starter only if needed, then a persistent editable details panel and repeated generate/refine/regenerate workspace. Do not frame the full questionnaire as a wizard to finish or hard-code the product around B200. See docs/product-context.md for the actual walkthrough feedback. Ask independent planning questions rather than a bundled single-choice project classification. Research starter UX before choosing controls. Preserve server/rack/topology discovery categories as views of a shared starter-design library, using placeholders until the same from-scratch authoring tooling can build reusable designs.
 
 Current stage: discovery and application design. No implementation stack, solver, or application architecture is approved yet. Sponsor direction: initial users are Hedgehog SEs and possibly selected partner SEs; deliver BOM first, then connection map. Optimize design assets for latest-release installation. Keep exact per-revision evidence versions for reproducibility, but do not treat old release pins as a permanent installation target. See docs/product-context.md for the decision boundaries. Do not start production implementation merely because a research ticket suggests one.
 
