@@ -299,6 +299,7 @@ Fabric <span class="field">backend (existing) ▾</span><br>
 <table><tr><th>Edit</th><th>Shown result</th></tr>
 <tr><td>SL-SRV selector odd 1–63</td><td><span class="tag t-bad">overlap</span> Cage 61 is marked unused and cage 63 is in SL-ONE; neither is assigned twice. Choose: exclude them, or change the other group</td></tr>
 <tr><td>Add cage 5 at 1 × 800G to another group</td><td><span class="tag t-bad">parent/child</span> Cage 5 is in 4 × 200G mode in SL-SRV; the parent cage cannot also be allocated as one port</td></tr>
+<tr><td colspan="2" class="note">These conflicts treat groups as exclusive pools. Model and topo propose that alias views can share one capacity ledger and that unspecified overlap stays unresolved (#8, #5; provisional). Shared pipeline limits are aggregate and do not make distinct children exclusive.</td></tr>
 <tr><td>SL-SRV mode 4 × 200G → 2 × 400G</td><td>Members 120 → 60 per leaf. Affected connection classes are listed before applying (R2)</td></tr></table>
 <h3>Singleton group versus exact binding</h3>
 <table><tr><th></th><th>Scope</th><th>Example</th></tr>
