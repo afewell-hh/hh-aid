@@ -144,15 +144,37 @@ assert cc["CC3"] + cc["CC4"] + cc["CC4x"] == 224    # SL-SRV demand
 assert cc["CC4"] // 4 == 5 and cc["CC4x"] // 4 == 1  # breakout assemblies, 4 tails
 assert v2["rj45 links (cords excluded)"] + s12["rj45 links (cords excluded)"] == 424
 
-# F8 rollup invariant: parent counts only itself; children counted once;
-# owner views of a shared assembly add nothing.
-per_server = ["BE-NIC", "FE-DPU1", "ST-NIC", "power cord", "rail kit",
-              "support contract (per server)"]
-children = sum(v2[k] for k in per_server)
-assert children == 1700
-expanded = v2["servers"] + children + (v2["server-end optics"] + v2["far-end optics"]) \
-    + v2["integrated assemblies"]
-owner_views = 0                                     # references, not quantities
-assert expanded + owner_views == 3600
+# F8 conservation (author verification only; no user-facing grand total, since
+# units differ). Pre-F9 scope: HGX x 100, single-port DPU variant. Each line key
+# is (requirement ID, unit, inclusion state); collapsing or expanding must
+# preserve the keyed map, including unresolved inclusion (parts P1, #6).
+req = {"RQ-SRV": (v2["servers"], "servers", "SKU unknown"),
+       "RQ-BNIC": (v2["BE-NIC"], "NICs", "unknown"),
+       "RQ-DPU": (v2["FE-DPU1"], "DPUs", "unknown"),
+       "RQ-SNIC": (v2["ST-NIC"], "NICs", "unknown"),
+       "RQ-PWR": (v2["power cord"], "cords", "unknown"),
+       "RQ-RAIL": (v2["rail kit"], "kits", "included"),
+       "RQ-SUP": (v2["support contract (per server)"], "contracts", "separate"),
+       "RQ-OPT-A": (v2["server-end optics"], "modules", "separate"),
+       "RQ-OPT-B": (v2["far-end optics"], "modules", "separate"),
+       "RQ-DAC": (v2["integrated assemblies"], "assemblies", "separate"),
+       "RQ-STL": (v2["links, media unknown"], "links", "media not counted")}
+# State 1 (collapsed): visible rows, each holding the IDs it stands for.
+state1 = {"RQ-SRV": ["RQ-SRV", "RQ-BNIC", "RQ-DPU", "RQ-SNIC", "RQ-PWR",
+                     "RQ-RAIL", "RQ-SUP"],          # children hidden, not dropped
+          "Sigma optics": ["RQ-OPT-A", "RQ-OPT-B"],  # view-only aggregate
+          "RQ-DAC": ["RQ-DAC"], "RQ-STL": ["RQ-STL"]}
+# Fully expanded: one visible line per ID, plus owner views that reference
+# RQ-DAC (deduplicated by ID, so they add no requirement).
+state_x = [(k, req[k]) for k in req] + [("RQ-DAC", req["RQ-DAC"])] * 2
+keyed1 = {k: req[k] for row in state1.values() for k in row}
+assert sum(len(r) for r in state1.values()) == len(keyed1)  # each ID once
+keyedx = dict(state_x)                                       # dedup references
+assert keyed1 == keyedx == req                               # same qty/unit/state
+assert keyedx["RQ-DAC"][0] == 200                            # not 400
+assert req["RQ-OPT-A"][0] + req["RQ-OPT-B"][0] == 1600       # Sigma row value
+assert req["RQ-BNIC"][:2] == (800, "NICs") and req["RQ-PWR"][:2] == (400, "cords")
+assert req["RQ-SUP"][:2] == (100, "contracts")
+assert len({u for _, u, _ in req.values()}) > 1  # mixed units: no grand total
 
 print("server-profile BOM arithmetic passed")

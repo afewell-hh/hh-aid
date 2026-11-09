@@ -2,6 +2,7 @@
 
 **Status:** draft for review (issue #9, lead assignment [6726546239](https://github.com/afewell-hh/hh-aid/issues/9#issuecomment-6726546239)). It is not approved and not a production design. This revision applies lead's four bounded corrections ([6727963025](https://github.com/afewell-hh/hh-aid/issues/9#issuecomment-6727963025)) to `8c3e325`: E1 filter scope, override verdicts, fabric creation from a port with none (F5b), and #28 mapping evidence. A second, consolidated pass ([6728366904](https://github.com/afewell-hh/hh-aid/issues/9#issuecomment-6728366904)) applies the independent reviews by parts ([6728280899](https://github.com/afewell-hh/hh-aid/issues/6#issuecomment-6728280899)) and model ([6728297958](https://github.com/afewell-hh/hh-aid/issues/8#issuecomment-6728297958)) of `8c3e325`, and topo's review of #28 ([6728308610](https://github.com/afewell-hh/hh-aid/issues/3#issuecomment-6728308610)): management-count labels, a sourced unequal-host example, E1's optical filter wording and #28 qualifications. No SE sessions or interviews have taken place, and none are claimed.
 **Sponsor iteration (2026-11-09):** lead assignment [6730314671](https://github.com/afewell-hh/hh-aid/issues/9#issuecomment-6730314671) against main `2ee0e7d` (allocation groups, summary BOM, connection-class review). The changes are listed in §13. The correction passes accepted by lead at `0a96456` ([6729382133](https://github.com/afewell-hh/hh-aid/issues/9#issuecomment-6729382133)) are preserved.
+**Bounded presentation correction (2026-11-09):** lead review [6730735430](https://github.com/afewell-hh/hh-aid/issues/9#issuecomment-6730735430) of `4c0b9b0`: R1 per-side fields and scoped inspection notes, F8 collapsed/expanded states without a grand total, G1 selected-members versus configured budget, and reconciliation with delivered #29 `8129d01` and #30 `a60134f` (§13.4). Still a draft.
 **Author:** t5 / ux. **Baseline:** main `4449d14` (sponsor feedback dated 2026-11-08).
 **Previous checkpoint:** D02 revision 3.1 (PR #24 at `7da2b0c`) is unchanged. It remains the reference for the persistent workspace, regeneration, stale/diff, conditional alternatives and starter-library views. This addendum replaces only its from-scratch *endpoint/links-per-endpoint* interaction.
 
@@ -169,7 +170,7 @@ Each step is optional except where noted. There is no forced sequence: the proje
 7. **F7 Enter the population.** "How many servers of this class?" is answered once, on the class: 100 (ranges allowed).
    - There is no per-fabric server count.
    - Racks and placement remain optional details from revision 3.1.
-8. **F8 BOM.** The default shows one row per top-level part or component with its quantity; ▸ expands to the line items (§13). Lines are grouped by owner: servers, per-server components, connection media, switches, and outside scope. The columns are **per unit × units = total**, purchase (included, separate or unknown) and identity (generic, unverified or real).
+8. **F8 BOM.** The default shows one row per top-level part or component with its quantity; ▸ expands to the line items, each with a stable requirement ID and unit; there is no grand total (§13). Lines are grouped by owner: servers, per-server components, connection media, switches, and outside scope. The columns are **per unit × units = total**, purchase (included, separate or unknown) and identity (generic, unverified or real).
    - Trace example: "800 = 8 per server (class r1) × 100 (supplied)".
    - Optical links show **two** modules (server end and leaf end).
    - In this straight-cable fixture, each DAC assembly serves one link, so 200 links need 200 DACs. The general rule is one per unique assembly instance: a breakout assembly can serve several links (§7.3).
@@ -343,8 +344,8 @@ Suggested reviewers:
 | parts #6 | #26 accepted by lead at `0230cd8` (conditional accounting scope). Review of #27 `8c3e325` ([6728280899](https://github.com/afewell-hh/hh-aid/issues/6#issuecomment-6728280899)): R1 per-host filtering and R2 override verdict, changes requested, fixed in `c481905` and this pass; RT6 and RT10 accepted with two wording fixes (F3 out-of-band label, F8 note), fixed here; unequal-host example supplied and used (§7.3). Still open: real NIC/DPU cages and modes; bundle contents | F2, F3, E1, F8 |
 | model #8 | #25 working contract accepted by lead at `365a0c3`. Review of #27 `8c3e325` ([6728297958](https://github.com/afewell-hh/hh-aid/issues/8#issuecomment-6728297958)): RT3 management labels and RT4 new-fabric flow, changes requested, fixed in F3/F8 and F5b; RT9 identity/adoption contract accepted with static-review limits | F3, F5b, F6, L1–L3, F8 |
 | bridge #3 (PR #28 `b4329a5`, draft) | Topo review [6728308610](https://github.com/afewell-hh/hh-aid/issues/3#issuecomment-6728308610): core fixture outcomes corroborated (9/9); C1–C7 changes requested. Used here only as qualified in §3.1. Still open: corrected pin; Q-FP-1; Q-FP-6; final support vocabulary | §3, F5, F5b, map note |
-| topo #5 | Allocation-pattern fixtures (`docs/research/port-allocation-patterns.md`, in progress): numbering basis (printed labels vs upstream names vs indices), DS5000 modes and breakout child names, shared-resource limits, negative cases | G1 numbering bar, modes, conflicts |
-| model #8 | Allocation contract addendum (`docs/design/port-allocation-contract.md`, in progress): group identity and revision, selector vs expanded members, overlap/alias rules, singleton vs binding, connection-class key, BOM hierarchy | F5b, G1, R1 key, R2 scope, F8 invariant |
+| topo #5 | Allocation-pattern fixtures delivered as draft PR #30 at `a60134f` (independent review by model pending; reconciled in §13.4): numbering basis (printed labels vs upstream names vs indices), DS5000 modes and breakout child names, shared-resource limits, negative cases | G1 numbering bar, modes, conflicts |
+| model #8 | Allocation contract delivered as draft PR #29 at `8129d01` (independent review by topo pending; reconciled in §13.4): group identity and revision, selector vs expanded members, overlap/alias rules, singleton vs binding, connection-class key, BOM hierarchy | F5b, G1, R1 key, R2 scope, F8 invariant |
 | sponsor / lead | Whether to keep the map (C) or ship A; whether project-only is the right default scope; the family list for a first library | §5, L1, F1 |
 
 ## 12. Acceptance self-check (to be verified by reviewers, not self-approved)
@@ -358,8 +359,8 @@ Suggested reviewers:
 | Alternatives compared fairly | §5 table, fairness notes and decision rule; screens A/B/C |
 | *Sponsor iteration:* F2 preserved | F2 unchanged |
 | F5b understandable without upstream internals | F5b: three choices, upstream mapping in collapsed Advanced |
-| Group scope and numbering visible | G1: numbering bar, cage map, selector → expansion preview, member counts |
-| Top-level BOM expands without double counting | F8 rollup rule and tally (3,600 either way); script assertion |
+| Group scope and numbering visible | G1: numbering bar, cage map, selector → expansion preview with stated order policy, selectable members (153) versus configured budget (unknown, not zero), project binding SB-1 |
+| Top-level BOM expands without double counting | F8 state 1 (top-level only) and state 2 (RQ-SRV expanded): each requirement ID once with the same quantity and unit; no mixed-unit grand total; script per-ID assertion |
 | A handful of review rows account for many connections, with explicit exceptions | R1: 5 rows for 1,224 links; CC4x exception |
 | Edit shortcuts preserve context | R1 → R2 → R1, same row, stale marks |
 
@@ -367,7 +368,7 @@ Suggested reviewers:
 
 - `python3 -I docs/design/server-profile-experience/bom-arithmetic.py` prints "server-profile BOM arithmetic passed".
 - Headless Chrome iframe measurement of `screens.html` at 1,400, 390 and 320 px found no page-level horizontal overflow. Wide tables scroll inside their own pane at 320 px.
-- A 1,400 px screenshot was inspected visually; after each correction pass, a 1,400 px render of the changed sections was inspected (correction passes: F3, F5b, E1, F8; sponsor iteration: F5b, G1, F8, R1, R2).
+- A 1,400 px screenshot was inspected visually; after each correction pass, a 1,400 px render of the changed sections was inspected (correction passes: F3, F5b, E1, F8; sponsor iteration: F5b, G1, F8, R1, R2; presentation correction: G1, F8, R1, R2).
 - Quantities did not change in either correction pass. The new out-of-band split (200/300) is the total minus the 100 in-band ports, which the script already counts; model and parts independently enumerated the same 200/300 out-of-band and 300/400 totals (#8 6728297958, #6 6728280899).
 
 These are document checks, not usability evidence, and not hardware or topology validation.
@@ -386,45 +387,58 @@ The sponsor likes F2, finds F5b confusing but wants its picker, wants F8 to open
 | Membership types, numbering, breakout members | Selector → expansion preview for range, list, odd/even, stride, singleton and breakout-child subset; cage map; numbering basis bar | G1 |
 | Uplink and server-facing reservations; intentionally unused ports | SL-UP even 2–64, SL-SRV odd 1–59 at 4 × 200G, cage 61 unused, cage 63 singleton | G1 |
 | Class singleton versus exact instance binding | Side-by-side table | G1 |
-| BOM opens at top-level rows; expansion without double counting; shared assembly one purchase | Collapsed rows, ▸/▾, rollup rule, owner views add nothing, tally | F8 |
-| Compact review grouped by unique connection class | 5 rows for 1,224 links with both ends' cage, mode, construction, fiber, reach or length | R1 |
+| BOM opens at top-level rows; expansion without double counting; shared assembly one purchase | State 1 top-level only; state 2 one row expanded; stable requirement IDs and units; owner views add nothing; no grand total | F8 |
+| Compact review grouped by unique connection class | 5 rows for 1,224 links; Side A and Side B each have where, cage · mode and media columns, with construction, fiber and length or reach between them | R1 |
 | Similar descriptions are not the same class; exceptions inspectable | CC4 and CC4x share "200G breakout cable" but differ in assembly type, length and servers | R1 |
 | Edit either side's source, preview impact, return with staleness | Edit B on CC4 → SL-SRV edit with class-versus-instance scope → return to CC4 with stale marks | R1, R2 |
-| Manual inspection first; E1 as drill-down | "Reviewed" is a manual note; E1 opens from "Detail" | R1, E1 |
+| Manual inspection first; E1 as drill-down | Review states uninspected / inspected with unknowns / stale; a note names its members and fields; E1 opens from "Detail" | R1, E1 |
 
 ### 13.2 Scenario (synthetic)
 
 Two server classes: HGX × 100 (two single-port DPUs) and Storage 2U × 12. Their storage ports land on leaf class **storage-leaf**, an illustrative 64-cage 800G-class leaf after the sponsor's DS5000 example (64 × 800G, 4 × 200G breakout, even ports as uplinks). That example is recorded as a requested allocation pattern, not as verified hardware facts or a universal even-port rule.
 
-| Group | Selector | Mode | Members per leaf |
+| Group | Selector | Mode | Selectable members per leaf |
 | --- | --- | --- | --- |
-| SL-UP spine uplinks | even 2–64 | 1 × 800G | 32 |
+| SL-UP spine uplinks | even 2–64 | 1 × 800G (one illustrative choice) | 32 |
 | SL-SRV server-facing | odd 1–59 | 4 × 200G | 120 |
 | SL-ONE singleton | 63 | 1 × 800G | 1 |
 | unused (intentional) | 61 | — | 0 |
 
-All 64 cages are accounted for once. SL-SRV demand is 224 terminations (HGX 200 + Storage 2U 24); the switch count stays not estimated, because a port total alone does not prove feasibility.
+All 64 cages are accounted for once. The 153 total is selected (eligible) group membership, not the configured-port budget: cage 61 has no selectable member but may still consume configured and pipeline budget, and that budget is unknown for this synthetic leaf (not zero, and not checked against DS5000 pipelines). Native 800G uplinks are one reading of the sponsor's example; all cages at 4 × 200G is another (topo #30 DS-EVEN-A/B). SL-SRV demand is 224 terminations (HGX 200 + Storage 2U 24); the switch count stays not estimated, because a port total alone does not prove feasibility.
 
-R1 reduces 1,224 fabric links to five classes: CC1 backend 800 (separate optics), CC2 frontend 200 (straight DAC), CC3 HGX storage 200 (medium not decided), CC4 Storage 2U 20 (breakout DAC, 5 assemblies of 1 → 4) and CC4x 4 (instance exception for two servers: breakout AOC, 1 assembly). Management links (424 RJ45, external in this fixture) are listed separately. `bom-arithmetic.py` asserts every number above, the R2 edit (120 → 116 members) and the F8 rollup tally (3,600 installed items collapsed or expanded).
+R1 reduces 1,224 fabric links to five classes: CC1 backend 800 (separate optics), CC2 frontend 200 (straight DAC), CC3 HGX storage 200 (medium not decided), CC4 Storage 2U 20 (breakout DAC, 5 assemblies of 1 → 4) and CC4x 4 (instance exception for two servers: breakout AOC, 1 assembly). Management links (424 RJ45, external in this fixture) are listed separately. `bom-arithmetic.py` asserts every number above, the R2 edit (120 → 116 members) and F8's per-requirement conservation (each ID once, same quantity and unit, collapsed or expanded). F8 is the pre-F9 project (HGX × 100 only); R1 is post-F9. No grand total is shown, because the lines have different units.
 
 ### 13.3 Rationale
 
 - **Picker before internals.** The engineer's minimum task is "where does this port go". Fabric context, leaf class and group answer that in product terms; upstream mapping is a later, optional decision (§3.1), so it is collapsed rather than removed.
 - **Selector plus expansion.** Engineers type compact selectors but must see real members. G1 always shows both, with an explicit numbering basis, because "even ports" is meaningless until the numbering convention and breakout children are known.
-- **Conflicts shown, not solved.** Overlap and parent/child collisions are displayed with choices; G1 defines no allocation algorithm, only a stated order (cage ascending, then child) for model to formalize.
-- **Summary BOM with a rollup rule.** A parent row counts only itself, children are counted once, and owner views are references. That keeps the summary from double counting while letting the engineer drill down.
+- **Conflicts shown, not solved.** Overlap and parent/child collisions are displayed with choices; G1 defines no allocation algorithm, only a stated order policy: numeric cage order then child for range, odd/even and stride; an explicit list offers as-entered or numeric order, and changing the policy is a new group revision.
+- **Summary BOM with a rollup rule.** A parent row counts only itself, children are counted once, a Σ row is a view of its children, and owner views are references. Stable requirement IDs make that checkable; a single "items" total would mix servers, NICs and contracts and imply procurement completeness, so none is shown.
 - **Review by construction, not by label.** Grouping by both ends' properties and the assembly mapping is what lets 1,224 links collapse to five rows honestly; matching descriptions never merge rows (CC4 versus CC4x).
-- **Manual review with staleness.** A source edit marks every affected row stale and keeps the earlier note as history. No verdict is computed, and the review is not qualification.
+- **Manual review with scope and staleness.** An inspection note says which members and fields were looked at, so a per-instance unknown such as a 3 m? length is visibly not covered. A source edit marks every affected row stale and keeps the earlier note as history. No verdict is computed, and the review is not qualification.
+- **Each side keeps its own fields.** R1 shows Side A and Side B as separate where / cage · mode / media columns, so an unknown at B never appears to inherit A's value. Integrated assemblies show each end's form and parent/tail rate instead of module fields.
 
-### 13.4 Provisional and unresolved
+### 13.4 Provisional and unresolved; reconciliation with #29 and #30
 
-- Group identity, revision, selector syntax, overlap/alias rules and the connection-class key are **provisional** until model's allocation addendum (#8). Nothing in G1 or R1 is a contract.
-- Cage numbering is a **synthetic convention**. Printed labels, upstream port names, breakout child names, modes and shared-resource (pipeline/bank) limits are **pending topo #5**; no DS5000 fact is asserted.
+Model's contract ([PR #29 at `8129d01`](https://github.com/afewell-hh/hh-aid/blob/8129d01f5b72cbaec04bd94e318a348d66620a95/docs/design/port-allocation-contract.md)) and topo's fixtures ([PR #30 at `a60134f`](https://github.com/afewell-hh/hh-aid/blob/a60134f1b937c98b631963ea4c59d7703098b210/docs/research/port-allocation-patterns.md)) are delivered drafts with independent reviews dispatched by lead. The screens follow them as below. Nothing here is accepted contract.
+
+| Topic | #29 / #30 | Screens |
+| --- | --- | --- |
+| Entities | #29 §2: group definition (ID + revision, owned by reusable leaf configuration), project group binding, expanded selection, destination demand, exact assignment, reservation, manual review record | G1 groups = definitions on storage-leaf r1; **project binding SB-1** shown in G1 and in R2's edit path, not in F5b; F5b selection = demand; G1's exact-binding row = exact assignment |
+| Basic picker | #29 §2: fabric context → leaf context → group; create/reuse keeps edits; upstream mapping separate | F5b unchanged in structure; no binding or order jargon added |
+| Selector order | #29 §3 preserves an explicit list's declared order; #30 §3 PA-LIST uses a numeric-order policy; both keep the source selector | G1 states numeric cage-then-child order for range/odd-even/stride and offers as-entered or numeric order for an explicit list; a policy change is a new revision |
+| Overlap | Both: alias views share one ledger, exclusive pools reject overlapping use, unspecified overlap unresolved; distinct children coexist only within mode/assembly/budget limits | G1's conflicts are labelled as declared exclusive pools; the alias and unresolved cases are described, not drawn |
+| Budgets | #30 §2: configured logical ports (including unused/reserved) versus eligible free terminations versus assigned links | G1: 153 selected members; configured budget unknown, not zero; cage 61 may consume budget; no DS5000 pipeline check |
+| DS5000 | #30 §4: pinned profile labels 1–64 → `E1/1`–`E1/64`, children `/1`–`/4`; DS-EVEN-A (all 4 × 200G) and DS-EVEN-B (even 1 × 800G) both kept | G1 cites the mapping but keeps synthetic `c<cage>.<k>` numbering; SL-UP's 1 × 800G is labelled one illustrative choice |
+| Review rows | #29 §5 signature (both ends' revisions, cage, mode, media; assembly end map; instance exceptions) and states uninspected / inspected with unknowns / stale; #30 §7 RC-OPT/DAC/SPLIT | R1 per-side columns; CC4 note names members and fields and leaves per-instance length unchecked; CC1 ≈ RC-OPT, CC2 ≈ RC-DAC, CC4 ≈ RC-SPLIT in shape only |
+| BOM | #29 §6: presentation nodes hold references; Σ rows never added to children; no sum across unlike units | F8 state 1/2 with requirement IDs and units; no grand total |
+| Reviews of `4c0b9b0` | parts P1–P4 ([#6 6732182172](https://github.com/afewell-hh/hh-aid/issues/6#issuecomment-6732182172)), model guidance ([#9 6732189611](https://github.com/afewell-hh/hh-aid/issues/9#issuecomment-6732189611)), topo G1 note ([#9 6732189886](https://github.com/afewell-hh/hh-aid/issues/9#issuecomment-6732189886)) | All applied in this pass: F8 keyed per-ID conservation (P1); R1 per-side fields, revisions and Edit A / Edit B / Edit assembly targets (P2); scoped inspection note with signature revision (P3); G1 unselected children as conditional candidates and cage 61 budget unknown, 154/157 only as illustration (P4, topo) |
+
+Fixture identity is kept separate: #29's six-link and 15-purchase-unit fixtures, #30's synthetic T8 and DS-EVEN snapshots, and this document's HGX × 100 / Storage 2U × 12 scenario have different count bases and are not combined.
+
+Still provisional or unresolved:
+- Group identity and revision syntax, the overlap relation and the connection-class key, pending the independent reviews of #29 and #30.
+- Real printed labels, child names, modes and shared-resource limits for any chosen leaf; G1's numbering is synthetic.
 - All parts remain generic or unverified; lengths, reaches and fiber types shown with "?" are unknown.
-- **Early reconciliation with model and topo** (their kickoffs, read after drafting): model's early table ([#8 6730484917](https://github.com/afewell-hh/hh-aid/issues/8#issuecomment-6730484917)) and topo's fixture kickoff ([#5 6730542987](https://github.com/afewell-hh/hh-aid/issues/5#issuecomment-6730542987)).
-  - G1's groups correspond to model's *PortAllocationGroup definition* (owned by the reusable leaf class, with a revision). F5b's selection corresponds to their *destination demand*. G1's "exact instance binding" corresponds to their *exact assignment*. A project-level *group binding* that customizes a definition is not drawn yet.
-  - G1's overlap example behaves as an **exclusive pool** conflict. Model and topo propose that **alias** views may share one capacity ledger, and that unspecified overlap stays unresolved; G1 does not yet show an alias view.
-  - Shared pipelines limit aggregate use without making distinct breakout children mutually exclusive (topo); G1's parent/child row shows only whole-parent versus child exclusivity.
-  - Topo's fixture IDs (PA-HALF, PA-STRIDE, PA-LIST, PA-SINGLE, PA-CHILD, PA-RESERVE, DS-EVEN) map to G1's selector rows, and RC-OPT/DAC/SPLIT map to R1's CC1, CC2 and CC4. Topo reports that the pinned DS5000 source maps labels 1–64 to `E1/1`–`E1/64` with 4 × 200G offsets and per-pipeline budgets. That is early and unreviewed, so G1 keeps its synthetic numbering until topo's handoff.
 - Parts reviews the compact R1 fields after handoff, if lead dispatches it.
 - These are static screens: no interaction, participant or hardware testing.
