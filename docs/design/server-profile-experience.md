@@ -1,6 +1,7 @@
 # D02 addendum: server-class-first profile experience
 
 **Status:** draft for review (issue #9, lead assignment [6726546239](https://github.com/afewell-hh/hh-aid/issues/9#issuecomment-6726546239)). It is not approved and not a production design. This revision applies lead's four bounded corrections ([6727963025](https://github.com/afewell-hh/hh-aid/issues/9#issuecomment-6727963025)) to `8c3e325`: E1 filter scope, override verdicts, fabric creation from a port with none (F5b), and #28 mapping evidence. A second, consolidated pass ([6728366904](https://github.com/afewell-hh/hh-aid/issues/9#issuecomment-6728366904)) applies the independent reviews by parts ([6728280899](https://github.com/afewell-hh/hh-aid/issues/6#issuecomment-6728280899)) and model ([6728297958](https://github.com/afewell-hh/hh-aid/issues/8#issuecomment-6728297958)) of `8c3e325`, and topo's review of #28 ([6728308610](https://github.com/afewell-hh/hh-aid/issues/3#issuecomment-6728308610)): management-count labels, a sourced unequal-host example, E1's optical filter wording and #28 qualifications. No SE sessions or interviews have taken place, and none are claimed.
+**Sponsor iteration (2026-11-09):** lead assignment [6730314671](https://github.com/afewell-hh/hh-aid/issues/9#issuecomment-6730314671) against main `2ee0e7d` (allocation groups, summary BOM, connection-class review). The changes are listed in §13. The correction passes accepted by lead at `0a96456` ([6729382133](https://github.com/afewell-hh/hh-aid/issues/9#issuecomment-6729382133)) are preserved.
 **Author:** t5 / ux. **Baseline:** main `4449d14` (sponsor feedback dated 2026-11-08).
 **Previous checkpoint:** D02 revision 3.1 (PR #24 at `7da2b0c`) is unchanged. It remains the reference for the persistent workspace, regeneration, stale/diff, conditional alternatives and starter-library views. This addendum replaces only its from-scratch *endpoint/links-per-endpoint* interaction.
 
@@ -78,13 +79,17 @@ No new survey was done. These sources inform layout and keyboard choices only. T
 | **Installation** (#28) | One controller plus its `fab.yaml`; it can hold several Fabrics since 26.05 | A Fabric |
 | **Leaf class** | Reusable switch role and model configuration. The model may be "not chosen yet". Product proposal, not an upstream object | A switch instance; upstream `SwitchGroup` |
 | **Leaf deployment group** (proposal) | A project's use of a leaf class within one fabric intent and, once mapped, one upstream Fabric and domain set. The Fabric scoping is a product choice, not upstream law: upstream only gives each *Switch instance* one Fabric (topo C1) | A reusable leaf class |
+| **Port allocation group** (provisional, model #8 / topo #5) | A planning selection of ports on a leaf class (range, list, odd/even, stride, singleton or breakout-child subset) with a configured mode, used to allocate connection-map terminations | A LACP bundle, port channel, `SwitchGroup` or switch configuration |
+| **Destination** | Fabric context → leaf class → allocation group for a server port; each later level may be "not chosen yet" | A switch instance or exact port |
+| **Exact binding** | One server instance's port bound to one switch instance's port, in one project | A class-level singleton group |
+| **Connection class** (provisional) | The unique physical construction shared by many links: both ends' source revision, cage and mode, and the medium or assembly with its end/group mapping | A SKU, a description or a fabric |
 | **Per-unit line** | Any BOM item with quantity per server (or per switch), including items outside the topology | — |
 | **Assembly** | DAC/AEC/AOC/breakout: one purchase identity with two **or more** ends, counted once per unique instance (R05 §4). Each end keeps its own host and port-group mapping | Two transceivers |
 
 ### 3.1 What this pass uses from #28 (topo-corroborated core; C1–C7 pending)
 
 - **One physical server, one population.** Upstream `Server` has no fabric or domain field, and one server may have Connections into several Fabrics of one installation (#28, executed; corroborated by topo). The screens keep one population per class across every attachment.
-- **Separate installations.** Ports that attach to a separate installation need a second upstream `Server` object there, so hh-aid owns the physical-server identity (inference; Q-FP-1 open). F5b shows this only as an upstream-mapping option.
+- **Separate installations.** Ports that attach to a separate installation need a second upstream `Server` object there, so hh-aid owns the physical-server identity (inference; Q-FP-1 open). It appears only as an upstream-mapping option under F5b's collapsed Advanced section.
 - **One Fabric per Connection.** Each Connection belongs to exactly one Fabric, so an ESLAG or bundled Connection cannot span Fabrics (#28 N1/N2, corroborated). The F4 conflict rule already prevents a silent move.
 - **Leaf class versus deployment group.** Upstream gives each Switch instance one Fabric; it has no class object (topo C1). A reusable leaf class stays a product configuration. Scoping a project's *leaf deployment group* to one fabric intent and one upstream Fabric is a product proposal for D01/D02, not an upstream constraint.
 - **Upstream mapping is a proposal with explicit status.** "Not decided yet" is the valid default, and nothing is inferred from a name such as "storage". The picker states that a domain is a spine set inside one Fabric with its own rules, not an interchangeable implementation of any network intent, and that a separate installation's support model is open (Q-FP-1). Combinations without evidence show as unverified.
@@ -158,15 +163,13 @@ Each step is optional except where noted. There is no forced sequence: the proje
    - Switch model may be **Not chosen yet**, a source-derived profile, a gated profile, a manual model or a placeholder. Source and support are separate columns, and support uses #28 §4.3's vocabulary (§3.1). A profile's presence in the source is not support proof; a manual model shows `manual · support: unverified` and is never installation-ready without a recorded authority decision.
    - The leaf class can carry its own per-unit lines.
    - Create assigns the leaf class to the selected ports and returns focus to the originating cell. Closing the panel keeps it as a draft until it is discarded.
-   - **F5b, a port with no fabric intent yet.** An alternate start: the project began from "No separate storage network", so only backend and frontend intents exist, and the engineer adds a storage NIC. From st1–st2, "+ New fabric intent…" opens the same non-modal panel with two sections, not a wizard:
-     1. Fabric intent: name, with an explicit "use existing?" prompt on a matching name, and an upstream mapping that defaults to "not decided yet" (§3.1).
-     2. Leaf class: optional now; "Skip" creates the fabric intent only, leaving the leaf class unresolved.
-   - Cancel and retry keep identity. Cancel before Create creates nothing and keeps the draft for retry. Create pressed twice or retried reuses the same draft IDs, so there is never a second "storage". A fabric intent can be discarded only after listing everything that references it. The F3 customization stays intact throughout.
+   - **F5b, destination picker** (simplified in the sponsor iteration, §13). One non-modal panel with three stacked choices: fabric context → leaf class → **port allocation group**. Each offers "not chosen yet", existing items and "+ New…". "+ New group…" opens the group editor G1 in the same panel and returns with the new group selected. Upstream installation/Fabric/domain mapping sits in a collapsed "Advanced (optional)" section, defaulting to "not decided yet" (§3.1).
+   - Identity rules are kept from the accepted correction pass: reuse is explicit; "+ New" keeps one draft, so pressing Create twice or retrying makes no duplicate; a matching name asks "Use existing?"; Cancel changes nothing. The F3 customization stays intact throughout.
 6. **F6 Return with edits intact.** A strip lists the changes since the last generate (customization, assignment, new leaf class), with undo. The customized row shows both values: "2 × single-port (class: 1 × dual-port)".
 7. **F7 Enter the population.** "How many servers of this class?" is answered once, on the class: 100 (ranges allowed).
    - There is no per-fabric server count.
    - Racks and placement remain optional details from revision 3.1.
-8. **F8 Expanded BOM.** Lines are grouped by owner: servers, per-server components, connection media, switches, and outside scope. The columns are **per unit × units = total**, purchase (included, separate or unknown) and identity (generic, unverified or real).
+8. **F8 BOM.** The default shows one row per top-level part or component with its quantity; ▸ expands to the line items (§13). Lines are grouped by owner: servers, per-server components, connection media, switches, and outside scope. The columns are **per unit × units = total**, purchase (included, separate or unknown) and identity (generic, unverified or real).
    - Trace example: "800 = 8 per server (class r1) × 100 (supplied)".
    - Optical links show **two** modules (server end and leaf end).
    - In this straight-cable fixture, each DAC assembly serves one link, so 200 links need 200 DACs. The general rule is one per unique assembly instance: a breakout assembly can serve several links (§7.3).
@@ -320,7 +323,11 @@ Screen M lists RT1–RT10, with the screens and what to look for in each:
 - RT8 both-ends comparison, with an override on an unknown and on a known mismatch;
 - RT9 project versus class scope and adopting r2;
 - RT10 what the BOM excludes;
-- RT11 create a fabric intent and its leaf class from a port with none, cancelling once and retrying.
+- RT11 create a fabric intent and its leaf class from a port with none, cancelling once and retrying (now via the F5b picker's "+ New");
+- RT12 choose a destination with an allocation group, reusing one and creating another in context;
+- RT13 read the group editor: which cages serve servers, uplinks, or nothing;
+- RT14 expand a top-level BOM row and say whether any total changed;
+- RT15 review the storage connections, spot the exception, edit SL-SRV from the row and return.
 
 Screen M also maps every sponsor feedback point to its screens.
 
@@ -336,6 +343,8 @@ Suggested reviewers:
 | parts #6 | #26 accepted by lead at `0230cd8` (conditional accounting scope). Review of #27 `8c3e325` ([6728280899](https://github.com/afewell-hh/hh-aid/issues/6#issuecomment-6728280899)): R1 per-host filtering and R2 override verdict, changes requested, fixed in `c481905` and this pass; RT6 and RT10 accepted with two wording fixes (F3 out-of-band label, F8 note), fixed here; unequal-host example supplied and used (§7.3). Still open: real NIC/DPU cages and modes; bundle contents | F2, F3, E1, F8 |
 | model #8 | #25 working contract accepted by lead at `365a0c3`. Review of #27 `8c3e325` ([6728297958](https://github.com/afewell-hh/hh-aid/issues/8#issuecomment-6728297958)): RT3 management labels and RT4 new-fabric flow, changes requested, fixed in F3/F8 and F5b; RT9 identity/adoption contract accepted with static-review limits | F3, F5b, F6, L1–L3, F8 |
 | bridge #3 (PR #28 `b4329a5`, draft) | Topo review [6728308610](https://github.com/afewell-hh/hh-aid/issues/3#issuecomment-6728308610): core fixture outcomes corroborated (9/9); C1–C7 changes requested. Used here only as qualified in §3.1. Still open: corrected pin; Q-FP-1; Q-FP-6; final support vocabulary | §3, F5, F5b, map note |
+| topo #5 | Allocation-pattern fixtures (`docs/research/port-allocation-patterns.md`, in progress): numbering basis (printed labels vs upstream names vs indices), DS5000 modes and breakout child names, shared-resource limits, negative cases | G1 numbering bar, modes, conflicts |
+| model #8 | Allocation contract addendum (`docs/design/port-allocation-contract.md`, in progress): group identity and revision, selector vs expanded members, overlap/alias rules, singleton vs binding, connection-class key, BOM hierarchy | F5b, G1, R1 key, R2 scope, F8 invariant |
 | sponsor / lead | Whether to keep the map (C) or ship A; whether project-only is the right default scope; the family list for a first library | §5, L1, F1 |
 
 ## 12. Acceptance self-check (to be verified by reviewers, not self-approved)
@@ -345,14 +354,72 @@ Suggested reviewers:
 | Enough space to inspect a whole server network profile | F2: tree, summary, map, treegrid, per-unit lines and details panel on one desktop screen |
 | No duplicate population per fabric | F7 and the script assertion: 100 servers regardless of attachments; F9 shows two populations, 112 servers |
 | Per-unit BOM multiplication visible | F8 columns and trace; worked arithmetic table |
-| Contextual fabric creation preserves work | F5 (leaf class in an existing fabric intent) and F5b (new fabric intent and leaf class from a port with none, cancel/retry identity); non-modal panel, draft kept, focus return; F6 change strip |
+| Contextual fabric creation preserves work | F5 (leaf class in an existing fabric intent) and F5b (destination picker: "+ New" fabric context, leaf class or allocation group, with G1 opened in the same panel; cancel/retry identity); non-modal panel, draft kept, focus return; F6 change strip |
 | Alternatives compared fairly | §5 table, fairness notes and decision rule; screens A/B/C |
+| *Sponsor iteration:* F2 preserved | F2 unchanged |
+| F5b understandable without upstream internals | F5b: three choices, upstream mapping in collapsed Advanced |
+| Group scope and numbering visible | G1: numbering bar, cage map, selector → expansion preview, member counts |
+| Top-level BOM expands without double counting | F8 rollup rule and tally (3,600 either way); script assertion |
+| A handful of review rows account for many connections, with explicit exceptions | R1: 5 rows for 1,224 links; CC4x exception |
+| Edit shortcuts preserve context | R1 → R2 → R1, same row, stale marks |
 
 ### Checks run
 
 - `python3 -I docs/design/server-profile-experience/bom-arithmetic.py` prints "server-profile BOM arithmetic passed".
 - Headless Chrome iframe measurement of `screens.html` at 1,400, 390 and 320 px found no page-level horizontal overflow. Wide tables scroll inside their own pane at 320 px.
-- A 1,400 px screenshot was inspected visually; after each correction pass, a 1,400 px render of the changed sections (F3, F5b, E1, F8) was inspected.
+- A 1,400 px screenshot was inspected visually; after each correction pass, a 1,400 px render of the changed sections was inspected (correction passes: F3, F5b, E1, F8; sponsor iteration: F5b, G1, F8, R1, R2).
 - Quantities did not change in either correction pass. The new out-of-band split (200/300) is the total minus the 100 in-band ports, which the script already counts; model and parts independently enumerated the same 200/300 out-of-band and 300/400 totals (#8 6728297958, #6 6728280899).
 
 These are document checks, not usability evidence, and not hardware or topology validation.
+
+## 13. Sponsor iteration: allocation groups, summary BOM, connection-class review (main `2ee0e7d`)
+
+The sponsor likes F2, finds F5b confusing but wants its picker, wants F8 to open as a summary, and wants E1 replaced as the main review by something compact for manual engineer inspection. This is directional feedback, not D02 acceptance. Canvas and compatibility automation are not new tasks.
+
+### 13.1 Feedback → screens
+
+| Sponsor point (main `2ee0e7d`) | Change | Screens |
+| --- | --- | --- |
+| Keep F2's spacious server-class profile | No change | F2 |
+| Destination picker with port allocation groups; upstream internals not required | Fabric context → leaf class → group, each select/reuse/create in context; upstream mapping in collapsed Advanced | F4, F5b |
+| Group is planning allocation, not LACP/switch configuration | Stated in the picker and the editor | F5b, G1 |
+| Membership types, numbering, breakout members | Selector → expansion preview for range, list, odd/even, stride, singleton and breakout-child subset; cage map; numbering basis bar | G1 |
+| Uplink and server-facing reservations; intentionally unused ports | SL-UP even 2–64, SL-SRV odd 1–59 at 4 × 200G, cage 61 unused, cage 63 singleton | G1 |
+| Class singleton versus exact instance binding | Side-by-side table | G1 |
+| BOM opens at top-level rows; expansion without double counting; shared assembly one purchase | Collapsed rows, ▸/▾, rollup rule, owner views add nothing, tally | F8 |
+| Compact review grouped by unique connection class | 5 rows for 1,224 links with both ends' cage, mode, construction, fiber, reach or length | R1 |
+| Similar descriptions are not the same class; exceptions inspectable | CC4 and CC4x share "200G breakout cable" but differ in assembly type, length and servers | R1 |
+| Edit either side's source, preview impact, return with staleness | Edit B on CC4 → SL-SRV edit with class-versus-instance scope → return to CC4 with stale marks | R1, R2 |
+| Manual inspection first; E1 as drill-down | "Reviewed" is a manual note; E1 opens from "Detail" | R1, E1 |
+
+### 13.2 Scenario (synthetic)
+
+Two server classes: HGX × 100 (two single-port DPUs) and Storage 2U × 12. Their storage ports land on leaf class **storage-leaf**, an illustrative 64-cage 800G-class leaf after the sponsor's DS5000 example (64 × 800G, 4 × 200G breakout, even ports as uplinks). That example is recorded as a requested allocation pattern, not as verified hardware facts or a universal even-port rule.
+
+| Group | Selector | Mode | Members per leaf |
+| --- | --- | --- | --- |
+| SL-UP spine uplinks | even 2–64 | 1 × 800G | 32 |
+| SL-SRV server-facing | odd 1–59 | 4 × 200G | 120 |
+| SL-ONE singleton | 63 | 1 × 800G | 1 |
+| unused (intentional) | 61 | — | 0 |
+
+All 64 cages are accounted for once. SL-SRV demand is 224 terminations (HGX 200 + Storage 2U 24); the switch count stays not estimated, because a port total alone does not prove feasibility.
+
+R1 reduces 1,224 fabric links to five classes: CC1 backend 800 (separate optics), CC2 frontend 200 (straight DAC), CC3 HGX storage 200 (medium not decided), CC4 Storage 2U 20 (breakout DAC, 5 assemblies of 1 → 4) and CC4x 4 (instance exception for two servers: breakout AOC, 1 assembly). Management links (424 RJ45, external in this fixture) are listed separately. `bom-arithmetic.py` asserts every number above, the R2 edit (120 → 116 members) and the F8 rollup tally (3,600 installed items collapsed or expanded).
+
+### 13.3 Rationale
+
+- **Picker before internals.** The engineer's minimum task is "where does this port go". Fabric context, leaf class and group answer that in product terms; upstream mapping is a later, optional decision (§3.1), so it is collapsed rather than removed.
+- **Selector plus expansion.** Engineers type compact selectors but must see real members. G1 always shows both, with an explicit numbering basis, because "even ports" is meaningless until the numbering convention and breakout children are known.
+- **Conflicts shown, not solved.** Overlap and parent/child collisions are displayed with choices; G1 defines no allocation algorithm, only a stated order (cage ascending, then child) for model to formalize.
+- **Summary BOM with a rollup rule.** A parent row counts only itself, children are counted once, and owner views are references. That keeps the summary from double counting while letting the engineer drill down.
+- **Review by construction, not by label.** Grouping by both ends' properties and the assembly mapping is what lets 1,224 links collapse to five rows honestly; matching descriptions never merge rows (CC4 versus CC4x).
+- **Manual review with staleness.** A source edit marks every affected row stale and keeps the earlier note as history. No verdict is computed, and the review is not qualification.
+
+### 13.4 Provisional and unresolved
+
+- Group identity, revision, selector syntax, overlap/alias rules and the connection-class key are **provisional** until model's allocation addendum (#8). Nothing in G1 or R1 is a contract.
+- Cage numbering is a **synthetic convention**. Printed labels, upstream port names, breakout child names, modes and shared-resource (pipeline/bank) limits are **pending topo #5**; no DS5000 fact is asserted.
+- All parts remain generic or unverified; lengths, reaches and fiber types shown with "?" are unknown.
+- Parts reviews the compact R1 fields after handoff, if lead dispatches it.
+- These are static screens: no interaction, participant or hardware testing.

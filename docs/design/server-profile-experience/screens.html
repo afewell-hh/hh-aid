@@ -33,7 +33,7 @@ nav.toc{columns:3 220px;font-size:13px}
 table{border-collapse:collapse;width:100%;font-size:12.5px}
 th,td{border:1px solid var(--line);padding:3px 6px;text-align:left;vertical-align:top}
 th{background:var(--soft);font-weight:600}
-td.n{text-align:right;font-variant-numeric:tabular-nums}
+td.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
 tr.child td:first-child{padding-left:22px}tr.gchild td:first-child{padding-left:38px}
 tr.sel td{background:var(--hi)}
 .tag{display:inline-block;border:1px solid var(--line);border-radius:3px;padding:0 4px;font-size:11px;white-space:nowrap}
@@ -54,13 +54,21 @@ svg .bx{fill:var(--card);stroke:var(--line);stroke-width:1.5}
 svg .ln{stroke:var(--fg);stroke-width:1.5;fill:none}
 svg .dash{stroke-dasharray:5 4}
 .cmp td:nth-child(n+2){font-size:12px}
+.cages{display:grid;grid-template-columns:110px repeat(32,minmax(17px,1fr));gap:2px;font-size:10px;min-width:700px;margin:6px 0}
+.cages span{border:1px solid var(--line);text-align:center;padding:1px 0;font-variant-numeric:tabular-nums}
+.cages .rl{border:0;text-align:left;color:var(--mut)}
+.cg-up{background:var(--gen)}.cg-srv{background:var(--ok)}.cg-one{background:var(--cust)}.cg-unu{background:repeating-linear-gradient(45deg,var(--soft),var(--soft) 3px,var(--card) 3px,var(--card) 6px)}
+.cg-up::after{content:" U"}.cg-srv::after{content:" S"}.cg-one::after{content:" 1"}.cg-unu::after{content:" –"}
+.cages span::after{font-size:9px;color:var(--mut)}
+.cages .rl::after{content:none}
+tr.stale td{background:var(--unk)}
 @media (max-width:900px){.app,.app.two,.app.side{grid-template-columns:minmax(0,1fr)}.pane{border-right:0;border-bottom:1px solid var(--line)}}
 </style>
 </head>
 <body>
 <main>
 <h1>Server profile experience: low-fidelity screens</h1>
-<p class="banner"><b>D02 #9 server-class pass, static wireframes.</b> These screens are not a calculator. Every quantity was entered by hand and is checked by <code>bom-arithmetic.py</code>. Every part is a <b>generic placeholder or unverified sponsor shorthand</b>, not a vendor-qualified SKU. Leaf and spine counts are deliberately shown as not estimated. Product terms such as <i>fabric</i> and <i>leaf class</i> are product language only; they are <b>product intent</b>, kept separate from the upstream Fabric object, domain and installation. The mapping uses only the core of bridge's source evidence that topo's review corroborated (#3, PR #28 <code>b4329a5</code>; corrections C1–C7 pending). It is always an explicit choice, never inferred from a network's name. Field names map to parts' accepted SU fields (#6, <code>0230cd8</code>) and model's working contract (#8, <code>365a0c3</code>); see the rationale, §6.1. Rationale: <a href="../server-profile-experience.md">server-profile-experience.md</a>.</p>
+<p class="banner"><b>D02 #9 server-class pass, static wireframes; sponsor iteration of main <code>2ee0e7d</code> (allocation groups, summary BOM, connection-class review).</b> These screens are not a calculator. Every quantity was entered by hand and is checked by <code>bom-arithmetic.py</code>. Every part is a <b>generic placeholder or unverified sponsor shorthand</b>, not a vendor-qualified SKU. Leaf and spine counts are deliberately shown as not estimated. Product terms such as <i>fabric</i> and <i>leaf class</i> are product language only; they are <b>product intent</b>, kept separate from the upstream Fabric object, domain and installation. The mapping uses only the core of bridge's source evidence that topo's review corroborated (#3, PR #28 <code>b4329a5</code>; corrections C1–C7 pending). It is always an explicit choice, never inferred from a network's name. Field names map to parts' accepted SU fields (#6, <code>0230cd8</code>) and model's working contract (#8, <code>365a0c3</code>); see the rationale, §6.1. Rationale: <a href="../server-profile-experience.md">server-profile-experience.md</a>.</p>
 <p class="note"><i>Server</i> means any non-switch device attached to the fabric, including storage arrays, appliances and other endpoints, following Hedgehog's Server concept. The product UI explains this once, on F1.</p>
 
 <nav class="toc" aria-label="Screens">
@@ -73,12 +81,15 @@ svg .dash{stroke-dasharray:5 4}
 <a href="#f3">F3 Customize DPU variant</a><br>
 <a href="#f4">F4 Assign ports to fabric and leaf class</a><br>
 <a href="#f5">F5 Create leaf class in context</a><br>
-<a href="#f5b">F5b Create fabric intent and leaf class from a port with none</a><br>
+<a href="#f5b">F5b Choose a destination (fabric context → leaf class → allocation group)</a><br>
+<a href="#g1">G1 Port allocation group editor</a><br>
 <a href="#f6">F6 Return with edits intact</a><br>
 <a href="#f7">F7 Enter population</a><br>
-<a href="#f8">F8 Expanded BOM</a><br>
+<a href="#f8">F8 BOM: top-level rows, expandable</a><br>
 <a href="#f9">F9 Add a second server class</a><br>
-<a href="#e1">E1 Both-ends comparison and filters</a><br>
+<a href="#r1">R1 Connection-class review (primary)</a><br>
+<a href="#r2">R2 Row shortcut: edit a source and return</a><br>
+<a href="#e1">E1 Connection detail (optional drill-down)</a><br>
 <a href="#l1">L1 Edit scope: project versus class</a><br>
 <a href="#l2">L2 New class revision available</a><br>
 <a href="#l3">L3 Stale lines and regenerated BOM</a><br>
@@ -212,13 +223,13 @@ Apply to: <span class="field">◉ This project only (customization)</span> <span
 <h2 id="f4">F4 Assign ports to fabric and leaf class (batch)</h2>
 <div class="frame"><div class="cap"><b>F4</b><span>Select be1–be8 (Shift+↓ or the checkboxes) → batch bar</span></div>
 <div class="app one"><div class="pane scroll">
-<div class="bar">8 ports selected · <span class="btn">Set fabric ▾</span> <span class="btn">Set leaf class ▾</span> <span class="btn">Set medium ▾</span> <span class="btn">Clear selection</span></div>
+<div class="bar">8 ports selected · <span class="btn">Set destination ▾</span> <span class="btn">Set medium ▾</span> <span class="btn">Clear selection</span></div>
 <table><tr><th>☑</th><th>Port</th><th>Rail</th><th>Fabric</th><th>Leaf class</th></tr>
 <tr class="sel"><td>☑</td><td>be1</td><td>1</td><td>backend</td><td><span class="field">— not chosen — ▾</span></td></tr>
 <tr class="sel"><td>☑</td><td>…</td><td>…</td><td>backend</td><td>…</td></tr>
 <tr class="sel"><td>☑</td><td>be8</td><td>8</td><td>backend</td><td>…</td></tr></table>
 <p><b>Leaf class menu:</b> <span class="field">— not chosen (valid) —</span> · <span class="field">existing: none in fabric "backend"</span> · <span class="field">+ Create leaf class in fabric "backend"…</span></p>
-<p class="note">Picking a leaf class sets its fabric. Fabric intent without a leaf class stays valid and is shown hollow on the map. If a port already has a <i>different</i> fabric, both values are kept and shown as a conflict with three choices: pick another leaf class, change the port's fabric, or create a leaf class in the intended fabric. Nothing moves silently (model §4). Rails stay attached to ports; the batch never re-numbers them.</p></div></div></div>
+<p class="note">Picking a leaf class sets its fabric. Fabric intent without a leaf class stays valid and is shown hollow on the map. If a port already has a <i>different</i> fabric, both values are kept and shown as a conflict with three choices: pick another leaf class, change the port's fabric, or create a leaf class in the intended fabric. Nothing moves silently (model §4). Rails stay attached to ports; the batch never re-numbers them. "Set destination" opens the same picker as F5b, so the batch can also choose an allocation group.</p></div></div></div>
 
 <h2 id="f5">F5 Create a leaf class in context (non-modal side panel)</h2>
 <div class="frame"><div class="cap"><b>F5</b><span>The editor stays visible and editable. The panel draft is kept if the engineer clicks elsewhere.</span></div>
@@ -238,33 +249,64 @@ Fabric <span class="field">backend (existing) ▾</span><br>
 <p class="note">Support values use bridge's proposed vocabulary (#28 §4.3; proposal, bridge corrections C1–C7 pending). A profile's presence proves representability only; a manual model never becomes installation-ready without a recorded authority decision. A leaf class is reusable configuration, not an upstream object and not a <code>SwitchGroup</code>. Upstream gives each Switch instance one <code>topology.fabric</code>; scoping a project's leaf deployment group to one Fabric is a product proposal, not upstream law (topo C1).</p>
 <p>Per-unit lines for this leaf class: <span class="btn">+ Add</span></p>
 <p><span class="btn p">Create and assign to 8 ports</span> <span class="btn">Discard draft</span></p>
-<p class="note">After Create, focus returns to the leaf-class cell of be1. Support status is a separate column from source. This case starts in an <i>existing</i> fabric intent; F5b shows the case where the port has none yet.</p></div></div></div>
+<p class="note">After Create, focus returns to the leaf-class cell of be1. Support status is a separate column from source. This case starts in an <i>existing</i> fabric intent; F5b shows the destination picker, where "+ New fabric context…" covers a port with none yet.</p></div></div></div>
 
-<h2 id="f5b">F5b Create fabric intent and its leaf class from a port with none</h2>
-<div class="frame"><div class="cap"><b>F5b</b><span>Same non-modal panel, two sections, not a wizard. Alternate start, not a continuation of F5: the project began from "No separate storage network" (F1), so it has fabric intents backend and frontend only; the engineer then adds a storage NIC and selects st1–st2. The unsaved DPU customization from F3 is intact.</span></div>
+<h2 id="f5b">F5b Choose a destination: fabric context → leaf class → allocation group</h2>
+<div class="frame"><div class="cap"><b>F5b</b><span>Simplified after sponsor feedback. One non-modal panel; every level may stay "not chosen yet". Example: the HGX storage ports st1–st2. The unsaved DPU customization from F3 is intact.</span></div>
 <div class="app side"><div class="pane scroll"><p class="note">(the editor stays visible; st1–st2 are highlighted)</p>
-<table><tr><th>Port</th><th>Fabric</th><th>Leaf class</th></tr>
-<tr class="sel"><td>st1–st2</td><td><span class="field">— none — ▾</span></td><td><span class="tag t-unk">not chosen</span></td></tr></table>
-<p><b>Fabric menu:</b> <span class="field">— none (valid) —</span> · <span class="field">existing: backend, frontend</span> · <span class="field">+ New fabric intent…</span></p>
-<p class="note">Choosing "+ New fabric intent…" opens the panel. The leaf-class menu stays usable but lists nothing until a fabric intent exists.</p></div>
-<div class="pane panel"><h4>1. Fabric intent (product)</h4>
-<p>Name <span class="field">storage</span> <span class="note">No existing intent matches. A name matching an existing one asks "Use existing frontend?"; nothing is merged by name.</span></p>
-<p>Upstream mapping <span class="field">Not decided yet ▾</span></p>
-<table><tr><th>Upstream mapping option</th><th>Meaning (#28 draft)</th></tr>
-<tr><td>Not decided yet (valid)</td><td>Product intent only; no export until decided</td></tr>
-<tr><td>Its own Fabric in installation <i>main</i></td><td>New upstream Fabric object, same controller</td></tr>
-<tr><td>A domain of an existing Fabric…</td><td>A spine set inside one Fabric with its own rules (for example a plane); not an interchangeable substitute for any network intent. Fit for this intent: <span class="tag t-unk">unverified</span></td></tr>
-<tr><td>A separate installation…</td><td>Another controller; the server gets a second upstream Server object (hh-aid keeps one physical identity). Support model open (Q-FP-1): <span class="tag t-unk">unverified</span></td></tr></table>
-<p class="note">This picker is a <b>proposal</b>. There is no default, and the purpose ("storage") never selects a Fabric, domain or installation on its own. Combinations without evidence show as unverified.</p>
-<h4>2. Leaf class (optional now)</h4>
-<p>Name <span class="field">storage-leaf</span> · Switch model <span class="field">Not chosen yet ▾</span> · <a href="#">Skip: create fabric intent only</a></p>
-<p><span class="btn p">Create and assign to st1–st2</span> <span class="btn">Cancel</span></p>
-<table><tr><th>What happens</th><th>Identity result</th></tr>
-<tr><td>Create</td><td>Draft IDs become one fabric intent and one leaf class; st1–st2 reference them; focus returns to st1's leaf-class cell</td></tr>
-<tr><td>Create pressed twice, or retried after a network error</td><td>The same draft IDs are reused, so there is no second "storage"</td></tr>
-<tr><td>Cancel before Create</td><td>Nothing is created; st1–st2 stay "none (valid)"; the draft is kept for retry until discarded</td></tr>
-<tr><td>Skip leaf class</td><td>Fabric intent created; st1–st2 get fabric "storage", leaf class unresolved (hollow on the map)</td></tr>
-<tr><td>Later discard of the fabric intent</td><td>Allowed only after listing every port and class that references it; no dangling references</td></tr></table></div></div></div>
+<table><tr><th>Port</th><th>Destination</th></tr>
+<tr class="sel"><td>st1–st2</td><td>storage › storage-leaf › <i>choosing group…</i></td></tr>
+<tr><td>be1–be8</td><td>backend › backend-leaf › <span class="tag t-unk">group not chosen</span></td></tr></table>
+<p class="note">A destination is read left to right: the fabric context the port serves, the leaf class it lands on, and the allocation group of ports on that leaf class. Each later level is optional.</p></div>
+<div class="pane panel"><h4>Destination for st1–st2</h4>
+<p>Fabric context <span class="field">storage ▾</span><br><span class="note">not chosen yet · backend · frontend · storage · + New fabric context…</span></p>
+<p>Leaf class <span class="field">storage-leaf ▾</span><br><span class="note">not chosen yet · storage-leaf · + New leaf class…</span></p>
+<p>Port allocation group <span class="field">SL-SRV ▾</span></p>
+<table><tr><th>Group on storage-leaf</th><th>Ports per leaf</th></tr>
+<tr><td>not chosen yet (valid)</td><td>—</td></tr>
+<tr class="sel"><td><b>SL-SRV</b> server-facing, 200G members</td><td>120 logical</td></tr>
+<tr><td>SL-ONE singleton (cage 63)</td><td>1</td></tr>
+<tr><td>SL-UP spine uplinks <span class="tag t-cls">not offered for server ports</span></td><td>32</td></tr>
+<tr><td>+ New group… <span class="note">(opens G1 in this panel)</span></td><td></td></tr></table>
+<p class="bar"><b>What is an allocation group?</b> A planning selection of switch ports that hh-aid uses when it lays out connections. It is <b>not</b> a LACP bundle, port channel or switch configuration, and it adds no protocol meaning.</p>
+<p><a href="#">▸ Advanced (optional): upstream installation, Fabric and domain mapping</a> <span class="note">Not needed to record this destination; stays "not decided yet" (rationale §3.1).</span></p>
+<p><span class="btn p">Apply to st1–st2</span> <span class="btn">Cancel</span></p>
+<p class="note">Reusing SL-SRV is an explicit choice. "+ New" at any level keeps one draft, so pressing Create twice or retrying makes no duplicate; a typed name that matches an existing item asks "Use existing?". Cancel changes nothing and leaves the ports' previous destination.</p></div></div></div>
+
+<h2 id="g1">G1 Port allocation group editor (opened in context from F5b)</h2>
+<div class="frame"><div class="cap"><b>G1</b><span>Leaf class storage-leaf: an illustrative 64-cage 800G-class leaf, after the sponsor's DS5000 example (64 × 800G, 4 × 200G breakout, even cages as uplinks). A requested pattern, not verified hardware facts. Groups apply to every storage-leaf instance.</span></div>
+<div class="app one"><div class="pane scroll">
+<p class="bar"><b>Numbering:</b> cages 1–64 are front-panel positions, a <b>synthetic convention</b> for these screens; the odd/even rows are drawn for reading only. Printed labels, upstream data-port names (<code>E&lt;asic&gt;/&lt;port&gt;</code> upstream, #28) and breakout child names are <span class="tag t-unk">pending topo #5</span>. Breakout members are written c&lt;cage&gt;.&lt;k&gt;. Modes and shared-resource limits come from the leaf profile: <span class="tag t-unk">pending topo #5</span>.</p>
+<div class="scroll"><div class="cages" role="img" aria-label="Cage map of storage-leaf: even cages 2 to 64 are spine uplinks (SL-UP); odd cages 1 to 59 are server-facing (SL-SRV); cage 61 is intentionally unused; cage 63 is the singleton group SL-ONE."><span class="rl">odd (synthetic top row)</span><span class="cg-srv">1</span><span class="cg-srv">3</span><span class="cg-srv">5</span><span class="cg-srv">7</span><span class="cg-srv">9</span><span class="cg-srv">11</span><span class="cg-srv">13</span><span class="cg-srv">15</span><span class="cg-srv">17</span><span class="cg-srv">19</span><span class="cg-srv">21</span><span class="cg-srv">23</span><span class="cg-srv">25</span><span class="cg-srv">27</span><span class="cg-srv">29</span><span class="cg-srv">31</span><span class="cg-srv">33</span><span class="cg-srv">35</span><span class="cg-srv">37</span><span class="cg-srv">39</span><span class="cg-srv">41</span><span class="cg-srv">43</span><span class="cg-srv">45</span><span class="cg-srv">47</span><span class="cg-srv">49</span><span class="cg-srv">51</span><span class="cg-srv">53</span><span class="cg-srv">55</span><span class="cg-srv">57</span><span class="cg-srv">59</span><span class="cg-unu">61</span><span class="cg-one">63</span><span class="rl">even (synthetic bottom row)</span><span class="cg-up">2</span><span class="cg-up">4</span><span class="cg-up">6</span><span class="cg-up">8</span><span class="cg-up">10</span><span class="cg-up">12</span><span class="cg-up">14</span><span class="cg-up">16</span><span class="cg-up">18</span><span class="cg-up">20</span><span class="cg-up">22</span><span class="cg-up">24</span><span class="cg-up">26</span><span class="cg-up">28</span><span class="cg-up">30</span><span class="cg-up">32</span><span class="cg-up">34</span><span class="cg-up">36</span><span class="cg-up">38</span><span class="cg-up">40</span><span class="cg-up">42</span><span class="cg-up">44</span><span class="cg-up">46</span><span class="cg-up">48</span><span class="cg-up">50</span><span class="cg-up">52</span><span class="cg-up">54</span><span class="cg-up">56</span><span class="cg-up">58</span><span class="cg-up">60</span><span class="cg-up">62</span><span class="cg-up">64</span></div></div>
+<p class="note">Legend (colour plus letter): U spine uplinks (SL-UP) · S server-facing (SL-SRV) · 1 singleton (SL-ONE) · – intentionally unused.</p>
+<table><tr><th>Group</th><th>Purpose</th><th>Selector (as entered)</th><th>Mode</th><th>Expands to (physical)</th><th class="n">Members per leaf</th><th>Notes</th></tr>
+<tr><td>SL-UP</td><td>spine uplinks (reserved)</td><td>even 2–64</td><td>1 × 800G</td><td>32 cages: 2, 4, 6, …, 64</td><td class="n">32</td><td>Uplink placement still follows topology, rail and plane rules (not evaluated here)</td></tr>
+<tr class="sel"><td>SL-SRV</td><td>server-facing, equal capability</td><td>odd 1–59</td><td>4 × 200G breakout</td><td>30 cages: 1, 3, …, 59</td><td class="n">120</td><td>c1.1–c1.4, c3.1–c3.4, …, c59.1–c59.4. No protocol meaning</td></tr>
+<tr><td>SL-ONE</td><td>singleton (class-level)</td><td>63</td><td>1 × 800G</td><td>cage 63</td><td class="n">1</td><td>One port on each instance; not a binding to a specific switch</td></tr>
+<tr><td>(unused)</td><td>intentionally unused</td><td>61</td><td>—</td><td>cage 61</td><td class="n">0</td><td>Engineer note: "kept free for growth"</td></tr>
+<tr><th colspan="5">All 64 cages accounted for; no cage is in two groups</th><th class="n">153</th><th></th></tr></table>
+<h3>New group (as created from F5b)</h3>
+<p>Name <span class="field">SL-SRV</span> Purpose <span class="field">server-facing ▾</span> Selector <span class="field">odd ▾</span> from <span class="field">1</span> to <span class="field">59</span> Mode <span class="field">4 × 200G ▾</span></p>
+<p class="bar"><b>Preview:</b> 30 cages → 120 logical members: c1.1–c1.4, c3.1–c3.4, …, c59.1–c59.4. Order for later allocation: cage ascending, then child.</p>
+<table><tr><th>Selector type</th><th>Entered as</th><th>Preview</th></tr>
+<tr><td>Contiguous range</td><td>1–16</td><td>16 cages: 1, 2, …, 16</td></tr>
+<tr><td>Explicit list (non-contiguous)</td><td>3, 7, 12, 40</td><td>4 cages: 3, 7, 12, 40</td></tr>
+<tr><td>Odd / even</td><td>even 2–64</td><td>32 cages: 2, 4, …, 64</td></tr>
+<tr><td>Range with stride</td><td>1–61 step 4</td><td>16 cages: 1, 5, 9, …, 61</td></tr>
+<tr><td>Singleton</td><td>63</td><td>1 cage: 63</td></tr>
+<tr><td>Breakout-child subset</td><td>c5.1–c5.2</td><td>2 logical members; c5.3–c5.4 stay free for another group in the same mode</td></tr></table>
+<h3>Conflicts are shown, never resolved silently</h3>
+<table><tr><th>Edit</th><th>Shown result</th></tr>
+<tr><td>SL-SRV selector odd 1–63</td><td><span class="tag t-bad">overlap</span> Cage 61 is marked unused and cage 63 is in SL-ONE; neither is assigned twice. Choose: exclude them, or change the other group</td></tr>
+<tr><td>Add cage 5 at 1 × 800G to another group</td><td><span class="tag t-bad">parent/child</span> Cage 5 is in 4 × 200G mode in SL-SRV; the parent cage cannot also be allocated as one port</td></tr>
+<tr><td>SL-SRV mode 4 × 200G → 2 × 400G</td><td>Members 120 → 60 per leaf. Affected connection classes are listed before applying (R2)</td></tr></table>
+<h3>Singleton group versus exact binding</h3>
+<table><tr><th></th><th>Scope</th><th>Example</th></tr>
+<tr><td>Class-level singleton group (SL-ONE)</td><td>Every storage-leaf instance</td><td>"cage 63 on each storage-leaf". With two instances there are two such ports, and which server uses which is not decided</td></tr>
+<tr><td>Exact instance binding</td><td>One switch instance and one server instance, in this project</td><td>"storage-leaf-02 cage 63 ↔ backup-01 port p1". Recorded on the connection map after instances exist; not part of the class. Not used in this scenario</td></tr></table>
+<p class="note">Demand on SL-SRV: 224 server-facing 200G terminations (HGX 200 + Storage 2U 24). SL-SRV offers 120 per leaf instance. The switch count stays <b>not estimated</b>: rails, placement, redundancy and shared-resource limits are not evaluated, and a port total alone does not prove feasibility.</p>
+<p><span class="btn p">Create group and return</span> <span class="btn">Cancel</span> <span class="note">Returns to F5b with SL-SRV selected; st1–st2 and the F3 edit are intact.</span></p>
+</div></div></div>
 
 <h2 id="f6">F6 Return with edits intact</h2>
 <div class="frame"><div class="cap"><b>F6</b><span>Back in the editor, with a change summary</span></div>
@@ -281,34 +323,29 @@ Fabric <span class="field">backend (existing) ▾</span><br>
 How many servers of this class? <span class="field">100</span> <span class="note">(a range such as 96–128 is allowed; racks and placement are optional details)</span></p>
 <p class="note">There is no separate "backend servers" or "storage servers" count. The 100 servers each carry all their attachments.</p></div></div></div>
 
-<h2 id="f8">F8 Expanded BOM</h2>
-<div class="frame"><div class="cap"><b>F8</b><span>Generate → BOM, grouped by owner, with per-unit multiplication visible. Every number opens its trace.</span></div>
+<h2 id="f8">F8 BOM: top-level rows, expandable</h2>
+<div class="frame"><div class="cap"><b>F8</b><span>Default view: one row per top-level part or component with its quantity. ▸ expands to the line items. Every number opens its trace.</span></div>
 <div class="app one"><div class="pane scroll">
-<p>View: <span class="btn p">Installed</span> <span class="btn">Purchase</span> <span class="note">Installed counts everything present. Purchase suppresses only children an explicit bundle covers; unknown inclusion leaves the purchase total unresolved, never zero (parts SF03, model §5).</span></p>
+<p>View: <span class="btn p">Installed</span> <span class="btn">Purchase</span> <span class="btn">▸ Expand all</span> <span class="note">Installed counts everything present. Purchase suppresses only children an explicit bundle covers; unknown inclusion leaves the purchase quantity unresolved, never zero (parts SF03, model §5).</span></p>
 <table>
-<tr><th>Line</th><th>Per unit</th><th>× units</th><th>= Total</th><th>Purchase</th><th>Identity</th></tr>
-<tr><th colspan="6">Servers</th></tr>
-<tr><td>HGX 8-GPU (B200-class) server</td><td class="n">1</td><td class="n">100</td><td class="n">100</td><td>server SKU <span class="tag t-unk">unknown</span></td><td><span class="tag t-gen">generic</span></td></tr>
-<tr><th colspan="6">Per-server components</th></tr>
-<tr><td>Backend NIC, 400G-class</td><td class="n">8</td><td class="n">100</td><td class="n">800</td><td><span class="tag t-unk">bundled?</span></td><td><span class="tag t-gen">generic</span></td></tr>
-<tr><td>DPU, single-port <span class="tag t-cust">customized</span></td><td class="n">2</td><td class="n">100</td><td class="n">200</td><td><span class="tag t-unk">bundled?</span></td><td><span class="tag t-unk">unverified</span></td></tr>
-<tr><td>Storage NIC, 200G-class</td><td class="n">1</td><td class="n">100</td><td class="n">100</td><td><span class="tag t-unk">bundled?</span></td><td><span class="tag t-gen">generic</span></td></tr>
-<tr><td>Power cord</td><td class="n">4</td><td class="n">100</td><td class="n">400</td><td><span class="tag t-unk">included or separate?</span></td><td><span class="tag t-gen">generic</span></td></tr>
-<tr><td>Rail kit</td><td class="n">1</td><td class="n">100</td><td class="n">100</td><td>included: not ordered separately</td><td>—</td></tr>
-<tr><td>Support contract</td><td class="n">1</td><td class="n">100</td><td class="n">100</td><td>separate</td><td>—</td></tr>
-<tr><th colspan="6">Connection media (in scope)</th></tr>
-<tr><td>Optic, server end (backend)</td><td class="n">8</td><td class="n">100</td><td class="n">800</td><td>separate</td><td><span class="tag t-gen">generic</span></td></tr>
-<tr><td>Optic, leaf end (backend)</td><td class="n">1 per link</td><td class="n">800 links</td><td class="n">800</td><td>separate</td><td><span class="tag t-unk">depends on leaf model</span></td></tr>
-<tr><td>DAC assembly (frontend), straight: one per link in this fixture, both ends included</td><td class="n">2</td><td class="n">100</td><td class="n">200</td><td>separate</td><td><span class="tag t-gen">generic</span></td></tr>
-<tr><td>Storage links: medium not decided</td><td class="n">2</td><td class="n">100</td><td class="n">200 links</td><td colspan="2"><span class="tag t-unk">media not counted; not zero</span></td></tr>
-<tr><th colspan="6">Switches</th></tr>
-<tr><td>backend-leaf</td><td colspan="5"><span class="tag t-unk">not estimated: leaf model not chosen</span> · needs ≥ 800 server-facing ports in fabric "backend"</td></tr>
-<tr><td>frontend and storage leaves</td><td colspan="5"><span class="tag t-unk">not estimated: no leaf class</span></td></tr>
-<tr><th colspan="6">Outside scope (disclosed, not part of the BOM)</th></tr>
-<tr><td colspan="6"><span class="tag t-out">out of scope</span> External fiber for 800 backend optical links · RJ45 cords for 400 total management links (per server: 1 in-band + 3 out-of-band: host BMC, 2 DPU management ports) · structured cabling and panels. Interface requirements stay visible in E1.</td></tr>
+<tr><th>Line</th><th class="n">Quantity</th><th>Purchase</th><th>Identity</th></tr>
+<tr class="sel"><td>▾ HGX 8-GPU (B200-class) server</td><td class="n">100</td><td>server SKU <span class="tag t-unk">unknown</span>; some children unresolved</td><td><span class="tag t-gen">generic</span></td></tr>
+<tr class="child"><td>Backend NIC, 400G-class</td><td class="n">8 × 100 = 800</td><td><span class="tag t-unk">bundled?</span></td><td><span class="tag t-gen">generic</span></td></tr>
+<tr class="child"><td>DPU, single-port <span class="tag t-cust">customized</span></td><td class="n">2 × 100 = 200</td><td><span class="tag t-unk">bundled?</span></td><td><span class="tag t-unk">unverified</span></td></tr>
+<tr class="child"><td>Storage NIC, 200G-class</td><td class="n">1 × 100 = 100</td><td><span class="tag t-unk">bundled?</span></td><td><span class="tag t-gen">generic</span></td></tr>
+<tr class="child"><td>Power cord</td><td class="n">4 × 100 = 400</td><td><span class="tag t-unk">included or separate?</span></td><td><span class="tag t-gen">generic</span></td></tr>
+<tr class="child"><td>Rail kit</td><td class="n">1 × 100 = 100</td><td>included: not ordered separately</td><td>—</td></tr>
+<tr class="child"><td>Support contract</td><td class="n">1 × 100 = 100</td><td>separate</td><td>—</td></tr>
+<tr><td>▸ Backend optics, both ends</td><td class="n">1,600</td><td>separate</td><td><span class="tag t-gen">generic</span></td></tr>
+<tr class="sel"><td>▾ Frontend DAC assemblies, straight</td><td class="n">200</td><td>separate</td><td><span class="tag t-gen">generic</span></td></tr>
+<tr class="child"><td>Owner view: HGX ports fe1–fe2</td><td class="n">(200 ends)</td><td colspan="2">reference to the same 200 assemblies; adds nothing</td></tr>
+<tr class="child"><td>Owner view: frontend leaf ports</td><td class="n">(200 ends)</td><td colspan="2">reference to the same 200 assemblies; adds nothing</td></tr>
+<tr><td>▸ Storage links, medium not decided</td><td class="n">200 links</td><td colspan="2"><span class="tag t-unk">media not counted; not zero</span></td></tr>
+<tr><td>▸ Switches</td><td class="n">—</td><td colspan="2"><span class="tag t-unk">not estimated: leaf model or group capacity not resolved</span></td></tr>
+<tr><td>▸ Outside scope (disclosed, not part of the BOM)</td><td class="n">—</td><td colspan="2"><span class="tag t-out">out of scope</span> External fiber for 800 backend optical links · RJ45 cords for 400 total management links (per server: 1 in-band + 3 out-of-band: host BMC, 2 DPU management ports) · structured cabling and panels</td></tr>
 </table>
-<div class="bar"><b>Trace for "800" (backend NIC):</b> 8 per server (class r1, unchanged) × 100 servers (supplied) = 800. The 8 NICs are one hardware row, not 8 separately counted populations. Bundling is unknown, so the line may move into the server SKU once parts evidence lands.</div>
-<p class="note">Totals are checked by <code>bom-arithmetic.py</code> (variant: 2 × single-port DPU; the default dual-port variant gives 100 DPUs and 300 total management links, 200 of them out-of-band; every other line is identical). Breakout assemblies, not shown here, count once per unique assembly instance and can serve several links.</p></div></div></div>
+<div class="bar"><b>Expanding never changes a total.</b> A parent row's number counts only its own item (100 servers); each child is a separate requirement line counted once; owner views are references to one purchase identity and add nothing. This view: 6 top-level rows collapsed, the same 10 requirement lines expanded, 3,600 installed items either way (100 servers + 1,700 per-server items + 1,600 optics + 200 DACs).</div>
+<p class="note">Purchase view: the rail kit (included) drops out; the NIC, DPU, storage NIC and cord lines stay "unresolved" rather than zero, and the parent row says which children are unresolved. Trace for "800": 8 per server (class r1, unchanged) × 100 servers (supplied). Totals are checked by <code>bom-arithmetic.py</code> (variant: 2 × single-port DPU; the default dual-port variant gives 100 DPUs and 300 total management links, 200 of them out-of-band; every other line is identical). Breakout assemblies count once per unique assembly instance and can serve several links (R1, CC4).</p></div></div></div>
 
 <h2 id="f9">F9 Add a second server class</h2>
 <div class="frame"><div class="cap"><b>F9</b><span>Project → Add server class → Storage 2U (generic) → assign storage ports</span></div>
@@ -322,8 +359,42 @@ How many servers of this class? <span class="field">100</span> <span class="note
 <div class="bar">BOM after regenerating: storage-fabric links 200 + 24 = 224 · drives 24 × 12 = 288 · servers 100 + 12 = 112 in two populations</div></div></div></div>
 
 <!-- ============================================================ -->
-<h2 id="e1">E1 Both-ends comparison with explainable filters</h2>
-<div class="frame"><div class="cap"><b>E1</b><span>Backend port (be1–be8, same pattern) ↔ backend-leaf port. Opened from the details panel with "Compare ends". Selection context: the <b>module for End B</b> (alternatives: module for End A, or an entire assembly).</span></div>
+<h2 id="r1">R1 Connection-class review (primary engineering review)</h2>
+<div class="frame"><div class="cap"><b>R1</b><span>Project after F9: HGX × 100 and Storage 2U × 12. 1,224 fabric links shown as 5 connection classes. Manual inspection: the engineer records what they looked at. Not a system verdict, not qualification.</span></div>
+<div class="app one"><div class="pane scroll">
+<div class="strip"><span><b>1,224 fabric links</b> in 5 classes</span><span>1 instance exception (CC4x)</span><span>Reviewed: 1 of 5</span><span>Unknowns shown in cells</span><span>Management: 424 RJ45 links, external in this fixture, listed separately</span></div>
+<table class="cmp"><tr><th>Class</th><th class="n">Links</th><th>Side A: server · port · cage · mode</th><th>Side B: leaf class · group · cage · mode</th><th>Construction</th><th>Fiber · reach / length</th><th>Manual review</th><th>Actions</th></tr>
+<tr><td>CC1 backend</td><td class="n">800</td><td>HGX r1 · be1–be8 · OSFP? · 1 × 400G?</td><td>backend-leaf · <span class="tag t-unk">group not chosen</span> · cage <span class="tag t-unk">unknown</span></td><td>separate optic at each end · DR4? · MPO-12?</td><td>SMF? (from DR4?, unverified) · 500 m-class?</td><td>not reviewed</td><td><a href="#">Edit A</a> · <a href="#">Edit B</a> · <a href="#">Instances (100)</a> · <a href="#e1">Detail</a></td></tr>
+<tr><td>CC2 frontend</td><td class="n">200</td><td>HGX <span class="tag t-cust">customized</span> · DPU fe1–fe2 · QSFP? · 1 × 200G?</td><td>frontend · <span class="tag t-unk">leaf class not chosen</span></td><td>integrated DAC, straight, 2 ends, 1 per link</td><td>length <span class="tag t-unk">unknown</span></td><td>not reviewed</td><td><a href="#">Edit A</a> · <a href="#">Edit B</a> · <a href="#">Instances</a> · <a href="#e1">Detail</a></td></tr>
+<tr><td>CC3 storage (HGX)</td><td class="n">200</td><td>HGX r1 · storage NIC st1–st2 · QSFP56? · 200G</td><td>storage-leaf · SL-SRV · odd cage child · 4 × 200G</td><td><span class="tag t-unk">medium not decided</span>: a breakout assembly or breakout optic is needed; not counted</td><td><span class="tag t-unk">unknown</span></td><td>not reviewed</td><td><a href="#">Edit A</a> · <a href="#">Edit B</a> · <a href="#">Instances</a> · <a href="#e1">Detail</a></td></tr>
+<tr class="sel"><td>▾ CC4 storage (Storage 2U)<br><span class="note">"200G breakout cable"</span></td><td class="n">20</td><td>Storage 2U r1 · NIC st1–st2 · QSFP56? · 200G · 10 servers</td><td>storage-leaf · SL-SRV · 5 odd cages · 4 × 200G</td><td>breakout DAC: 1 parent end → 4 tails; 5 assemblies</td><td>3 m?</td><td>reviewed (manual note, illustrative)</td><td><a href="#">Edit A</a> · <a href="#r2"><b>Edit B</b></a> · <a href="#">Instances (10)</a> · <a href="#e1">Detail</a></td></tr>
+<tr class="child"><td colspan="8">End/group mapping: parent end P → storage-leaf SL-SRV cage (800G-class cage, 4 × 200G mode); tails T1–T4 → st1 and st2 of two Storage 2U servers. Pairing assumption: one assembly's tails go to ports of the same class (parts SU-SPLIT). One purchase identity per assembly; it appears in both the server and leaf owner views.</td></tr>
+<tr><td>CC4x exception<br><span class="note">"200G breakout cable"</span></td><td class="n">4</td><td>Storage 2U r1 · st1–st2 · <b>s11–s12 only</b> (rack R9) · QSFP56? · 200G</td><td>storage-leaf · SL-SRV · 1 odd cage · 4 × 200G</td><td><b>breakout AOC</b>: 1 parent end → 4 tails; 1 assembly</td><td>15 m?</td><td>not reviewed</td><td><a href="#">Edit A</a> · <a href="#">Edit B</a> · <a href="#">Instances (2)</a> · <a href="#e1">Detail</a></td></tr>
+</table>
+<p class="note">Rows are unique physical constructions: both ends' source revision, cage, configured mode, and the medium or assembly with its end/group mapping. A matching SKU or description never merges rows: CC4 and CC4x share the description "200G breakout cable" but differ in assembly type, length and the servers they serve, so CC4x is its own row and its servers are named. An unknown never matches a known value. Spine uplinks reserved in SL-UP are not shown: spine links are not estimated.</p>
+<p class="note">Unknown values and already-known conflicts stay visible in the cells (E1 has the evidence). Recording "reviewed" is a manual note with the reviewer and time; it is not qualification and does not replace allocation integrity (G1).</p></div></div></div>
+
+<h2 id="r2">R2 Row shortcut: edit a source, preview the impact, return</h2>
+<div class="frame"><div class="cap"><b>R2</b><span>From R1 row CC4 → Edit B. The review table stays visible; the panel edits the source definition.</span></div>
+<div class="app side"><div class="pane scroll">
+<table><tr><th>Class</th><th class="n">Links</th><th>Impact of the pending edit</th></tr>
+<tr class="sel"><td>CC3</td><td class="n">200</td><td>affected: Side B group membership</td></tr>
+<tr class="sel"><td>CC4</td><td class="n">20</td><td>affected (opened from here)</td></tr>
+<tr class="sel"><td>CC4x</td><td class="n">4</td><td>affected</td></tr>
+<tr><td>CC1, CC2</td><td class="n">1,000</td><td>not affected</td></tr></table>
+<p class="note">Edit A on the same row opens Storage 2U → NIC → port st1 in the F2 layout, with the same scope choice (new class revision or this project only).</p></div>
+<div class="pane panel"><h4>Edit source: group SL-SRV (storage-leaf r1)</h4>
+<p>Selector <span class="field">odd 1–59</span> → <span class="field">odd 1–57</span> <span class="note">(keep cage 59 free)</span></p>
+<p class="bar"><b>Preview:</b> members per leaf 120 → 116. Affected classes CC3, CC4, CC4x (224 links). No instance bindings exist yet, so nothing moves; bound connections would be listed and kept, never moved silently.</p>
+<p>Apply to:<br><span class="field">◉ Class definition: storage-leaf r2, every instance in this project</span><br><span class="field">○ One instance only (exception): storage-leaf-02 ▾</span></p>
+<p class="note">An instance exception becomes its own inspectable R1 row (for example "CC3 · exception: storage-leaf-02, cage 59 unavailable"); it never silently changes all links.</p>
+<p><span class="btn p">Apply and return to CC4</span> <span class="btn">Cancel</span></p></div></div>
+<div class="pane scroll"><div class="strip"><span><b>Returned to row CC4</b></span><span>SL-SRV r1 → r2 <span class="tag t-cust">changed</span></span><span>Review marks on CC3, CC4, CC4x: <span class="tag t-unk">stale: Side B source changed</span></span><span><a href="#">undo</a></span></div>
+<table><tr><th>Class</th><th>Side B</th><th>Manual review</th></tr>
+<tr class="stale"><td>CC4</td><td>storage-leaf · SL-SRV <b>r2</b> (odd 1–57) · 4 × 200G</td><td>stale: earlier note kept as history, not carried forward as current</td></tr></table></div></div>
+
+<h2 id="e1">E1 Connection detail (optional drill-down from R1)</h2>
+<div class="frame"><div class="cap"><b>E1</b><span>Backend port (be1–be8, same pattern) ↔ backend-leaf port. Opened from an R1 row with "Detail"; not required reading for the review. Selection context: the <b>module for End B</b> (alternatives: module for End A, or an entire assembly).</span></div>
 <div class="app one"><div class="pane scroll">
 <p><b>Filtering:</b> candidate modules or assembly ends for <b>End B, the backend-leaf port</b> (host: leaf switch, model not chosen).</p>
 <p>Filters: <span class="btn">☑ Fits End B's own host cage</span> <span class="btn">☑ Fits End B's own host mode and electrical lanes</span> <span class="btn">☑ Link-side check vs End A's module: hide evidence-backed mismatches only</span> <span class="btn">☐ Prefer same PMD and connector as End A (search preference, not a compatibility rule)</span> <span class="btn">☐ Documented pairs only</span> <span class="btn">☑ Show unknown</span> <span class="btn">☐ Show mismatches</span> <a href="#">Why is an option hidden?</a></p>
@@ -393,8 +464,12 @@ How many servers of this class? <span class="field">100</span> <span class="note
 <tr><td>RT8 Compare both ends of a backend link; record an override on an unknown and on a known mismatch</td><td>E1</td><td>Does each filter say which end it tests? Is it understood that the override keeps "unknown" or "mismatch" and is not qualification?</td></tr>
 <tr><td>RT9 Change one value for this project only, then adopt class r2</td><td>L1, L2</td><td>Is the scope choice understood? Does the customization survive?</td></tr>
 <tr><td>RT10 Say what the BOM does not include</td><td>F8 excluded, K</td><td>External cabling disclosed; generic parts not orderable</td></tr>
-<tr><td>RT11 From storage ports with no fabric, create the storage fabric intent and its leaf class; cancel once, then retry</td><td>F5b</td><td>Edits intact? One "storage" after retry? Is "upstream mapping: not decided" understood as valid, not defaulted?</td></tr>
-</table>
+<tr><td>RT11 From storage ports with no fabric, create the storage fabric context and its leaf class with "+ New"; cancel once, then retry</td><td>F5b</td><td>Edits intact? One "storage" after retry? Is the collapsed Advanced section ignorable?</td></tr>
+
+<tr><td>RT12 Send the storage ports to storage-leaf, reuse one group, then create another in context</td><td>F5b → G1 → F5b</td><td>Understood without upstream terms? Is a group read as planning, not LACP?</td></tr>
+<tr><td>RT13 Say which cages serve servers, which are uplinks, and which are unused</td><td>G1</td><td>Numbering basis noticed? Singleton versus exact binding clear?</td></tr>
+<tr><td>RT14 Read the BOM top-level, expand one row and say whether a total changed</td><td>F8</td><td>Is the shared DAC read as one purchase?</td></tr>
+<tr><td>RT15 Review all storage connections, spot the exception, then change SL-SRV and come back</td><td>R1 → R2 → R1</td><td>Is CC4x found? Is "stale" understood? Is E1 needed?</td></tr></table>
 <h3>Sponsor feedback (main 4449d14) → screens</h3>
 <table><tr><th>Feedback point</th><th>Screens</th></tr>
 <tr><td>"Server" for every non-switch device, explained once</td><td>F1 note, page header</td></tr>
@@ -409,7 +484,20 @@ How many servers of this class? <span class="field">100</span> <span class="note
 <tr><td>Source-derived, manual and placeholder switch models with support status</td><td>F5</td></tr>
 <tr><td>External cabling excluded and disclosed; transceivers and assemblies included</td><td>F8, K, E1</td></tr>
 <tr><td>Compare interaction styles; canvas optional</td><td>A, B, C</td></tr>
-<tr><td>Keep the persistent workspace, regeneration and library views</td><td>F1 library link, F6, L3</td></tr></table></div></div>
+<tr><td>Keep the persistent workspace, regeneration and library views</td><td>F1 library link, F6, L3</td></tr></table>
+<h3>Sponsor feedback (main 2ee0e7d) → screens</h3>
+<table><tr><th>Feedback point</th><th>Screens</th></tr>
+<tr><td>Keep F2's spacious server-class profile</td><td>F2 (unchanged)</td></tr>
+<tr><td>Destination = fabric context → leaf class → port allocation group; select, reuse or create in context; upstream internals deferred</td><td>F4, F5b, G1</td></tr>
+<tr><td>Allocation groups are planning selections, not LACP or switch configuration</td><td>F5b note, G1</td></tr>
+<tr><td>Contiguous, non-contiguous, odd/even, stride, singleton and breakout-child membership with inspectable expansion and numbering</td><td>G1</td></tr>
+<tr><td>Uplink and server-facing reservations; intentionally unused ports; no capacity assigned twice</td><td>G1</td></tr>
+<tr><td>Class-level singleton versus exact instance binding</td><td>G1</td></tr>
+<tr><td>BOM opens at top-level rows and expands without double counting; shared assemblies one purchase</td><td>F8</td></tr>
+<tr><td>Compact review grouped by unique connection class with both ends' key attributes</td><td>R1</td></tr>
+<tr><td>Similar descriptions are not the same class; exceptions inspectable</td><td>R1 (CC4 vs CC4x)</td></tr>
+<tr><td>Edit either side's source, preview affected instances, return with staleness visible</td><td>R1 → R2</td></tr>
+<tr><td>Manual inspection first; E1 as a drill-down; no automatic compatibility prerequisite</td><td>R1, E1</td></tr></table></div></div>
 
 <p class="note">Static page: no script, no storage. Generated for D02 #9 review.</p>
 </main>

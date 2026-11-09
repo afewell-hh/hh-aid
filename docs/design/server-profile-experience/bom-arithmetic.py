@@ -121,4 +121,38 @@ assert h100["servers"] + s12["servers"] == 112  # two populations, no duplicatio
 # --- Attachment count does not change server count --------------------------
 assert expand(hgx_profile(storage=False), 100)["servers"] == h100["servers"] == 100
 
+# --- Sponsor iteration (main 2ee0e7d): allocation groups, review, F8 rollup -----
+# Synthetic 64-cage leaf (illustrative; numbering is a screen convention only).
+def odd(a, b): return [c for c in range(a, b + 1) if c % 2]
+def even(a, b): return [c for c in range(a, b + 1) if c % 2 == 0]
+groups = {"SL-UP": (even(2, 64), 1), "SL-SRV": (odd(1, 59), 4),
+          "SL-ONE": ([63], 1), "unused": ([61], 0)}
+cages = [c for sel, _ in groups.values() for c in sel]
+assert len(cages) == len(set(cages)) == 64          # every cage once, no overlap
+members = {g: len(sel) * k for g, (sel, k) in groups.items()}
+assert members == {"SL-UP": 32, "SL-SRV": 120, "SL-ONE": 1, "unused": 0}
+assert sum(members.values()) == 153
+assert len(list(range(1, 62, 4))) == 16 and len(range(1, 17)) == 16
+assert len(odd(1, 63)) - len(odd(1, 59)) == 2       # 61 and 63 would overlap
+assert len(odd(1, 57)) * 4 == 116                   # R2 edit: 120 -> 116
+assert len(odd(1, 59)) * 2 == 60                    # mode 2x400G: 120 -> 60
+
+# R1 connection classes (project after F9, single-port DPU variant).
+cc = {"CC1": 800, "CC2": 200, "CC3": 200, "CC4": 10 * 2, "CC4x": 2 * 2}
+assert sum(cc.values()) == v2["fabric links"] + s12["fabric links"] == 1224
+assert cc["CC3"] + cc["CC4"] + cc["CC4x"] == 224    # SL-SRV demand
+assert cc["CC4"] // 4 == 5 and cc["CC4x"] // 4 == 1  # breakout assemblies, 4 tails
+assert v2["rj45 links (cords excluded)"] + s12["rj45 links (cords excluded)"] == 424
+
+# F8 rollup invariant: parent counts only itself; children counted once;
+# owner views of a shared assembly add nothing.
+per_server = ["BE-NIC", "FE-DPU1", "ST-NIC", "power cord", "rail kit",
+              "support contract (per server)"]
+children = sum(v2[k] for k in per_server)
+assert children == 1700
+expanded = v2["servers"] + children + (v2["server-end optics"] + v2["far-end optics"]) \
+    + v2["integrated assemblies"]
+owner_views = 0                                     # references, not quantities
+assert expanded + owner_views == 3600
+
 print("server-profile BOM arithmetic passed")
