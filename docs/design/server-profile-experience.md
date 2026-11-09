@@ -1,6 +1,6 @@
 # D02 addendum: server-class-first profile experience
 
-**Status:** draft for review (issue #9, lead assignment [6726546239](https://github.com/afewell-hh/hh-aid/issues/9#issuecomment-6726546239)). It is not approved and not a production design. This revision applies lead's four bounded corrections ([6727963025](https://github.com/afewell-hh/hh-aid/issues/9#issuecomment-6727963025)) to `8c3e325`: E1 filter scope, override verdicts, fabric creation from a port with none (F5b), and #28 mapping evidence. No SE sessions or interviews have taken place, and none are claimed.
+**Status:** draft for review (issue #9, lead assignment [6726546239](https://github.com/afewell-hh/hh-aid/issues/9#issuecomment-6726546239)). It is not approved and not a production design. This revision applies lead's four bounded corrections ([6727963025](https://github.com/afewell-hh/hh-aid/issues/9#issuecomment-6727963025)) to `8c3e325`: E1 filter scope, override verdicts, fabric creation from a port with none (F5b), and #28 mapping evidence. A second, consolidated pass ([6728366904](https://github.com/afewell-hh/hh-aid/issues/9#issuecomment-6728366904)) applies the independent reviews by parts ([6728280899](https://github.com/afewell-hh/hh-aid/issues/6#issuecomment-6728280899)) and model ([6728297958](https://github.com/afewell-hh/hh-aid/issues/8#issuecomment-6728297958)) of `8c3e325`, and topo's review of #28 ([6728308610](https://github.com/afewell-hh/hh-aid/issues/3#issuecomment-6728308610)): management-count labels, a sourced unequal-host example, E1's optical filter wording and #28 qualifications. No SE sessions or interviews have taken place, and none are claimed.
 **Author:** t5 / ux. **Baseline:** main `4449d14` (sponsor feedback dated 2026-11-08).
 **Previous checkpoint:** D02 revision 3.1 (PR #24 at `7da2b0c`) is unchanged. It remains the reference for the persistent workspace, regeneration, stale/diff, conditional alternatives and starter-library views. This addendum replaces only its from-scratch *endpoint/links-per-endpoint* interaction.
 
@@ -13,11 +13,11 @@
 - Port counts, speeds and cages are fixture inputs.
 - Switch counts are deliberately **not estimated**.
 
-**Coordination.** Field names are provisional until these land:
-- parts' field/fixture matrix (#6, `docs/research/server-unit-bom.md`);
-- model's contract fixture (#8, `docs/design/server-class-contract.md`).
+**Coordination.** Screen field names map to, but are not identical with, these accepted design inputs (§6.1):
+- parts' field/fixture matrix (#6, `docs/research/server-unit-bom.md`), accepted by lead at `0230cd8` within its conditional accounting scope;
+- model's contract (#8, `docs/design/server-class-contract.md`), accepted by lead as working input at `365a0c3`.
 
-Product words such as *fabric* and *leaf class* are product intent. Their mapping to the upstream Fabric object, domain and installation now uses bridge's draft source evidence: #3, PR #28 at [`b4329a5`](https://github.com/afewell-hh/hh-aid/blob/b4329a5f8107ef8bf64ede045992187461f552da/docs/research/fabric-profile-contract.md), author bridge, independent review pending. §3.1 lists what this pass adopts from it and what stays open.
+Product words such as *fabric* and *leaf class* are product intent. Their mapping to the upstream Fabric object, domain and installation uses bridge's draft source evidence: #3, PR #28 at [`b4329a5`](https://github.com/afewell-hh/hh-aid/blob/b4329a5f8107ef8bf64ede045992187461f552da/docs/research/fabric-profile-contract.md). Topo's independent review ([6728308610](https://github.com/afewell-hh/hh-aid/issues/3#issuecomment-6728308610)) corroborates its core fixture outcomes but requests corrections C1–C7 from bridge, so only the corroborated core is used here and uncorrected claims are not treated as constraints. §3.1 lists what this pass uses and what stays open.
 
 ## 1. What the sponsor asked for, and what this pass changes
 
@@ -28,7 +28,7 @@ Product words such as *fabric* and *leaf class* are product intent. Their mappin
 | Family, reusable class revision and project customization have distinct identities | Four identities: family, class revision, project copy with customizations, population | §8 |
 | One server has several concurrent attachments; keep rails and planes | One population per class. Attachments are properties of ports, not separate inventories | §6 F2, F4, F7 |
 | Nested NIC/DPU → port → cage/mode → optic or assembly | Treegrid hardware table | §7 |
-| Arbitrary per-unit lines; ×N expansion; bundled versus separate; shared assemblies counted once | Per-unit lines table; BOM shows per unit × units = total; purchase column; assemblies counted per link | §6 F2, F8 |
+| Arbitrary per-unit lines; ×N expansion; bundled versus separate; shared assemblies counted once | Per-unit lines table; BOM shows per unit × units = total; purchase column; assemblies counted per unique instance | §6 F2, F8 |
 | Physical detail at both ends; explainable filters; unknowns and overrides visible | Both-ends comparison (E1) | §7.3 |
 | Port → fabric and leaf class; leaf class resolves fabric; partial intent valid; create in context without duplicates | Batch assignment, a non-modal create panel, reuse-first menus | §6 F4, F5, F9 |
 | Source-derived, manual and placeholder switch models with support status | Model picker in F5, with source and support as separate columns | §6 F5 |
@@ -59,7 +59,7 @@ Reused from appendix A: GOV.UK Check answers (review before regenerating) and NN
 
 No new survey was done. These sources inform layout and keyboard choices only. They do not establish which alternative SEs will perform best with. That is what the review tasks in §10 are for.
 
-## 3. Vocabulary (product intent; upstream terms per draft #28, review pending)
+## 3. Vocabulary (product intent; upstream terms per #28's corroborated core)
 
 | Term | Meaning in this design | Not the same as |
 | --- | --- | --- |
@@ -72,24 +72,26 @@ No new survey was done. These sources inform layout and keyboard choices only. T
 | **Port** | A logical port on a hardware item, with cage, configured mode and server-end medium | A link |
 | **Attachment** | The port's fabric intent and leaf class, plus its rail and plane tags | An upstream Connection (each Connection belongs to exactly one upstream Fabric, #28) |
 | **Fabric intent** (product; "fabric" in the screens) | The network purpose a server port is meant to join, such as backend, frontend or storage. Bridge's glossary calls this a *network* | The upstream Fabric object, a domain or an installation |
-| **Upstream mapping** | An explicit, per-fabric-intent choice: not decided yet (valid), its own Fabric in an installation, a domain of an existing Fabric, or a separate installation. Never defaulted from the purpose name | — |
+| **Upstream mapping** (proposal) | An explicit, per-fabric-intent choice: not decided yet (valid), its own Fabric in an installation, a domain of an existing Fabric, or a separate installation. Never defaulted from the purpose name. Options carry their own support status; a domain is not an automatically interchangeable implementation of any network intent | — |
 | **Upstream Fabric** (#28) | One spine-leaf topology inside one installation | Older docs' use of "fabric" for a whole installation |
 | **Domain** (#28) | A spine set inside one Fabric; a plane may map to one domain | A rail, a redundancy group or a VPC |
 | **Installation** (#28) | One controller plus its `fab.yaml`; it can hold several Fabrics since 26.05 | A Fabric |
-| **Leaf class** | A switch role and model choice inside one fabric intent. The model may be "not chosen yet". It resolves to exactly one upstream Fabric once mapped (#28 §2.1) | A switch instance; upstream `SwitchGroup` |
+| **Leaf class** | Reusable switch role and model configuration. The model may be "not chosen yet". Product proposal, not an upstream object | A switch instance; upstream `SwitchGroup` |
+| **Leaf deployment group** (proposal) | A project's use of a leaf class within one fabric intent and, once mapped, one upstream Fabric and domain set. The Fabric scoping is a product choice, not upstream law: upstream only gives each *Switch instance* one Fabric (topo C1) | A reusable leaf class |
 | **Per-unit line** | Any BOM item with quantity per server (or per switch), including items outside the topology | — |
-| **Assembly** | DAC/AEC/AOC/breakout: one item spanning two or more ends, counted once per instance (R05 §4) | Two transceivers |
+| **Assembly** | DAC/AEC/AOC/breakout: one purchase identity with two **or more** ends, counted once per unique instance (R05 §4). Each end keeps its own host and port-group mapping | Two transceivers |
 
-### 3.1 What this pass adopts from #28 (draft evidence, review pending)
+### 3.1 What this pass uses from #28 (topo-corroborated core; C1–C7 pending)
 
-- **One physical server, one population.** Upstream `Server` has no fabric or domain field, and one server may have Connections into several Fabrics of one installation (#28 §1, executed). The screens keep one population per class across every attachment.
-- **Separate installations.** Ports that attach to a separate installation need a second upstream `Server` object there, so hh-aid owns the physical-server identity (#28 §2.1, inference; Q-FP-1 open). F5b shows this only as an upstream-mapping option.
-- **No default mapping.** Whether a fabric intent becomes its own Fabric or a domain of a shared Fabric is an open D01/D02 choice (#28 handoff). The screens make it an explicit field whose valid default is "not decided yet"; they never infer it from a name such as "storage".
-- **Bundles stay within one Fabric.** An ESLAG or bundled Connection cannot span Fabrics (#28, executed N1/N2). The F4 conflict rule already prevents a silent move; a cross-Fabric bundle would be a visible conflict.
-- **Switch-model support vocabulary.** F5 uses #28 §4.3: `documented-supported`, `catalog-gated`, `virtual-only`, `api-accepted-not-documented`, `manual` (support: unverified) and `placeholder`. A profile's presence proves representability only.
-- **Management networks.** #28 §2.1 places server BMC/OOB outside Hedgehog wiring (citing R06 O1). In this fixture in-band management and all BMC/DPU management ports are shown as external networks. That is **this fixture's scope**, not a product rule: another server class may attach in-band management to a fabric intent.
+- **One physical server, one population.** Upstream `Server` has no fabric or domain field, and one server may have Connections into several Fabrics of one installation (#28, executed; corroborated by topo). The screens keep one population per class across every attachment.
+- **Separate installations.** Ports that attach to a separate installation need a second upstream `Server` object there, so hh-aid owns the physical-server identity (inference; Q-FP-1 open). F5b shows this only as an upstream-mapping option.
+- **One Fabric per Connection.** Each Connection belongs to exactly one Fabric, so an ESLAG or bundled Connection cannot span Fabrics (#28 N1/N2, corroborated). The F4 conflict rule already prevents a silent move.
+- **Leaf class versus deployment group.** Upstream gives each Switch instance one Fabric; it has no class object (topo C1). A reusable leaf class stays a product configuration. Scoping a project's *leaf deployment group* to one fabric intent and one upstream Fabric is a product proposal for D01/D02, not an upstream constraint.
+- **Upstream mapping is a proposal with explicit status.** "Not decided yet" is the valid default, and nothing is inferred from a name such as "storage". The picker states that a domain is a spine set inside one Fabric with its own rules, not an interchangeable implementation of any network intent, and that a separate installation's support model is open (Q-FP-1). Combinations without evidence show as unverified.
+- **Switch-model support vocabulary.** F5 uses #28 §4.3's proposed labels: `documented-supported`, `catalog-gated`, `virtual-only`, `api-accepted-not-documented`, `manual` (support: unverified) and `placeholder`. A profile's presence proves representability only.
+- **Management networks.** This fixture shows in-band management and all BMC/DPU management ports as external networks. That is **this fixture's scope only**. Topo C3 notes that the cited evidence covers unmanaged bootstrap/OOB wiring outside hhfab's management model; it does not show that a BMC or other server Ethernet endpoint cannot attach to a managed Fabric. Another class may do so.
 
-Still open from #28: Q-FP-1 (one server across two installations), Q-FP-6 (criteria for several Fabrics versus separate installations), and topo's independent review.
+Still open: bridge's C1–C7 corrections and corrected pin; Q-FP-1 (one server across two installations); Q-FP-6 (several Fabrics versus separate installations).
 
 ## 4. Tasks and criteria used to compare interactions
 
@@ -143,7 +145,7 @@ Each step is optional except where noted. There is no forced sequence: the proje
    - the details panel.
    Values are tagged by origin (K legend). Rails stay on ports (rail = NIC index, a class assumption). Plane is "unknown" until supplied.
 3. **F3 Customize a variant.** On the DPU row, "Change variant" offers 1 × dual-port, 2 × single-port or Not decided yet.
-   - A preview shows the deltas. DPUs per server go from 1 to 2 (×100 = 200), and so do **DPU management ports**, because each physical DPU has one (parts SU-A-PORTS, model SCX-ATT): out-of-band demands go from 300 to 400. Frontend data ports, links and DACs are unchanged.
+   - A preview shows the deltas. DPUs per server go from 1 to 2 (×100 = 200), and so do **DPU management ports**, because each physical DPU has one (parts SU-A-PORTS, model SCX-ATT): out-of-band (host BMC plus DPU management) ports go from 200 to 300, and **total management ports, including 100 in-band ports**, go from 300 to 400. Frontend data ports, links and DACs are unchanged.
    - It also shows what is **not evaluated**: failure independence and PCIe/slot fit.
    - Apply asks for scope (§8): **this project only** (default) or a new class revision.
    - "Not decided yet" produces conditional alternatives in the BOM, per the D01 contract.
@@ -167,10 +169,10 @@ Each step is optional except where noted. There is no forced sequence: the proje
 8. **F8 Expanded BOM.** Lines are grouped by owner: servers, per-server components, connection media, switches, and outside scope. The columns are **per unit × units = total**, purchase (included, separate or unknown) and identity (generic, unverified or real).
    - Trace example: "800 = 8 per server (class r1) × 100 (supplied)".
    - Optical links show **two** modules (server end and leaf end).
-   - DAC assemblies are counted **once per link**.
+   - In this straight-cable fixture, each DAC assembly serves one link, so 200 links need 200 DACs. The general rule is one per unique assembly instance: a breakout assembly can serve several links (§7.3).
    - Storage links with an undecided medium show "200 links; media not counted; not zero".
    - Switch lines say "not estimated: leaf model not chosen" and state the requirement (≥ 800 server-facing ports in fabric backend).
-   - External fiber and RJ45 cords are disclosed with their basis (800 optical links; 400 management links in the two-DPU variant shown).
+   - External fiber and RJ45 cords are disclosed with their basis (800 optical links; 400 total management links in the two-DPU variant shown, 100 in-band plus 300 out-of-band; 300 total, with 200 out-of-band, in the dual-port default).
    - An **Installed / Purchase** view switch follows parts SF03 and model §5. Installed counts everything present. Purchase suppresses only children an explicit bundle covers, and unknown inclusion leaves the purchase total unresolved rather than zero.
 9. **F9 Add a second server class.** Add server class → Storage 2U (generic) × 12.
    - Its fabric menu lists **existing fabrics first**, and typing "storage" offers the existing fabric instead of creating "storage-2".
@@ -186,9 +188,10 @@ Each step is optional except where noted. There is no forced sequence: the proje
 | Storage NICs | 1 | 100 | 100 | 0 |
 | Fabric links (8 backend + 2 frontend + 2 storage) | 12 | 1,200 | 1,200 | 1,000 |
 | Optics, both ends of backend links | 16 | 1,600 | 1,600 | 1,600 |
-| DAC assemblies (frontend, one per link) | 2 | 200 | 200 | 200 |
+| DAC assemblies (frontend; straight, one per link in this fixture) | 2 | 200 | 200 | 200 |
 | Storage links, medium undecided | 2 | 200 | 200 | 0 |
-| RJ45 management links: in-band, host BMC, one per physical DPU (cords out of scope) | 3 | 300 | **400** | 300 |
+| RJ45 management links, total: in-band, host BMC, one per physical DPU (cords out of scope) | 3 | 300 | **400** | 300 |
+| of which out-of-band (host BMC + DPU management) | 2 | 200 | **300** | 200 |
 | Power cords (4/server, bundling unknown) | 4 | 400 | 400 | 400 |
 
 Adding the storage class (12 servers × 2 storage ports) gives 224 storage-fabric links. The script also asserts that the number of attachments never changes the server count.
@@ -218,9 +221,9 @@ Parts posted [server-unit-bom.md at 0230cd8](https://github.com/afewell-hh/hh-ai
 - An edit can be scoped to split a population ("only some servers", with occurrence IDs kept). An edit to a shared customization lists every affected population (L1).
 - Known mismatches are hidden from the compatible list but stay inspectable; the filter rules follow CF1–CF7. SU-COMPARE-1 (DR4 versus FR4) is the reference mismatch (E1).
 
-**UX questions back to them, answered by lead** ([6727963025](https://github.com/afewell-hh/hh-aid/issues/9#issuecomment-6727963025)):
-- Unknown bundle inclusion stays unresolved unless a visible sourced or assumed configuration supplies it; it is never zero by default. The screens already do this (F8).
-- Two optic BOM rows are acceptable if both link to the same connection requirement with distinct component identities; an integrated assembly keeps one purchase identity. The screens already use two rows under connection media.
+**UX questions back to them, answered by lead** ([6727963025](https://github.com/afewell-hh/hh-aid/issues/9#issuecomment-6727963025)) and parts ([6728280899](https://github.com/afewell-hh/hh-aid/issues/6#issuecomment-6728280899)):
+- Unknown bundle inclusion stays unresolved unless a visible sourced or assumed configuration supplies it; it is never zero by default. A family may supply an attributed, revisable assumption for a conditional estimate, but it never becomes verified coverage, and the screen shows which purchase quantity depends on it. The screens already do this (F8).
+- Two optic BOM rows are acceptable if both link to the same connection requirement with distinct component identities; aggregating identical SKUs keeps occurrence provenance. An integrated assembly keeps one purchase identity with several end references and no added optics. The screens already use two rows under connection media.
 
 ## 7. Nested hardware, ports and both ends
 
@@ -249,27 +252,35 @@ Generic parts contribute quantity but are never shown as orderable. Unknown neve
 
 The view has one row per attribute: host cage fit, host mode and electrical lanes, medium, PMD and reach, connector/fiber/polarity, and assembly ends. Columns are the attribute, **what it is checked against**, End A, End B, status, and evidence/action.
 
-**What is compared with what.** In the first draft, filters such as "same cage family" and "same lane rate × lanes" mixed up a module fitting its own host with the two ends interoperating. They are replaced:
-- **Host fit is per end.** Each selected module or assembly end must fit its *own* host: End A against the server NIC cage and mode, End B against the leaf port. End B is not required to share End A's cage form factor or electrical lane count.
-- **Link-side attributes are compared across ends:** optical PMD, reach, connector and fiber, or a single integrated assembly.
+**Selection context is named.** The engineer is choosing a module for End A, a module for End B, or an entire assembly. The screen shows the End B module (the backend-leaf port).
 
-**Filters**, each naming the component under selection (the screen shows End B, the backend-leaf port):
-- fits End B's own host cage;
-- fits End B's own host mode and electrical lanes;
-- optical interface matches End A's module (PMD, reach, connector);
+**Host fit is per end.** Each module or assembly plug is checked against its *own* host: mechanical cage, electrical mode, and power, FEC and firmware where known. End A is checked against the server NIC and End B against the leaf port. End B is never required to share End A's cage form factor or electrical lane count.
+
+**The link side is an evidence check, not label equality.** It covers the optical PMD, channel and wavelength, connector, polish, fiber, polarity and reach path, or the integrated assembly's end-to-group mapping. It reuses parts CF2–CF4:
+- a candidate is hidden as incompatible only when **evidence** shows a mismatch (CF2), as in SU-COMPARE-1;
+- a field that is unknown or unverified at either end yields **unknown**, never incompatible (CF3);
+- shorthand or a matching label (for example "DR4" at both ends) is never compatibility evidence (CF4).
+
+The first draft's "same cage family" and "same lane rate × lanes" filters compared a module with the opposite host. They are removed.
+
+**Filters**, each naming the component under selection and the source it uses:
+- fits End B's own host (cage; mode, lanes, power, FEC and firmware where known);
+- link-side check against End A's module: hides only evidence-backed mismatches;
+- prefer the same PMD and connector as End A (**off by default**): an explicit exact-value search preference, labelled as such, never a compatibility rule;
 - documented pairs only (off by default);
 - show unknown (on by default);
 - show mismatches (off by default).
 
-Each filter states its source, and the count of hidden options is always visible. With the leaf model not chosen, the End B host-fit filters hide nothing and show host fit as unknown.
+The count of hidden options is always visible, and "Why is an option hidden?" names the host, field and evidence that rejected each one. With the leaf model not chosen, the End B host-fit filter hides nothing and shows host fit as unknown. End A's PMD is still a tentative class value, so the link-side check hides nothing either: candidates show unknown rather than incompatible.
 
-**Unequal host form factors.** E1 shows the pattern with placeholder cage families X ≠ Y: each end fits its own host and the link side agrees, so the inequality is not a mismatch by itself. No real cage pair, module or electrical presentation is claimed. Lead asked parts for a bounded primary-source example with the right PMD/assembly checks ([6727963231](https://github.com/afewell-hh/hh-aid/issues/6#issuecomment-6727963231)); it will replace X/Y when it lands.
+**Unequal host form factors (sourced example).** Parts supplied a primary-source counterexample ([6728280899](https://github.com/afewell-hh/hh-aid/issues/6#issuecomment-6728280899)). The [Cisco 400G datasheet](https://www.cisco.com/c/en/us/products/collateral/interfaces-modules/transceiver-modules/datasheet-c78-743172.html) (updated 2026-03-03, accessed 2026-11-08 by parts; Table 2) lists **QDD-2Q200-CU3M**: one assembly with a 400G QSFP-DD end and two QSFP56 200GBASE-CR4 ends. It is one purchase serving two links, with unequal host form factors and port presentations. E1 shows it as one assembly with three ends, each checked against its own host and mapped to its own port group. The example only disproves a universal cross-host equality rule. It does not qualify any hh-aid host, NIC or switch tuple, and it does not establish Hedgehog support.
+
+Acceptance behaviour, from parts: the unequal QSFP-DD → 2 × QSFP56 construction is not rejected for inequality alone; a plug that does not fit its own host still fails; unknown host support stays unknown.
 
 **Other rules:**
-- Matching names (for example DR4 at both ends) is never shown as compatibility evidence.
 - Unknown and evidence-backed mismatch are distinct states and are never merged.
 - A mismatch keeps both values and is never auto-corrected.
-- **An override preserves the original verdict (parts CF6).** It records the engineer, a reason and the time. A known mismatch stays *mismatch + override*; an unknown stays *unknown + override*. Neither becomes "documented" or "supported", and outputs carry the flag until resolved. E1 shows both cases; the mismatch case is parts' SU-COMPARE-1 (DR4 versus FR4).
+- **An override preserves the original verdict (parts CF6).** Selection provenance (engineer, reason, time) is recorded separately from the compatibility verdict. A known mismatch stays *mismatch + override*, with the conflicting values and evidence kept; an unknown stays *unknown + override*. Neither can enter qualified results, and outputs carry the flag until resolved. A genuinely changed component choice triggers re-evaluation; the override itself is not evidence. E1 shows both cases; the mismatch case is parts' SU-COMPARE-1 (DR4 versus FR4).
 - Connector and polarity requirements stay visible even though external fiber is out of scope. They are the interface requirements the sponsor asked us to keep, and excluding the cabling from the BOM does not mean it is unnecessary.
 
 ## 8. Lifecycle: class revision versus project customization (L1–L3)
@@ -293,7 +304,7 @@ Each filter states its source, and the count of hidden options is always visible
 - **In scope:** server and switch lines, per-unit lines, NIC/DPU quantities, transceivers at each end of an optical link, and integrated DAC/AEC/AOC and breakout assemblies (counted per assembly instance).
 - **Outside scope, disclosed:** external structured or fiber cabling (jumpers, trunks, panels, polarity components) and RJ45 patch cords. Each is shown with its quantity basis and with the interface requirements kept.
 - **Not estimated in these screens:** leaf and spine counts, which need a chosen leaf model and the planning engine. No solver was built, per lead's instruction.
-- **Management networks:** shown as external in this fixture only (§3.1); not a universal product rule.
+- **Management networks:** shown as external in this fixture only (§3.1). This is not a product rule, and the evidence does not show that a BMC endpoint cannot attach to a managed Fabric.
 - **Unverified throughout:** every NIC/DPU cage, mode and port count; the sponsor's "BF3" variants; the HGX B200-class profile; bundling (included in server SKU or not). The screens label these, and parts' primary-source evidence would replace them.
 
 ## 10. Review tasks and feedback-to-screen map
@@ -322,9 +333,9 @@ Suggested reviewers:
 
 | Owner | Needed from them | Used in |
 | --- | --- | --- |
-| parts #6 | Drafted (SU-FIELDS, SU-COMPARE, CF1–CF7; §6.1). Still open: evidence for real NIC/DPU cages and modes; bundle contents; the unequal-host-form-factor example (§7.3). Review of #27 in progress | F2, E1, F8 columns |
-| model #8 | Drafted (identity, edit scope, in-context creation, counting; §6.1). Still open: final IDs after parts/compat review; the presentation rule for population split | F3, F6, L1–L3, F8 |
-| bridge #3 (PR #28, draft; topo review pending) | Drafted and adopted as draft evidence (§3.1). Still open: Q-FP-1, Q-FP-6, review outcome; final support vocabulary | §3, F5, F5b, map note |
+| parts #6 | #26 accepted by lead at `0230cd8` (conditional accounting scope). Review of #27 `8c3e325` ([6728280899](https://github.com/afewell-hh/hh-aid/issues/6#issuecomment-6728280899)): R1 per-host filtering and R2 override verdict, changes requested, fixed in `c481905` and this pass; RT6 and RT10 accepted with two wording fixes (F3 out-of-band label, F8 note), fixed here; unequal-host example supplied and used (§7.3). Still open: real NIC/DPU cages and modes; bundle contents | F2, F3, E1, F8 |
+| model #8 | #25 working contract accepted by lead at `365a0c3`. Review of #27 `8c3e325` ([6728297958](https://github.com/afewell-hh/hh-aid/issues/8#issuecomment-6728297958)): RT3 management labels and RT4 new-fabric flow, changes requested, fixed in F3/F8 and F5b; RT9 identity/adoption contract accepted with static-review limits | F3, F5b, F6, L1–L3, F8 |
+| bridge #3 (PR #28 `b4329a5`, draft) | Topo review [6728308610](https://github.com/afewell-hh/hh-aid/issues/3#issuecomment-6728308610): core fixture outcomes corroborated (9/9); C1–C7 changes requested. Used here only as qualified in §3.1. Still open: corrected pin; Q-FP-1; Q-FP-6; final support vocabulary | §3, F5, F5b, map note |
 | sponsor / lead | Whether to keep the map (C) or ship A; whether project-only is the right default scope; the family list for a first library | §5, L1, F1 |
 
 ## 12. Acceptance self-check (to be verified by reviewers, not self-approved)
@@ -341,6 +352,7 @@ Suggested reviewers:
 
 - `python3 -I docs/design/server-profile-experience/bom-arithmetic.py` prints "server-profile BOM arithmetic passed".
 - Headless Chrome iframe measurement of `screens.html` at 1,400, 390 and 320 px found no page-level horizontal overflow. Wide tables scroll inside their own pane at 320 px.
-- A 1,400 px screenshot was inspected visually.
+- A 1,400 px screenshot was inspected visually; after each correction pass, a 1,400 px render of the changed sections (F3, F5b, E1, F8) was inspected.
+- Quantities did not change in either correction pass. The new out-of-band split (200/300) is the total minus the 100 in-band ports, which the script already counts; model and parts independently enumerated the same 200/300 out-of-band and 300/400 totals (#8 6728297958, #6 6728280899).
 
 These are document checks, not usability evidence, and not hardware or topology validation.
