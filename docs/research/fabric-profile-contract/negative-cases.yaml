@@ -83,7 +83,7 @@ cases:
       portProfiles:
         P-400G: {speed: {default: 400G, supported: [400G]}}
   expect: accept-at-wiring-level
-  expect_note: "operator opt-in admits a manual profile to offline validation; this proves schema/port consistency only, NOT NOS/platform support, deployability or Hedgehog support"
+  expect_note: "operator opt-in admits a manual profile to offline validation; this exercises offline wiring/profile/port checks only, NOT complete CRD schema/admission, NOS/platform support, deployability or Hedgehog support"
   source: switchprofile/catalog.go L114-128; switchprofile_wh.go L84-89; fabricator fabricator_types.go L294
 - id: B1-role-hint-not-enforced
   intent: BOUNDARY. a documented spine-only model (celestica-ds4000) used as a server-leaf

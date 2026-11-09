@@ -2,7 +2,7 @@
 # Purpose: one physical server (gpu-01) whose NIC ports attach to two Fabrics in ONE controller installation:
 #   backend  (domains plane-a, plane-b; rail leaves in one plane each; one shared leaf class in both planes)
 #   frontend (domain default; ESLAG leaf pair)
-# Virtual profile "vs" only. Evidence target: unmodified pinned `hhfab validate` (v0.51.4 / fabric v0.144.1).
+# Virtual profile "vs" only. Evidence target: restricted local `hhfab validate` using pinned validation source (v0.51.4 / fabric v0.144.1).
 apiVersion: wiring.githedgehog.com/v1beta1
 kind: Fabric
 metadata:

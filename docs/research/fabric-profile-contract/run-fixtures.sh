@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Runs the R02b fixtures through an unmodified pinned hhfab (v0.51.4 = d2316ac, fabric v0.144.1).
+# Runs the R02b fixtures through a restricted local hhfab using pinned validation source (v0.51.4 = d2316ac, fabric v0.144.1).
 # Usage: run-fixtures.sh <path-to-hhfab> <empty-work-dir>
 # Build hhfab exactly as docs/research/upstream-reuse/repro.sh (R03) does. Needs python3 (stdlib + PyYAML-free).
 set -euo pipefail
