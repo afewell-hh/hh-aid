@@ -1,0 +1,165 @@
+# SYNTHETIC research fixture (R02b, #3). Not a Hedgehog-supported design, not a qualified BOM, not generator output.
+# Purpose: one physical server (gpu-01) whose NIC ports attach to two Fabrics in ONE controller installation:
+#   backend  (domains plane-a, plane-b; rail leaves in one plane each; one shared leaf class in both planes)
+#   frontend (domain default; ESLAG leaf pair)
+# Virtual profile "vs" only. Evidence target: restricted local `hhfab validate` using pinned validation source (v0.51.4 / fabric v0.144.1).
+apiVersion: wiring.githedgehog.com/v1beta1
+kind: Fabric
+metadata:
+  name: backend
+spec:
+  leafASNStart: 4200100001
+  leafASNEnd: 4200100999
+  domains:
+    plane-a: {spineASN: 4200101000, gatewayASN: 4200102000}
+    plane-b: {spineASN: 4200103000, gatewayASN: 4200104000}
+---
+apiVersion: wiring.githedgehog.com/v1beta1
+kind: Fabric
+metadata:
+  name: frontend
+spec:
+  leafASNStart: 4200200001
+  leafASNEnd: 4200200999
+  domains:
+    default: {spineASN: 4200201000, gatewayASN: 4200202000}
+---
+apiVersion: wiring.githedgehog.com/v1beta1
+kind: VLANNamespace
+metadata:
+  name: default
+spec:
+  ranges:
+  - {from: 1000, to: 2999}
+---
+apiVersion: wiring.githedgehog.com/v1beta1
+kind: SwitchGroup
+metadata:
+  name: fe-eslag
+spec:
+  topology: {fabric: frontend}
+---
+# ---- backend: spines (exactly one domain each)
+apiVersion: wiring.githedgehog.com/v1beta1
+kind: Switch
+metadata: {name: spine-a1}
+spec: {role: spine, profile: vs, boot: {mac: "0c:20:12:aa:00:01"}, topology: {fabric: backend, domains: [plane-a]}}
+---
+apiVersion: wiring.githedgehog.com/v1beta1
+kind: Switch
+metadata: {name: spine-b1}
+spec: {role: spine, profile: vs, boot: {mac: "0c:20:12:aa:00:02"}, topology: {fabric: backend, domains: [plane-b]}}
+---
+# ---- backend leaf class "rail-leaf" (one plane each)
+apiVersion: wiring.githedgehog.com/v1beta1
+kind: Switch
+metadata: {name: rail-leaf-a1}
+spec: {role: server-leaf, profile: vs, boot: {mac: "0c:20:12:aa:00:11"}, topology: {fabric: backend, domains: [plane-a]}}
+---
+apiVersion: wiring.githedgehog.com/v1beta1
+kind: Switch
+metadata: {name: rail-leaf-b1}
+spec: {role: server-leaf, profile: vs, boot: {mac: "0c:20:12:aa:00:12"}, topology: {fabric: backend, domains: [plane-b]}}
+---
+# ---- backend leaf class "shared-leaf" (both planes; attachment point for VPCs of both, never a transit path)
+apiVersion: wiring.githedgehog.com/v1beta1
+kind: Switch
+metadata: {name: shared-leaf-1}
+spec: {role: server-leaf, profile: vs, boot: {mac: "0c:20:12:aa:00:21"}, topology: {fabric: backend, domains: [plane-a, plane-b]}}
+---
+# ---- frontend
+apiVersion: wiring.githedgehog.com/v1beta1
+kind: Switch
+metadata: {name: fe-spine-1}
+spec: {role: spine, profile: vs, boot: {mac: "0c:20:12:bb:00:01"}, topology: {fabric: frontend}}
+---
+apiVersion: wiring.githedgehog.com/v1beta1
+kind: Switch
+metadata: {name: fe-leaf-1}
+spec: {role: server-leaf, profile: vs, boot: {mac: "0c:20:12:bb:00:11"}, groups: [fe-eslag], redundancy: {group: fe-eslag, type: eslag}, topology: {fabric: frontend}}
+---
+apiVersion: wiring.githedgehog.com/v1beta1
+kind: Switch
+metadata: {name: fe-leaf-2}
+spec: {role: server-leaf, profile: vs, boot: {mac: "0c:20:12:bb:00:12"}, groups: [fe-eslag], redundancy: {group: fe-eslag, type: eslag}, topology: {fabric: frontend}}
+---
+# ---- one physical server: NO fabric/domain field exists on Server
+apiVersion: wiring.githedgehog.com/v1beta1
+kind: Server
+metadata: {name: gpu-01}
+spec: {description: "one physical server, ports in two Fabrics"}
+---
+# ---- fabric (spine-leaf) connections
+apiVersion: wiring.githedgehog.com/v1beta1
+kind: Connection
+metadata: {name: spine-a1--fabric--rail-leaf-a1}
+spec:
+  topology: {fabric: backend}
+  fabric: {links: [{spine: {port: spine-a1/E1/1}, leaf: {port: rail-leaf-a1/E1/30}}]}
+---
+apiVersion: wiring.githedgehog.com/v1beta1
+kind: Connection
+metadata: {name: spine-a1--fabric--shared-leaf-1}
+spec:
+  topology: {fabric: backend}
+  fabric: {links: [{spine: {port: spine-a1/E1/2}, leaf: {port: shared-leaf-1/E1/30}}]}
+---
+apiVersion: wiring.githedgehog.com/v1beta1
+kind: Connection
+metadata: {name: spine-b1--fabric--rail-leaf-b1}
+spec:
+  topology: {fabric: backend}
+  fabric: {links: [{spine: {port: spine-b1/E1/1}, leaf: {port: rail-leaf-b1/E1/30}}]}
+---
+apiVersion: wiring.githedgehog.com/v1beta1
+kind: Connection
+metadata: {name: spine-b1--fabric--shared-leaf-1}
+spec:
+  topology: {fabric: backend}
+  fabric: {links: [{spine: {port: spine-b1/E1/2}, leaf: {port: shared-leaf-1/E1/31}}]}
+---
+apiVersion: wiring.githedgehog.com/v1beta1
+kind: Connection
+metadata: {name: fe-spine-1--fabric--fe-leaf-1}
+spec:
+  topology: {fabric: frontend}
+  fabric: {links: [{spine: {port: fe-spine-1/E1/1}, leaf: {port: fe-leaf-1/E1/30}}]}
+---
+apiVersion: wiring.githedgehog.com/v1beta1
+kind: Connection
+metadata: {name: fe-spine-1--fabric--fe-leaf-2}
+spec:
+  topology: {fabric: frontend}
+  fabric: {links: [{spine: {port: fe-spine-1/E1/2}, leaf: {port: fe-leaf-2/E1/30}}]}
+---
+# ---- gpu-01 server connections: each Connection names exactly one Fabric, equal to its switches' Fabric
+apiVersion: wiring.githedgehog.com/v1beta1
+kind: Connection
+metadata: {name: gpu-01--unbundled--rail-leaf-a1}
+spec:
+  topology: {fabric: backend}
+  unbundled: {link: {server: {port: gpu-01/be-rail0}, switch: {port: rail-leaf-a1/E1/1}}}
+---
+apiVersion: wiring.githedgehog.com/v1beta1
+kind: Connection
+metadata: {name: gpu-01--unbundled--rail-leaf-b1}
+spec:
+  topology: {fabric: backend}
+  unbundled: {link: {server: {port: gpu-01/be-rail1}, switch: {port: rail-leaf-b1/E1/1}}}
+---
+apiVersion: wiring.githedgehog.com/v1beta1
+kind: Connection
+metadata: {name: gpu-01--unbundled--shared-leaf-1}
+spec:
+  topology: {fabric: backend}
+  unbundled: {link: {server: {port: gpu-01/storage0}, switch: {port: shared-leaf-1/E1/1}}}
+---
+apiVersion: wiring.githedgehog.com/v1beta1
+kind: Connection
+metadata: {name: gpu-01--eslag--fe-leaf-1--fe-leaf-2}
+spec:
+  topology: {fabric: frontend}
+  eslag:
+    links:
+    - {server: {port: gpu-01/fe0}, switch: {port: fe-leaf-1/E1/1}}
+    - {server: {port: gpu-01/fe1}, switch: {port: fe-leaf-2/E1/1}}

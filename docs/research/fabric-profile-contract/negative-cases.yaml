@@ -1,0 +1,94 @@
+# SYNTHETIC research fixture (R02b, #3): single-mutation negative/boundary cases of positive-multi-fabric-server.yaml.
+# Each case replaces exactly one `find` string (must occur once) with `replace`, or appends `append` documents.
+# `expect` is the independently predicted outcome FROM SOURCE READING before running; `source` cites the rule.
+# run-fixtures.sh records the actual pinned `hhfab validate` result next to each prediction.
+cases:
+- id: N1-conn-fabric-mismatch
+  intent: a server Connection labelled with one Fabric lands on a leaf of another Fabric
+  find: "metadata: {name: gpu-01--unbundled--shared-leaf-1}\nspec:\n  topology: {fabric: backend}\n  unbundled: {link: {server: {port: gpu-01/storage0}, switch: {port: shared-leaf-1/E1/1}}}"
+  replace: "metadata: {name: gpu-01--unbundled--shared-leaf-1}\nspec:\n  topology: {fabric: backend}\n  unbundled: {link: {server: {port: gpu-01/storage0}, switch: {port: fe-leaf-1/E1/2}}}"
+  expect: reject
+  expect_error: "connection is in fabric backend but switch fe-leaf-1 is in fabric frontend"
+  source: fabric api/wiring/v1beta1/connection_types.go L883-899 (switch fabric == connection fabric)
+- id: N2-eslag-across-fabrics
+  intent: one ESLAG bundle with legs on leaves of two different Fabrics
+  find: "    - {server: {port: gpu-01/fe1}, switch: {port: fe-leaf-2/E1/1}}"
+  replace: "    - {server: {port: gpu-01/fe1}, switch: {port: rail-leaf-a1/E1/2}}"
+  expect: reject
+  expect_error: "is in fabric backend"
+  source: connection_types.go L883-899
+- id: N3-spine-leaf-domain-mismatch
+  intent: a plane-a spine cabled to a plane-b-only rail leaf (cross-plane uplink)
+  find: "fabric: {links: [{spine: {port: spine-b1/E1/1}, leaf: {port: rail-leaf-b1/E1/30}}]}"
+  replace: "fabric: {links: [{spine: {port: spine-a1/E1/3}, leaf: {port: rail-leaf-b1/E1/30}}]}"
+  expect: reject
+  expect_error: "spine spine-a1 is in domain plane-a but leaf rail-leaf-b1 is in domains [plane-b]"
+  source: connection_types.go L726-735 (ValidateDomains)
+- id: N4-spine-two-domains
+  intent: one spine declared in both planes
+  find: "topology: {fabric: backend, domains: [plane-a]}}\n---\napiVersion: wiring.githedgehog.com/v1beta1\nkind: Switch\nmetadata: {name: spine-b1}"
+  replace: "topology: {fabric: backend, domains: [plane-a, plane-b]}}\n---\napiVersion: wiring.githedgehog.com/v1beta1\nkind: Switch\nmetadata: {name: spine-b1}"
+  expect: reject
+  expect_error: "spine must be in exactly one domain"
+  source: switch_types.go L636-638
+- id: N5-undeclared-domain
+  intent: a leaf names a plane the Fabric does not declare
+  find: "topology: {fabric: backend, domains: [plane-b]}}\n---\n# ---- backend leaf class \"shared-leaf\""
+  replace: "topology: {fabric: backend, domains: [plane-c]}}\n---\n# ---- backend leaf class \"shared-leaf\""
+  expect: reject
+  expect_error: "domain plane-c not found in fabric backend"
+  source: switch_types.go L728-732
+- id: N6-manual-profile-without-opt-in
+  intent: a manually described SwitchProfile used by a leaf, default config (allowExtraSwitchProfiles unset)
+  find: "metadata: {name: rail-leaf-a1}\nspec: {role: server-leaf, profile: vs,"
+  replace: "metadata: {name: rail-leaf-a1}\nspec: {role: server-leaf, profile: manual-example-64x400,"
+  append: |
+    apiVersion: wiring.githedgehog.com/v1beta1
+    kind: SwitchProfile
+    metadata: {name: manual-example-64x400}
+    spec:
+      displayName: Manual example (hypothetical)
+      switchSilicon: hypothetical
+      nosType: sonic-bcm-vs
+      platform: x86_64-kvm_x86_64-r0
+      ports:
+        M1: {nos: Management0, management: true, oniePortName: eth0}
+        E1/1: {nos: Ethernet0, label: "1", profile: P-400G}
+        E1/2: {nos: Ethernet1, label: "2", profile: P-400G}
+        E1/30: {nos: Ethernet29, label: "30", profile: P-400G}
+      portProfiles:
+        P-400G: {speed: {default: 400G, supported: [400G]}}
+  expect: reject
+  expect_error: "switch profile manual-example-64x400 does not exist"
+  source: fabricator pkg/util/apiutil/include.go L31-38 (Enforce deletes non-default profiles); switchprofile/catalog.go L114-128
+- id: P2-manual-profile-with-opt-in
+  intent: POSITIVE BOUNDARY. same manual SwitchProfile as N6, with fab.yaml spec.config.fabric.allowExtraSwitchProfiles=true
+  find: "metadata: {name: rail-leaf-a1}\nspec: {role: server-leaf, profile: vs,"
+  replace: "metadata: {name: rail-leaf-a1}\nspec: {role: server-leaf, profile: manual-example-64x400,"
+  fab_patch: allowExtraSwitchProfiles
+  append: |
+    apiVersion: wiring.githedgehog.com/v1beta1
+    kind: SwitchProfile
+    metadata: {name: manual-example-64x400}
+    spec:
+      displayName: Manual example (hypothetical)
+      switchSilicon: hypothetical
+      nosType: sonic-bcm-vs
+      platform: x86_64-kvm_x86_64-r0
+      ports:
+        M1: {nos: Management0, management: true, oniePortName: eth0}
+        E1/1: {nos: Ethernet0, label: "1", profile: P-400G}
+        E1/2: {nos: Ethernet1, label: "2", profile: P-400G}
+        E1/30: {nos: Ethernet29, label: "30", profile: P-400G}
+      portProfiles:
+        P-400G: {speed: {default: 400G, supported: [400G]}}
+  expect: accept-at-wiring-level
+  expect_note: "operator opt-in admits a manual profile to offline validation; this exercises offline wiring/profile/port checks only, NOT complete CRD schema/admission, NOS/platform support, deployability or Hedgehog support"
+  source: switchprofile/catalog.go L114-128; switchprofile_wh.go L84-89; fabricator fabricator_types.go L294
+- id: B1-role-hint-not-enforced
+  intent: BOUNDARY. a documented spine-only model (celestica-ds4000) used as a server-leaf
+  find: "metadata: {name: rail-leaf-b1}\nspec: {role: server-leaf, profile: vs,"
+  replace: "metadata: {name: rail-leaf-b1}\nspec: {role: server-leaf, profile: celestica-ds4000,"
+  expect: accept-at-wiring-level
+  expect_note: "docs Supported Roles is a generated hint (pkg/gen/profilesref.go getRolesHint, TODO); no role/profile check in Switch.Validate. API acceptance here is NOT documented support."
+  source: fabric pkg/gen/profilesref.go L240-262; switch_types.go L612-930
