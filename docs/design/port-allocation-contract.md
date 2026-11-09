@@ -42,6 +42,20 @@ Ranges declare inclusive bounds and positive stride. Odd/even refers to the decl
 
 These are separate alternatives, not five additive pools on one switch. A logical termination is not a cable, cage, bandwidth guarantee or proof of feasibility. Shared parent/bank/pipeline limits and topology/rail/plane/failure constraints apply beyond member cardinality. Unknown budgets prevent a feasibility claim but preserve the selector preview.
 
+### Configured usage, selected/free terminations and assigned links (AC1)
+
+Keep three separate accounts per physical switch occurrence and applicable shared resource; none can substitute for another:
+
+| Account | Count basis | Meaning and limit |
+| --- | --- | --- |
+| Configured switch-resource usage | All logical members exposed by the configured modes across the switch and each applicable profile/bank/pipeline scope | Includes members outside the selected group, reserved members, parked channels and intentionally unused or disconnected members. Compare this full usage with each applicable configured-resource budget, counting canonical resources once across aliases. |
+| Selected and eligible/free terminations | The group's expanded members, then the remaining candidates after assignments, exclusions, reservations and physical constraints | Show selected count separately from eligible/free count. Small selections do not reduce configured usage or prove budget feasibility; an unresolved or exceeded shared budget must remain visible even if the local member selection fits. |
+| Assigned links | Explicit link records with both ends and applicable topology/service eligibility, physical construction and resource constraints | A selected/free termination alone is not a link. A candidate with an unresolved or conflicting budget cannot be reported as a valid feasible assignment. Existing assignments/commitments remain recorded as stale/conflicting where appropriate. |
+
+Reserve, exclude, park or disconnect is **not a configuration change**. Such actions can reduce free choices or active links but do not reduce configured-resource usage. Unknown mode on an intentionally unused cage leaves its contribution and applicable switch/shared-resource totals unknown, not zero; retain known contributions without claiming a complete total. Changing a configured mode requires a new snapshot and impact check under §4, including dependent assignments and locks.
+
+**AC1 negative fixture:** two parents on one synthetic shared resource each configure four children; its budget is six configured logical ports. Select only child 1 of each parent: selected=2, but configured=8>6, so the resource conflicts before any valid link assignment. Reserving a selected child reduces the unreserved selection to one; reserving an outside-group child leaves it at two. Neither changes configured=8 or resolves the conflict. There are zero assigned links in this fixture; two selected terminations must not be presented as two links. If one unused parent's mode becomes unknown in a new candidate snapshot, its contribution and total configured usage become unresolved rather than falling to four. This is planning arithmetic, not a hardware claim or allocator.
+
 **Overlap proposal, awaiting topo review:**
 
 - **Alias views** expose the same capacity. Two groups containing C03/N do not create two slots. Reservations/assignments appear through every alias; union capacity uses canonical identities.
@@ -121,7 +135,7 @@ These are proposed hard **planning integrity** rules in their applicable records
 | --- | --- | --- |
 | PA1 selector expansion | §3 ordered previews/numbering | Duplicate canonical member or absent numbering map: reject duplicate capacity / mark unresolved |
 | PA2 overlap/reservation | Alias union and occurrence ledger | Same C03 through two groups: no double allocation; unspecified relation unresolved |
-| PA3 configured resource | PA-CHILD footprint | Parent plus child, inconsistent modes or shared-bank exhaustion: conflict despite different logical labels |
+| PA3 configured resource | PA-CHILD footprint and §3 AC1 three-way accounting | Parent plus child or inconsistent modes conflict. Two four-child parents exceed shared budget six despite only two selected; reservation leaves configured eight. Unknown unused mode leaves applicable usage unresolved, not zero |
 | PA4 destination | Singleton on SW-A/SW-B | Class singleton silently binds instance or new network clones server inventory: reject |
 | PA5 regeneration | §4 ordered inputs/retained bindings | Exhaustion, removed locked port or iteration-order change: no silent movement; same semantic snapshot gives same result |
 | RC1 grouping | §5 signature and six-link fixture | Same SKU with different PMD, revision, length, connector or unknown provenance: split/expose exception |
@@ -143,6 +157,24 @@ parent, child1, child3 = {1,2,3,4}, {1}, {3}  # synthetic footprints
 assert parent & child1 and not child1 & child3
 assert len({1,3}-{3}) == 1  # reserved child unavailable
 assert len({(sw,3) for sw in ('SW-A','SW-B')}) == 2
+# AC1: configured usage is independent of selection/reservation/link count.
+configured_members = {(p,c) for p in ('P1','P2') for c in range(1,5)}
+selected_members = {('P1',1), ('P2',1)}
+shared_budget = 6
+assigned_links = set()  # no paired, eligible link assignments in this fixture
+assert selected_members <= configured_members
+assert len(selected_members) == 2 and len(configured_members) == 8 > shared_budget
+assert len(assigned_links) == 0
+for reserved_members, unreserved_count in [({('P1',1)},1), ({('P1',4)},2)]:
+    assert len(selected_members-reserved_members) == unreserved_count
+    assert len(configured_members) == 8 > shared_budget  # reservation is not reconfiguration
+# New candidate snapshot: unused P2 has unknown mode, not zero configured use.
+configured_contributions = {'P1': 4, 'P2': None}
+known_usage = sum(n for n in configured_contributions.values() if n is not None)
+total_usage = (sum(configured_contributions.values())
+               if all(n is not None for n in configured_contributions.values()) else None)
+assert known_usage == 4 and total_usage is None
+print('AC1 passed: selected=2, configured=8>6, assigned=0; reservation preserves 8; unused unknown mode leaves total unresolved')
 rows = {'opt': {'A1/o','A2/o'}, 'dac': {'B1/d','B2/d'},
         'split': {'A1/b','B1/b'}}
 assert len(set.union(*rows.values())) == sum(map(len,rows.values())) == 6
