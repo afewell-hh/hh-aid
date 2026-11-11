@@ -1,0 +1,33 @@
+{
+  "name": "hh-aid-first-bom",
+  "private": true,
+  "version": "0.0.0-experiment",
+  "description": "BOM-first experiment (#14). Not production software.",
+  "type": "module",
+  "engines": { "node": ">=26.13.0 <27" },
+  "bin": { "hhaid": "./bin/hhaid" },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "node --test --test-concurrency=1 'test/**/*.test.ts'",
+    "sources:verify": "node scripts/sources.ts verify",
+    "sources:materialize": "node scripts/sources.ts materialize",
+    "ui:build": "vite build ui",
+    "app": "node src/server/main.ts",
+    "e2e": "playwright test -c e2e/playwright.config.ts",
+    "determinism": "node scripts/determinism.ts"
+  },
+  "dependencies": {
+    "ajv": "8.20.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.64.1",
+    "@types/node": "26.6.5",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "@vitejs/plugin-react": "6.1.2",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
+    "typescript": "7.0.2",
+    "vite": "8.3.5"
+  }
+}

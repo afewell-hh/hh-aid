@@ -1,0 +1,165 @@
+{
+  "schema": "hhaid-sources-lock/1",
+  "note": "Exact inputs for the #14 build. role=generation-input may be read by the application; role=oracle is materialized only for the independent harness and must never be read by src/; role=provenance is cited, not consumed.",
+  "repository_fetch": "git fetch origin <commit> (any clone of https://github.com/afewell-hh/hh-aid)",
+  "entries": [
+    {
+      "role": "provenance",
+      "repo": "afewell-hh/hh-aid",
+      "commit": "6a91fd117a5b144edb83835a85021d9f57748069",
+      "path": "docs/first-bom-experiment.md",
+      "blob": "124b121cf61821f46ff16d0d6dd64ecd2999e8d6",
+      "sha256": "302e7ec13141185f05537d6334319d72b91979a6612536867f15a6749c039df8"
+    },
+    {
+      "role": "provenance",
+      "repo": "afewell-hh/hh-aid",
+      "commit": "6a91fd117a5b144edb83835a85021d9f57748069",
+      "path": "docs/first-bom-build.md",
+      "blob": "bb916bb213c10ff336d72f8b89268345388b3f58",
+      "sha256": "73c9a2be58842fe2195e172ec71facda05199902f5ca87790abe335dfe4c9127"
+    },
+    {
+      "role": "provenance",
+      "repo": "afewell-hh/hh-aid",
+      "commit": "6a91fd117a5b144edb83835a85021d9f57748069",
+      "path": "docs/design-checkpoint.md",
+      "blob": "afb3d77f8d695402c80e1a8ba94cedf4dd7ca1a5",
+      "sha256": "d972155ab3a97bdc204631109dcbf58cc0e10ccb525cca49e40aa24a2f50d7a6"
+    },
+    {
+      "role": "provenance",
+      "repo": "afewell-hh/hh-aid",
+      "commit": "6a91fd117a5b144edb83835a85021d9f57748069",
+      "path": "docs/design/inception-outcome.md",
+      "blob": "df6e0aa4fa3973c930c09b69c05bbacc0bacf618",
+      "sha256": "7ec5befa29cfaedfd0000de69b42911afe4a7b19f1390b8f19f8bf524716b8e1"
+    },
+    {
+      "role": "generation-input",
+      "repo": "afewell-hh/hh-aid",
+      "commit": "ce4b8e6b03f79b8aa4ff796e8b4460ebc67312a8",
+      "path": "docs/design/first-bom/scenario.json",
+      "blob": "de857badfabe1e50f9437cc337ad4abc0ac179c4",
+      "sha256": "9200061edb0571a58a46fe04c7921898783db6601c615169792963667900d723"
+    },
+    {
+      "role": "provenance",
+      "repo": "afewell-hh/hh-aid",
+      "commit": "ce4b8e6b03f79b8aa4ff796e8b4460ebc67312a8",
+      "path": "docs/design/topology-engine.md",
+      "blob": "b737e6c5fed346e09ce1363e478e92e0ad9fc76b",
+      "sha256": "6c521d703eb6a65a3802fa63aa4f37eed993a1a67053d6629abeb82e222e6287"
+    },
+    {
+      "role": "provenance",
+      "repo": "afewell-hh/hh-aid",
+      "commit": "25d642363a477e2b04a06e74421da0b15e991412",
+      "path": "docs/design/verification-strategy.md",
+      "blob": "0bbc5749b1923da5b3f296accea8b01682ff29b0",
+      "sha256": "e2c68569890dc1a57f41b31de74651fdafb65fbc2b3d351148d00389bdfd16e4"
+    },
+    {
+      "role": "oracle",
+      "repo": "afewell-hh/hh-aid",
+      "commit": "25d642363a477e2b04a06e74421da0b15e991412",
+      "path": "docs/design/first-bom/verification/fb01-expected.json",
+      "blob": "59a32b0236a520f2f2d6e35a62282ccd34094684",
+      "sha256": "180d0df8a907bde3da10d564b380e5e8a29efb4c6f9bb20fbc72d89456f54863"
+    },
+    {
+      "role": "oracle",
+      "repo": "afewell-hh/hh-aid",
+      "commit": "25d642363a477e2b04a06e74421da0b15e991412",
+      "path": "docs/design/first-bom/verification/check_fb01.py",
+      "blob": "d0b8c49bc8a6517c426031f28ed2501173b02d1c",
+      "sha256": "295ff02920be8e5f6ef129f7732133729383512f5430dc6c4abb83ccb74c0e00"
+    },
+    {
+      "role": "oracle",
+      "repo": "afewell-hh/hh-aid",
+      "commit": "25d642363a477e2b04a06e74421da0b15e991412",
+      "path": "docs/design/first-bom/verification/ac1.json",
+      "blob": "427a7b1ef3a2418efa8d7906a7854ce7412c94a4",
+      "sha256": "a457d00e6eec14045b495efed18ca2273556ddbd0948a4698cf4653c307bae50"
+    },
+    {
+      "role": "oracle",
+      "repo": "afewell-hh/hh-aid",
+      "commit": "25d642363a477e2b04a06e74421da0b15e991412",
+      "path": "docs/design/first-bom/verification/check_ac1.py",
+      "blob": "08a0e105a820d50def4993aced14c29113f2bb2c",
+      "sha256": "b2af1cb7381361680d0eae09c47c2774afb44f82fdfb1c9cd9236b6ddfa3428d"
+    },
+    {
+      "role": "provenance",
+      "repo": "afewell-hh/hh-aid",
+      "commit": "75ba52328699c036c368d6700325011556d38615",
+      "path": "docs/design/architecture-options.md",
+      "blob": "3b02e2a563ef100c6d31eaa26d4c14aad629a6b0",
+      "sha256": "cfb418c3c404a0cd87a64247ae278ae327c0a9dc7c155274febc3bbd88301275"
+    },
+    {
+      "role": "provenance",
+      "repo": "afewell-hh/hh-aid",
+      "commit": "365a0c363a942b02881eb5a911a40f189107cf73",
+      "path": "docs/design/server-class-contract.md",
+      "blob": "8e49e63f4572d07c8b1795c2a5074c2299c6c689",
+      "sha256": "51632ab79858fd051a7691acb01cc181d7f35f8fec9816bf2fb0491ce2b03e18"
+    },
+    {
+      "role": "provenance",
+      "repo": "afewell-hh/hh-aid",
+      "commit": "0230cd8690c3eb43454424a70d95611e44ada35d",
+      "path": "docs/research/server-unit-bom.md",
+      "blob": "8e318498ecde14f73b6bd39f0247b75a2e4278f0",
+      "sha256": "cb6cdae15f19fcefbd176044fa010302e64534098d2ccec8a8d168deb68bf495"
+    },
+    {
+      "role": "provenance",
+      "repo": "afewell-hh/hh-aid",
+      "commit": "d97a2efa77a5b4e98a0c9198a7af9cd05ae008ff",
+      "path": "docs/design/port-allocation-contract.md",
+      "blob": "e8f274470b1958c02e75fa791828253f684bc098",
+      "sha256": "6c002c2e4ed1f1681bc01c17f7b5a2a7e2651d54758d399ab003da488c07edb3"
+    },
+    {
+      "role": "provenance",
+      "repo": "afewell-hh/hh-aid",
+      "commit": "a60134f1b937c98b631963ea4c59d7703098b210",
+      "path": "docs/research/port-allocation-patterns.md",
+      "blob": "7593d21da611e3f1709783cb8b7655c0726c92d6",
+      "sha256": "0686f8bc8fe561b465df82a58f02d2eddd8464b7012a28d020104c69ec078c48"
+    },
+    {
+      "role": "provenance",
+      "repo": "afewell-hh/hh-aid",
+      "commit": "31779ded356b4db0c6e582d4cb209dddbc005bf2",
+      "path": "docs/research/fabric-profile-contract.md",
+      "blob": "7f836c47d2e15fd0811154fd097fa04619741198",
+      "sha256": "10c0a38f25d33ce630031f524e449b4aea20026082e90a728c6fb37396df25c6"
+    },
+    {
+      "role": "provenance",
+      "repo": "afewell-hh/hh-aid",
+      "commit": "d1fd01fba10ba6cbb27a5bd06c7165473a1baf6b",
+      "path": "docs/design/server-profile-experience/screens.html",
+      "blob": "a0715625dc1f4d7d5e26631918afde97470b2aac",
+      "sha256": "cbb1cecf848667f64ba886ea3f91fc3e9ff3853eef9ba90cbdbbb7494438f66b"
+    }
+  ],
+  "upstream": [
+    {
+      "role": "extraction-source",
+      "repo": "githedgehog/fabric",
+      "tag": "v0.144.1",
+      "commit": "4bde50829fd7cfebac69332982abd1dee504a8a3",
+      "path": "pkg/ctrl/switchprofile/p_bcm_celestica_ds5000.go",
+      "note": "blob and sha256 recorded by the extractor provenance file"
+    }
+  ],
+  "toolchain": {
+    "node": "v26.13.0 (scripts/bootstrap-node.sh; verified against nodejs.org SHASUMS256.txt)",
+    "npm_policy": "exact pins, newest stable published >=14 days before 2026-11-11 (scripts/pick-pins.mjs), install scripts disabled (.npmrc)"
+  }
+}

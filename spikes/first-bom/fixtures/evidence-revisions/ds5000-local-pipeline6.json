@@ -1,0 +1,8 @@
+{
+  "kind": "EvidenceRevision",
+  "id": "LOCAL-DS5000-PIPE6",
+  "origin": "local-modified",
+  "profile": "celestica-ds5000",
+  "note": "controlled local test revision (manifest FB-EVIDENCE): every pipeline limit narrowed from 10 to 6; synthetic, not a Hedgehog release",
+  "patch": { "pipelineMaxPorts": 6 }
+}

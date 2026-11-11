@@ -1,0 +1,9 @@
+node_modules/
+.toolchain/
+ui/dist/
+fixtures/materialized/
+test-results/
+playwright-report/
+*.hhaid/
+*.hhaid.json
+!test/fixtures/**/*.hhaid.json

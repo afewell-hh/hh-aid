@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+# hh-aid first-BOM experiment CLI. Uses the pinned Node from .toolchain/ when bootstrapped.
+HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+NODE="$HERE/.toolchain/node/bin/node"; [ -x "$NODE" ] || NODE=node
+exec "$NODE" "$HERE/src/cli/main.ts" "$@"
