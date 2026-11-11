@@ -874,7 +874,8 @@
     "missingInfrastructure",
     "reviewRows",
     "diagnostics",
-    "excluded"
+    "excluded",
+    "unplacedDemands"
    ],
    "properties": {
     "kind": {
@@ -1020,6 +1021,9 @@
        }
       }
      }
+    },
+    "unplacedDemands": {
+     "type": "array"
     }
    }
   },

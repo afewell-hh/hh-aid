@@ -122,7 +122,7 @@ export function s2(ctx: StageCtx) {
       if (n === 'invalid') { diagnostics.push({ code: 'mode-not-supported', severity: 'conflict', affected: [`${lc.id}/${port}`], observed: mode, cause: `mode ${mode} is not supported by profile port ${port}` }); for (const t of targets) t.unknownPorts.push(port); continue; }
       for (const t of targets) t.known += n;
     }
-    const order = (a: string, b: string) => a === 'switch' ? -1 : b === 'switch' ? 1 : Number(a.split(':')[1]) - Number(b.split(':')[1]);
+    const order = (a: string, b: string) => { if (a === 'switch' || b === 'switch') return a === b ? 0 : a === 'switch' ? -1 : 1; const x = a.split(':')[1]!, y = b.split(':')[1]!; const nx = /^\d+$/.test(x), ny = /^\d+$/.test(y); return nx && ny ? Number(x) - Number(y) : nx ? -1 : ny ? 1 : byId(x, y); };
     for (const id of [...scopes.keys()].sort(order)) {
       const s = scopes.get(id)!;
       const status = s.limit !== null && s.known > s.limit ? 'conflict' : s.unknownPorts.length ? 'unresolved' : 'within-budget';
@@ -152,7 +152,7 @@ export function s3(ctx: StageCtx) {
     for (const r of lc.reservations) for (const l of r.labels) { const n = childrenOf(l); if (n === null) continue; for (let k = 1; k <= n; k++) if (!r.children || r.children.includes(k)) { reservedMembers.add(`${l}/${k}`); if (r.owner === 'uplink') uplinkReserved++; } }
     const seen = new Set<number>(); let selected = 0, reservedSelected = 0; const unresolvedLabels: number[] = []; const usableParents: { label: number; port: string; children: number }[] = [];
     for (const l of lc.serverGroup.selector.labels) {
-      if (seen.has(l)) bad(`duplicate selector member ${l} in ${lc.serverGroup.id}`); seen.add(l);
+      if (seen.has(l)) { diagnostics.push({ code: 'duplicate-selector-member', severity: 'conflict', affected: [`${lc.id}/${lc.serverGroup.id}/${l}`], cause: `label ${l} repeated in the selector; an alias never adds capacity, the repeat is ignored`, remedies: ['remove the duplicate'] }); continue; } seen.add(l);
       const n = childrenOf(l); if (n === null) { unresolvedLabels.push(l); continue; }
       let anyReserved = false;
       for (let k = 1; k <= n; k++) { if (childSel && !childSel.includes(k)) continue; selected++; if (reservedMembers.has(`${l}/${k}`)) { reservedSelected++; anyReserved = true; } }
@@ -294,7 +294,9 @@ export function s5(ctx: StageCtx) {
     const row = [...rows.values()].find(r => r.units.has(u.id)); if (row) row.reservedChildren += u.reservedChildren;
   }
   const reviewRows = [...rows.values()].map(r => ({ id: r.id, signature: r.signature, memberDigest: digestOf([...r.links].sort(byId)), counts: { links: r.links.length, units: r.units.size, physicalServerEnds: r.links.length, reservedOrParkedChildren: r.reservedChildren }, links: [...r.links].sort(byId), units: [...r.units].sort(byId), exceptions: { unassigned: r.unassigned.sort(byId), heldByLock: r.heldByLock.sort(byId) }, unknownFields: r.signature.construction.unknownFields, editShortcuts: r.editShortcuts, inspection: 'manual review required; inspection does not confer qualification' })).sort((a, b) => byId(a.id, b.id));
-  return { purchaseLines, knownGenericPurchaseUnits, unresolvedPurchase, missingInfrastructure, reviewRows, diagnostics };
+  const placedLinks = new Set((S4?.units ?? []).flatMap((u: any) => u.links));
+  const unplacedDemands = (S1.demands ?? []).filter((d: Demand) => !placedLinks.has(d.id)).map((d: Demand) => ({ demand: d.id, network: d.network, context: d.context, reason: S4?.skipped ? 'S4 skipped' : 'not eligible for any construction unit (see diagnostics)' }));
+  return { purchaseLines, knownGenericPurchaseUnits, unresolvedPurchase, missingInfrastructure, reviewRows, unplacedDemands, diagnostics };
 }
 
 export const STAGES = [

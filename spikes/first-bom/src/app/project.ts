@@ -9,6 +9,7 @@ import { RUN_CONFIGS } from '../engine/stages.ts';
 import { evidenceFromExtraction, evidenceRevision } from '../evidence/load.ts';
 import { MUTATIONS } from '../model/mutations.ts';
 import { seedFromManifest } from '../model/seed.ts';
+import { AC1_VARIANTS, type Ac1Variant, ac1Evidence, ac1State } from '../model/synthetic.ts';
 import type { ProjectState } from '../model/types.ts';
 import { startRun, type RunHandle } from '../runner/runner.ts';
 import { ProjectStore } from '../store/store.ts';
@@ -34,6 +35,20 @@ export async function seed(store: ProjectStore, manifestPath: string, manifestCo
   const state = seedFromManifest(manifest, { commit: entry.commit, path: entry.path, sha256: sha }, store.index().projectId, evId, ev);
   const id = store.put(state);
   await store.commit(actor, 'seed', () => ({ add: { inputs: [id], evidence: [evId] }, inputHead: id }));
+  return id;
+}
+
+/** Synthetic AC1 project from the locked manifest's FB-AC1 entry plus a contract variant. */
+export async function seedSynthetic(store: ProjectStore, manifestPath: string, manifestCommit: string, variant: string, actor: string) {
+  if (!(AC1_VARIANTS as readonly string[]).includes(variant)) throw new Error(`unknown AC1 variant ${variant}; one of ${AC1_VARIANTS.join(', ')}`);
+  const bytes = readFileSync(manifestPath); const sha = sha256(bytes);
+  const lock = JSON.parse(readFileSync(join(SPIKE_ROOT, 'sources.lock.json'), 'utf8'));
+  if (!lock.entries.some((e: any) => e.role === 'generation-input' && e.commit.startsWith(manifestCommit) && e.sha256 === sha)) throw new Error('manifest bytes do not match a locked generation input');
+  if (store.index().inputHead) throw new Error('project already seeded');
+  const m = parseStrictJson(bytes.toString('utf8')) as any;
+  const ev = ac1Evidence(m); const evId = store.put(ev);
+  const id = store.put(ac1State(m, variant as Ac1Variant, store.index().projectId, evId));
+  await store.commit(actor, 'seed-synthetic', () => ({ add: { inputs: [id], evidence: [evId] }, inputHead: id }));
   return id;
 }
 

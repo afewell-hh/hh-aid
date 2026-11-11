@@ -41,7 +41,7 @@ export function assembleOutput(inputId: string, state: ProjectState, evidenceIds
     requirements: r.S1.requirements, demands: r.S1.demands, purchaseLines: r.S5.purchaseLines,
     ledgers: r.S2.ledgers, contextLedgers: r.S2.contexts, groups: r.S3.groups,
     constructions: r.S4.units, assignments: r.S4.assignments, sizing: r.S4.sizing,
-    missingInfrastructure: r.S5.missingInfrastructure, reviewRows: r.S5.reviewRows, diagnostics,
+    missingInfrastructure: r.S5.missingInfrastructure, reviewRows: r.S5.reviewRows, unplacedDemands: r.S5.unplacedDemands, diagnostics,
     excluded: ['external fiber/structured cabling', 'external management patch cabling (fixture choice)', 'wiring export (not emitted in this slice)'],
   };
 }

@@ -52,7 +52,7 @@ test('reimport rejects tampering, unreachable extras, dangling references, unkno
   const base = JSON.parse(readFileSync(x, 'utf8'));
   const tryImport = (doc: any, raw?: string) => { const f = join(tmp(), 'bad.hhaid.json'); writeFileSync(f, raw ?? canonicalize(doc)); return () => cli('import', f, join(tmp(), 'q')); };
   const out = base.documents.findIndex((d: any) => d.content.kind === 'OutputRevision');
-  const t1 = structuredClone(base); t1.documents[out].content.summary.servers = 5; assert.throws(tryImport(t1), /digest mismatch/);
+  const t1 = structuredClone(base); t1.documents[out].content.summary.servers = 777; assert.throws(tryImport(t1), /digest mismatch/);
   const t2 = structuredClone(base); const extra = { kind: 'DiffRecord', from: base.documents[out].id, to: base.documents[out].id, changes: {} }; t2.documents.push({ id: sha256(canonicalize(extra)), content: extra }); t2.documents.sort((a: any, b: any) => (a.id < b.id ? -1 : 1)); assert.throws(tryImport(t2), /unreachable/);
   const t3 = structuredClone(base); t3.documents = t3.documents.filter((d: any) => d.content.kind !== 'ReviewRecord'); assert.throws(tryImport(t3), /unresolved reference/);
   const t4 = structuredClone(base); t4.documents[out].content.surprise = 1; t4.documents[out].id = sha256(canonicalize(t4.documents[out].content)); assert.throws(tryImport(t4), /schema|must NOT have additional/);
