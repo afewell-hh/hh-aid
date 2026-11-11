@@ -42,3 +42,9 @@ No new agent sessions. Topo has no rewrite assignment unless the independent rev
 5. Independent challenge and performance evidence: exported actual projections, occurrence-level conservation, lifecycle/UI checks, deliberate failures and the separately configured scale probe. Record commands, exact commits and limitations.
 
 Each step must leave a runnable checkpoint. The first useful BOM is the first demo; complete wiring export is deferred. Build acceptance requires all rows in the delivery brief, not just count snapshots. The eventual exact Hedgehog-supported topology scope remains in the coverage ledger.
+
+## Correction review and build release
+
+Lead accepted D04 `25d642363a477e2b04a06e74421da0b15e991412` and D05 `75ba52328699c036c368d6700325011556d38615` after delta review. Parts independently accepted D03 `ce4b8e6b03f79b8aa4ff796e8b4460ebc67312a8` in #10 comment 6786925499. Both corrected oracle scripts pass; direct bool/float/null corruption probes reject invalid projections. The original type bug is closed. Architecture now specifies a worker runner, explicit history/export roots, safe integers, separate scale limits and source extraction provenance.
+
+The bounded design gate is complete. Release #14 to existing t7 / arch and #15 harness preparation to existing t8 / parts. The [build assignment](../first-bom-build.md) supplies execution clarifications and ownership; no further document correction round is required. This supersedes pending-pass language above. It does not close broader parent criteria or claim any application tests have passed.

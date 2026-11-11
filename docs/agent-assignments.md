@@ -38,6 +38,8 @@ The messenger service only alerts the recipient. After posting, send `nickname: 
 
 ## Assignment index
 
+Current implementation dispatch: **t7 / arch → #14**, **t8 / parts → #15** (harness preparation now; final review depends on #14). These are existing agents, retaining their nicknames. No spike/check sessions are needed. See [build assignment](first-bom-build.md). The completed bounded D03–D05 design passes below are historical context.
+
 Current bounded delivery pass (2026-11-10): [first BOM experiment](first-bom-experiment.md). Existing **t6 / topo** owns the experiment-scoped D03 packet (#10), **t8 / parts** owns the independent D04 packet (#11), and **t7 / arch** owns D05 (#12). Nicknames stay unchanged; solver/check are future roles, not newly instantiated sessions. Lead consolidates in #13 before the #14 executable spike. Earlier accepted research remains evidence; do not restart it.
 
 | ID | Issue | Owner role | Reviewer | Depends on |
