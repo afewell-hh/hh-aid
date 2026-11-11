@@ -1,0 +1,83 @@
+{
+  "manifest_version": "0.1",
+  "scenario_id": "FB-01",
+  "revision": "r1",
+  "status": "proposed-conditional-estimate",
+  "units": {"rate": "Gb/s-per-direction", "quantity": "each"},
+  "evidence": {
+    "checkpoint": "4c71aa5",
+    "server_class": "365a0c363a942b02881eb5a911a40f189107cf73",
+    "server_unit_bom": "0230cd8690c3eb43454424a70d95611e44ada35d",
+    "allocation_contract": "d97a2efa77a5b4e98a0c9198a7af9cd05ae008ff",
+    "allocation_patterns": "a60134f1b937c98b631963ea4c59d7703098b210",
+    "profile_contract": "31779ded356b4db0c6e582d4cb209dddbc005bf2",
+    "fabric_commit": "4bde50829fd7cfebac69332982abd1dee504a8a3",
+    "fabric_version": "v0.144.1",
+    "profile_name": "celestica-ds5000",
+    "profile_path": "pkg/ctrl/switchprofile/p_bcm_celestica_ds5000.go",
+    "current_installation_release_verified": false
+  },
+  "derivation": [
+    "New small fixture; not the sum of SCX, SU, PA or UX populations.",
+    "A adapts SC-A: retain eight explicit backend rail NICs and dual-port frontend DPU; omit in-band NIC and optional storage from this example, retaining site dependencies.",
+    "B adapts SC-B: two separate NICs changed from 100G to assumed 200G; no qualified SKU implied.",
+    "Both classes use two separate cords per server; arbitrary accessory inclusion remains unknown; no license line assumed present.",
+    "Backend SCX-SPLIT concept pairs two servers on the SAME explicit rail, not adjacent unrelated rail numbers.",
+    "PA half split is adapted to frontend 4x200G and backend 2x400G. Label 32 intentionally unused but retains its configured mode."
+  ],
+  "classes": [
+    {"id": "A", "revision": "r1", "occurrences": ["A01", "A02"],
+     "separate_per_server": {"chassis_bundle_A": 1, "backend_nic_400": 8, "frontend_dual_dpu_200": 1, "power_cord": 2},
+     "included_per_server": {"accelerator": 8, "psu": 2, "rail_kit": 1, "bmc": 1},
+     "unresolved_inclusion_per_server": {"accessory": 1},
+     "frontend_ports": ["dpu1/p1", "dpu1/p2"], "frontend_rate": 200,
+     "backend_ports": ["nic0/p1", "nic1/p1", "nic2/p1", "nic3/p1", "nic4/p1", "nic5/p1", "nic6/p1", "nic7/p1"],
+     "backend_rails": ["r0", "r1", "r2", "r3", "r4", "r5", "r6", "r7"], "backend_rate": 400,
+     "management_interfaces_per_server": 2},
+    {"id": "B", "revision": "r1", "occurrences": ["B01", "B02"],
+     "separate_per_server": {"chassis_bundle_B": 1, "frontend_nic_200": 2, "power_cord": 2},
+     "included_per_server": {"disk": 4, "psu": 2, "rail_kit": 1, "bmc": 1},
+     "unresolved_inclusion_per_server": {"accessory": 1},
+     "frontend_ports": ["nic1/p1", "nic2/p1"], "frontend_rate": 200,
+     "backend_ports": [], "backend_rails": [], "management_interfaces_per_server": 1}
+  ],
+  "network_intents": [
+    {"id": "NET-FE", "purpose": "frontend-and-storage-service", "leaf_context": "LC-FE", "proposed_installation": "INST-1", "proposed_fabric": "fabric-fe", "proposed_domain": "default", "service": "L3-only-requested", "eslag": false, "redundancy_guarantee": "not-requested-in-fixture"},
+    {"id": "NET-BE", "purpose": "backend", "leaf_context": "LC-BE", "proposed_installation": "INST-1", "proposed_fabric": "fabric-be", "proposed_domain": "default", "plane_intent": "single-plane", "first_hop_rail_domain": "RD-1", "service": "L3-only-requested", "eslag": false, "redundancy_guarantee": "not-requested-in-fixture"}
+  ],
+  "leaf_contexts": [
+    {"id": "LC-FE", "profile": "celestica-ds5000", "instance_quantity": null, "server_mode": "4x200G", "server_group": "FE-SERVER", "server_labels_inclusive": [1,31], "configured_server_labels_inclusive": [1,32], "uplink_labels_inclusive": [33,64], "uplink_mode": "1x800G", "unused_labels": [32], "auxiliary_modes": {"E1/65": "25G", "E1/66": "25G"}, "auxiliary_allocation": "excluded"},
+    {"id": "LC-BE", "profile": "celestica-ds5000", "instance_quantity": null, "server_mode": "2x400G", "server_group": "BE-RAIL", "server_labels_inclusive": [1,31], "configured_server_labels_inclusive": [1,32], "uplink_labels_inclusive": [33,64], "uplink_mode": "1x800G", "unused_labels": [32], "auxiliary_modes": {"E1/65": "25G", "E1/66": "25G"}, "auxiliary_allocation": "excluded"}
+  ],
+  "selection_policy": {"namespace": "pinned-profile-label", "order": ["network-id", "class-id", "occurrence-id", "port-array-order", "numeric-cage", "numeric-child"], "overlap": "exclusive-within-context", "uplinks_reserved": true, "whole_parent_excludes_children": true, "aliases_share_occurrence_ledger": true, "missing_mode": "unresolved-not-zero", "locks": [], "existing_assignments": [], "rule_revision": "FB-constructive-v1-proposed"},
+  "constructions": [
+    {"id": "FE-OPT", "network": "NET-FE", "server_module_per_link": 1, "switch_module_per_parent": 1, "logical_links_per_switch_parent": 4, "assembly_type": "separate-optics", "qualification": "unknown", "pmd": null, "connector": null, "fiber_type": null, "reach": null, "external_fiber_bom": "excluded-with-interface-dependency", "map": "four independent 200G paths per hypothetical parent module; ordered server demands to children 1..4", "partial_parent": "one whole module; unconnected children reserved"},
+    {"id": "BE-SPLIT", "network": "NET-BE", "assembly_type": "hypothetical-integrated-two-tail-DAC", "logical_links_per_assembly": 2, "separate_modules": 0, "length": null, "qualification": "unknown", "map": "one assembly per rail and pair of server occurrences: parent child1 to first server nic[rail]/p1, child2 to second; odd tail parked", "cross_rail_pairing": false}
+  ],
+  "author_expected": {
+    "physical_servers": 4, "frontend_links": 8, "backend_links": 16,
+    "frontend_server_modules": 8, "frontend_switch_modules": 2, "backend_split_assemblies": 8,
+    "management_interfaces": 6, "accessory_inclusion_unknown_requirements": 4,
+    "separate_server_component_units": 34, "known_generic_purchase_units_excluding_infrastructure": 52,
+    "FE": {"configured_ports": 162, "selected_server_members": 124, "uplink_reserved_members": 32, "unused_configured_members": 4, "max_pipeline_usage": 8, "conditional_leaf_lower_bound": 1, "used_server_parents": 2},
+    "BE": {"configured_ports": 98, "selected_server_members": 62, "uplink_reserved_members": 32, "unused_configured_members": 2, "max_pipeline_usage": 4, "conditional_leaf_lower_bound": 1, "used_server_parents": 8}
+  },
+  "missing_infrastructure": [
+    {"id": "INF-LEAF", "quantity": null, "conditional_lower_bound": 2, "reason": "one per separate context only under placement and construction assumptions"},
+    {"id": "INF-SPINE", "quantity": null, "reason": "topology and failure/growth policy not supplied"},
+    {"id": "INF-UPLINK-MEDIA", "quantity": null, "reason": "reserved capacity is not actual cabled uplinks"},
+    {"id": "INF-CONTROL-GATEWAY", "quantity": null, "reason": "installation/service design unresolved"},
+    {"id": "INF-OOB", "quantity": null, "known_server_interfaces": 6, "reason": "management switch/media/site and infrastructure interfaces unresolved"},
+    {"id": "INF-ANCILLARY", "quantity": null, "reason": "switch PSU/airflow/cord/license/spares and inclusion unresolved"}
+  ],
+  "unresolved": ["qualified-server-SKUs", "optical-PMD-and-parent-channel-map", "DAC-host-fit-and-length", "rack-placement-and-failure-policy", "spine-and-uplink-connectivity", "VPC-service-resources", "latest-supported-installation-evidence", "accessory-inclusion"],
+  "mutations": [
+    {"id": "FB-DPU", "change": "A dual-port DPU -> two single-port DPUs per server", "expected_delta": {"adapter_units": 2, "management_interfaces": 2, "frontend_links": 0, "physical_servers": 0, "known_generic_purchase_units": 2}},
+    {"id": "FB-COUNT", "change": "A occurrences become A01,A02,A03", "expected": {"physical_servers": 5, "frontend_links": 10, "frontend_server_modules": 10, "frontend_switch_modules": 3, "backend_links": 24, "backend_assemblies": 16, "parked_backend_tails": 8, "management_interfaces": 8, "known_generic_purchase_units_excluding_infrastructure": 75}},
+    {"id": "FB-AC1", "synthetic_only": true, "configured_children_per_parent": [4,4], "shared_budget": 6, "selected_children_per_parent": [1,1], "assigned_links": 0, "expected": "conflict:8-configured>6;selected2-not-links"},
+    {"id": "FB-UNKNOWN-MODE", "change": "LC-FE unused label32 mode null", "expected": "configured total and pipeline15 unresolved;selected124 preserved;no feasible allocation claim"},
+    {"id": "FB-EXHAUST", "change": "FE-SERVER selection only label1 for eight demands", "expected": "conditional lower bound2; fixed one occurrence leaves four unmet, never borrow uplinks"},
+    {"id": "FB-LOCK", "change": "retain explicit FE demand at label1 child1 then remove label1 from selection", "expected": "retain old binding as conflict; no silent relocation"},
+    {"id": "FB-EVIDENCE", "synthetic_only": true, "change": "local evidence revision narrows shared pipeline limit from10 to6", "expected": "FE configured8 conflicts; historical output immutable; not a new Hedgehog release"}
+  ]
+}
