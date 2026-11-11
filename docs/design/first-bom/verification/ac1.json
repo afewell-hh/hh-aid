@@ -1,0 +1,12 @@
+{
+  "schema": "hh-aid-verification-cases-v1",
+  "scope": "standalone synthetic AC1; not the pending D03 population manifest",
+  "source_commit": "d97a2efa77a5b4e98a0c9198a7af9cd05ae008ff",
+  "source_path": "docs/design/port-allocation-contract.md",
+  "cases": [
+    {"id":"AC1-over-budget", "input":{"parents":{"P1":4,"P2":4},"budget":6,"selected":["P1/1","P2/1"],"reserved":[]}, "expected":{"known_configured":8,"configured_total":8,"selected":2,"available_selected":2,"assigned":0,"status":"conflict","diagnostic":"configured-budget-exceeded"}},
+    {"id":"AC1-reserve-selected", "input":{"parents":{"P1":4,"P2":4},"budget":6,"selected":["P1/1","P2/1"],"reserved":["P1/1"]}, "expected":{"known_configured":8,"configured_total":8,"selected":2,"available_selected":1,"assigned":0,"status":"conflict","diagnostic":"configured-budget-exceeded"}},
+    {"id":"AC1-reserve-unselected", "input":{"parents":{"P1":4,"P2":4},"budget":6,"selected":["P1/1","P2/1"],"reserved":["P1/4"]}, "expected":{"known_configured":8,"configured_total":8,"selected":2,"available_selected":2,"assigned":0,"status":"conflict","diagnostic":"configured-budget-exceeded"}},
+    {"id":"AC1-unused-mode-unknown", "input":{"parents":{"P1":4,"P2":null},"budget":6,"selected":["P1/1"],"reserved":[]}, "expected":{"known_configured":4,"configured_total":null,"selected":1,"available_selected":1,"assigned":0,"status":"unresolved","diagnostic":"configured-mode-unknown"}}
+  ]
+}
