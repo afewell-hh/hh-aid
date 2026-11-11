@@ -38,6 +38,8 @@ The messenger service only alerts the recipient. After posting, send `nickname: 
 
 ## Assignment index
 
+Current bounded delivery pass (2026-11-10): [first BOM experiment](first-bom-experiment.md). Existing **t6 / topo** owns the experiment-scoped D03 packet (#10), **t8 / parts** owns the independent D04 packet (#11), and **t7 / arch** owns D05 (#12). Nicknames stay unchanged; solver/check are future roles, not newly instantiated sessions. Lead consolidates in #13 before the #14 executable spike. Earlier accepted research remains evidence; do not restart it.
+
 | ID | Issue | Owner role | Reviewer | Depends on |
 | --- | --- | --- | --- | --- |
 | R01 | [#2](https://github.com/afewell-hh/hh-aid/issues/2) | **scout** — Product discovery lead | UX researcher and sponsor | Ready now |
