@@ -114,4 +114,8 @@ Preserve distinctions between server, GPU, tray, rack, rail, first-hop rail doma
 
 ## Unresolved product decisions
 
+### Sponsor checkpoint — 2026-11-10
+
+The sponsor reviewed the latest allocation-group, expandable BOM and connection-class screens and said, “I think all those screens look pretty good.” This endorses the current interaction direction at PR #27 `d1fd01fba10ba6cbb27a5bd06c7165473a1baf6b` for subsequent design planning. Stop iterating the static screens without a concrete new finding. It does not claim participant usability results, a selected implementation stack, qualified hardware, or production behavior. The lead accepted the final AC1 clarification in PR #29 `d97a2efa77a5b4e98a0c9198a7af9cd05ae008ff` after independently checking configured versus selected/assigned resource usage; the current allocation-contract correction cycle is complete. See [design checkpoint](design-checkpoint.md) for exact evidence and the next planning gate.
+
 The initial audience, BOM-before-connection-map delivery order and latest-release installation direction are settled above. Design must establish detailed workflows, first BOM readiness/scenario, deployment model, import/export and round-trip needs, release-update mechanics, topology family coverage, algorithm objectives, collaboration/security needs, performance targets, and lifecycle ownership. Confirm how existing Hedgehog planning tools overlap before proposing duplicate functionality. No application stack or solver has been selected.
