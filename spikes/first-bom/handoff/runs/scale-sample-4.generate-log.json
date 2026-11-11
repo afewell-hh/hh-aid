@@ -1,0 +1,79 @@
+{
+ "appCommit": "ce6c47ba68891c7bc64c6d1f45d496f395200aee",
+ "manifest": "/Users/arthurfewell/git/afewell-hh/hh-aid-build/spikes/first-bom/fixtures/materialized/generation/ce4b8e6/docs/design/first-bom/scenario.json",
+ "project": "/var/folders/xg/hdzs8trs459_0422bq812z480000gn/T/hhaid-gen-RypIBb/p",
+ "export": "/private/tmp/claude-501/-Users-arthurfewell-git-afewell-hh-hh-aid/c1a483e3-391d-4634-aebc-6e1500c3205c/scratchpad/scale-run/4/project.hhaid.json",
+ "outcome": "complete",
+ "outputId": "bede7f8a8106d45adb23f65bc86e7482d25259e0d6e6ba36020d4f98cb1eba25",
+ "partialId": null,
+ "log": [
+  {
+   "command": [
+    "hhaid",
+    "new",
+    "/var/folders/xg/hdzs8trs459_0422bq812z480000gn/T/hhaid-gen-RypIBb/p",
+    "--name",
+    "experiment-check",
+    "--project-id",
+    "proj-experiment-check"
+   ],
+   "ms": 135,
+   "result": {
+    "head": "e81e2c00d38490fa2a238cedead3c1b0c66340835aa3e3190a82d69b4fa585b1"
+   }
+  },
+  {
+   "command": [
+    "hhaid",
+    "seed",
+    "/var/folders/xg/hdzs8trs459_0422bq812z480000gn/T/hhaid-gen-RypIBb/p",
+    "--manifest",
+    "/Users/arthurfewell/git/afewell-hh/hh-aid-build/spikes/first-bom/fixtures/materialized/generation/ce4b8e6/docs/design/first-bom/scenario.json",
+    "--manifest-commit",
+    "ce4b8e6",
+    "--scale",
+    "1000"
+   ],
+   "ms": 393,
+   "result": {
+    "input": "b2886b721d7848ae8ee99a571bf5bfd14e889fc62e2a94f909700aa19d5388bf"
+   }
+  },
+  {
+   "command": [
+    "hhaid",
+    "generate",
+    "/var/folders/xg/hdzs8trs459_0422bq812z480000gn/T/hhaid-gen-RypIBb/p",
+    "--config",
+    "scale"
+   ],
+   "ms": 3148,
+   "result": {
+    "outcome": "complete",
+    "outputId": "bede7f8a8106d45adb23f65bc86e7482d25259e0d6e6ba36020d4f98cb1eba25",
+    "message": "complete",
+    "completedStages": [
+     "S1",
+     "S2",
+     "S3",
+     "S4",
+     "S5"
+    ],
+    "reusedStages": []
+   }
+  },
+  {
+   "command": [
+    "hhaid",
+    "export",
+    "/var/folders/xg/hdzs8trs459_0422bq812z480000gn/T/hhaid-gen-RypIBb/p",
+    "-o",
+    "/private/tmp/claude-501/-Users-arthurfewell-git-afewell-hh-hh-aid/c1a483e3-391d-4634-aebc-6e1500c3205c/scratchpad/scale-run/4/project.hhaid.json"
+   ],
+   "ms": 4366,
+   "result": {
+    "bytes": 100714425
+   }
+  }
+ ]
+}

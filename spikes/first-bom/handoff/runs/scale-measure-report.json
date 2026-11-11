@@ -1,0 +1,94 @@
+{
+  "app_commit": "ce6c47ba68891c7bc64c6d1f45d496f395200aee",
+  "harness_commit": "10b0cdc84b563257d68c3322c283279c99673799",
+  "platform": "macOS-26.5-arm64-arm-64bit",
+  "processor": "arm",
+  "config_sha256": "4307a7792653fff17ede30fac5fc6e199b16f81a52f0028c5f3a885bd20a6628",
+  "manifest_sha256": "9200061edb0571a58a46fe04c7921898783db6601c615169792963667900d723",
+  "measurement": "/usr/bin/time process-tree peak RSS; not sum of concurrent process peaks",
+  "verification": "pending: run independent member/history checks on each export",
+  "samples": [
+    {
+      "run": 1,
+      "command": [
+        "/Users/arthurfewell/git/afewell-hh/hh-aid-build/spikes/first-bom/experiment-check",
+        "generate",
+        "--config",
+        "scale",
+        "--scale",
+        "1000",
+        "--export",
+        "/private/tmp/claude-501/-Users-arthurfewell-git-afewell-hh-hh-aid/c1a483e3-391d-4634-aebc-6e1500c3205c/scratchpad/scale-run/1"
+      ],
+      "wall_seconds": 8.339768667,
+      "peak_rss_bytes": 1446248448,
+      "exit_code": 0
+    },
+    {
+      "run": 2,
+      "command": [
+        "/Users/arthurfewell/git/afewell-hh/hh-aid-build/spikes/first-bom/experiment-check",
+        "generate",
+        "--config",
+        "scale",
+        "--scale",
+        "1000",
+        "--export",
+        "/private/tmp/claude-501/-Users-arthurfewell-git-afewell-hh-hh-aid/c1a483e3-391d-4634-aebc-6e1500c3205c/scratchpad/scale-run/2"
+      ],
+      "wall_seconds": 8.180102875,
+      "peak_rss_bytes": 1442250752,
+      "exit_code": 0
+    },
+    {
+      "run": 3,
+      "command": [
+        "/Users/arthurfewell/git/afewell-hh/hh-aid-build/spikes/first-bom/experiment-check",
+        "generate",
+        "--config",
+        "scale",
+        "--scale",
+        "1000",
+        "--export",
+        "/private/tmp/claude-501/-Users-arthurfewell-git-afewell-hh-hh-aid/c1a483e3-391d-4634-aebc-6e1500c3205c/scratchpad/scale-run/3"
+      ],
+      "wall_seconds": 8.153444834000002,
+      "peak_rss_bytes": 1444200448,
+      "exit_code": 0
+    },
+    {
+      "run": 4,
+      "command": [
+        "/Users/arthurfewell/git/afewell-hh/hh-aid-build/spikes/first-bom/experiment-check",
+        "generate",
+        "--config",
+        "scale",
+        "--scale",
+        "1000",
+        "--export",
+        "/private/tmp/claude-501/-Users-arthurfewell-git-afewell-hh-hh-aid/c1a483e3-391d-4634-aebc-6e1500c3205c/scratchpad/scale-run/4"
+      ],
+      "wall_seconds": 8.119019916999996,
+      "peak_rss_bytes": 1446576128,
+      "exit_code": 0
+    },
+    {
+      "run": 5,
+      "command": [
+        "/Users/arthurfewell/git/afewell-hh/hh-aid-build/spikes/first-bom/experiment-check",
+        "generate",
+        "--config",
+        "scale",
+        "--scale",
+        "1000",
+        "--export",
+        "/private/tmp/claude-501/-Users-arthurfewell-git-afewell-hh-hh-aid/c1a483e3-391d-4634-aebc-6e1500c3205c/scratchpad/scale-run/5"
+      ],
+      "wall_seconds": 8.136494708999997,
+      "peak_rss_bytes": 1442119680,
+      "exit_code": 0
+    }
+  ],
+  "median_seconds": 8.153444834000002,
+  "max_seconds": 8.339768667
+}

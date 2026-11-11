@@ -1,0 +1,1 @@
+{"id":"scale","maxMaterializedOccurrences":100000,"maxDemandTerminations":100000,"maxCandidateSwitches":8192,"maxCandidateInspections":250000000,"replicas":1000,"runnerDeadlineMs":120000}
