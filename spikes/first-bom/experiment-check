@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+# experiment-check generate|lifecycle (arch drivers) | verify|measure (parts' harness, verification/).
+HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+NODE="$HERE/.toolchain/node/bin/node"; [ -x "$NODE" ] || NODE=node
+case "$1" in
+  generate|lifecycle) exec "$NODE" "$HERE/scripts/experiment-check.ts" "$@" ;;
+  verify|measure)
+    sub="$1"; shift
+    if [ "$sub" = verify ]; then f="$HERE/verification/verify.py"; else f="$HERE/verification/measure.py"; fi
+    [ -f "$f" ] || { echo "parts' harness not present at $f (owned by t8 / parts, #15)" >&2; exit 2; }
+    exec python3 -I "$f" "$@" ;;
+  *) echo "usage: experiment-check generate|lifecycle|verify|measure ..." >&2; exit 2 ;;
+esac

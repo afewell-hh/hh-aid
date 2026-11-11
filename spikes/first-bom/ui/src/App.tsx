@@ -159,7 +159,7 @@ function Bom({ p, out, outAssess, act }: { p: any; out: any; outAssess: any; act
                 <td>{r ? `${fmtQ(r.units)} × ${r.perUnit} = ${fmtQ(r.installed)}` : u ? `${u.links.length} link(s)` : ''}</td><td>{r ? fmtQ(r.purchaseNeed) : u ? '1 unit' : ''}</td><td>{r ? `${r.classId}@${r.classRevision}${r.coveredBy ? ` · covered by ${r.coveredBy.split('/').pop()}` : ''}` : u ? `${u.reservedChildren} reserved/parked child(ren)` : ''}</td></tr>; })}
           </Fragment>)}
         </tbody></table>
-        <p>Known generic purchase units (mixed-unit checksum, not a price): <strong data-testid="known-units">{out.summary.knownGenericPurchaseUnits}</strong>; unresolved: {out.summary.unresolvedPurchaseLines.join(', ') || 'none'}.</p>
+        <p>Known generic purchase units (mixed-unit checksum, not a price): <strong data-testid="known-units">{fmtQ(out.summary.knownGenericPurchaseUnits)}</strong>; unresolved: {out.summary.unresolvedPurchaseLines.join(', ') || 'none'}.</p>
         <h3>Missing infrastructure (never zero)</h3>
         <ul>{out.missingInfrastructure.map((m: any) => <li key={m.id} data-testid={`missing-${m.id}`}><strong>{m.id}</strong>: {fmtQ(m.quantity)} — {m.reason}{m.conditionalLowerBound !== undefined ? ` · conditional lower bound ${fmtQ(m.conditionalLowerBound)}` : ''}{m.knownServerInterfaces !== undefined ? ` · known server interfaces ${fmtQ(m.knownServerInterfaces)}` : ''}</li>)}</ul>
         <h3>Diagnostics</h3>

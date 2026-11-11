@@ -202,10 +202,14 @@ export function s4(ctx: StageCtx) {
     let status: string = ledger.status === 'conflict' ? 'conflict' : ledger.status === 'unresolved' ? 'unresolved' : !isKnown(lowerBound) ? 'unresolved' : 'conditional-witness';
     if (netUnits.length && usable.length === 0) diagnostics.push({ code: 'no-usable-parent', severity: 'conflict', affected: [`${lc.id}/${group.id}`], cause: `no selected parent in ${group.id} has a free ${cons.linksPerUnit}-child footprint` });
     const witnessIds: string[] = []; let unmet: string[] = [];
+    if (limit) status = 'limit-reached';
     if (status === 'conditional-witness') {
       const count = fixed ?? (lowerBound as number);
       candidates += count;
-      if (candidates > config.maxCandidateSwitches) { limit = { limit: 'maxCandidateSwitches', observed: candidates, allowed: config.maxCandidateSwitches, stage: 'S4' }; break; }
+      if (candidates > config.maxCandidateSwitches) { limit = { limit: 'maxCandidateSwitches', observed: candidates, allowed: config.maxCandidateSwitches, stage: 'S4' }; status = 'limit-reached'; }
+    }
+    if (status === 'conditional-witness') {
+      const count = fixed ?? (lowerBound as number);
       for (let w = 1; w <= count; w++) witnessIds.push(`${lc.id}/${fixed !== null ? 'SW' : 'W'}${w}`);
       // slots in stable order: occurrence, then selector order
       const slots: { occ: string; label: number; used: boolean }[] = [];
@@ -229,11 +233,11 @@ export function s4(ctx: StageCtx) {
         if (placed.has(u.id)) continue;
         let found: typeof slots[number] | undefined;
         for (const s of slots) { inspections++; if (!s.used) { found = s; break; } }
-        if (inspections > config.maxCandidateInspections) { limit = { limit: 'maxCandidateInspections', observed: inspections, allowed: config.maxCandidateInspections, stage: 'S4' }; break; }
+        if (inspections > config.maxCandidateInspections) { limit = { limit: 'maxCandidateInspections', observed: inspections, allowed: config.maxCandidateInspections, stage: 'S4' }; status = 'limit-reached'; break; }
         if (!found) { unmet.push(...u.links); continue; }
         found.used = true; place(u, found, (_d, k) => k + 1);
       }
-      if (limit) break;
+      if (limit) { witnessIds.length = 0; unmet = []; }
       if (unmet.length) diagnostics.push({ code: 'capacity-exhausted', severity: 'conflict', affected: unmet, observed: { fixedOccurrences: fixed, usableParentsPerOccurrence: usable.length }, required: { lowerBound }, cause: `${unmet.length} demand(s) unmet in ${lc.id}; reserved uplinks are never borrowed`, remedies: ['add switch occurrences', 'widen the allocation group', 'release a reservation explicitly'] });
     }
     sizing.push({ context: lc.id, network: net.id, group: group.id, construction: cons.id, status, lowerBound, operands: { units: netUnits.length, usableParentsPerOccurrence: usable.length, linksPerUnit: cons.linksPerUnit }, suppliedOccurrences: lc.instanceQuantity, witnessIds, unmetDemands: unmet.length, ledgerStatus: ledger.status, claim: 'conditional local packing only; not an exact supported topology' });
@@ -267,7 +271,7 @@ export function s5(ctx: StageCtx) {
   }
   for (const c of constructionLines) lines.set(c.item, { id: `BUY/${c.item}`, item: c.item, category: c.item.includes('optic') ? 'optical-module' : 'assembly', quantity: c.quantity, installed: c.quantity, acquisition: 'separate', construction: c.construction, basis: c.basis, requirementIds: c.requirementIds, readiness: 'conditional-estimate', qualification: 'unknown' });
   const purchaseLines = [...lines.values()].sort((a, b) => byId(a.id, b.id)).map(l => l.acquisition === 'included' ? { ...l, quantity: 0, purchaseNote: 'covered by its bundle; installed inventory only' } : l);
-  const knownGenericPurchaseUnits = purchaseLines.filter(l => l.acquisition === 'separate' && isKnown(l.quantity)).reduce((n, l) => n + (l.quantity as number), 0);
+  const knownGenericPurchaseUnits: Q = sumQ(purchaseLines.filter(l => l.acquisition === 'separate' && isKnown(l.quantity)).map(l => l.quantity), 'knownGenericPurchaseUnits');
   const unresolvedPurchase = purchaseLines.filter(l => !isKnown(l.quantity)).map(l => l.id);
   // missing infrastructure: never zeroed or omitted
   const bounds = (S4?.sizing ?? []).map((s: any) => s.lowerBound);
@@ -276,10 +280,11 @@ export function s5(ctx: StageCtx) {
   // review rows: presentation partition of physical link occurrences (one row per link)
   const demandById = new Map<string, Demand>((S1.demands ?? []).map((d: Demand) => [d.id, d]));
   const assignByDemand = new Map<string, any>((S4?.assignments ?? []).map((a: any) => [a.demand, a]));
-  const rows = new Map<string, any>();
+  const rows = new Map<string, any>(); const consById = new Map(state.constructions.map(c => [c.id, c])); const ctxById = new Map(state.leafContexts.map(c => [c.id, c])); const groupByCtx = new Map(S3.groups.map((g: any) => [g.context, g]));
   for (const u of S4?.units ?? []) {
-    const cons = state.constructions.find(c => c.id === u.construction)!; const lc = state.leafContexts.find(c => c.id === u.context)!;
-    const group = S3.groups.find((g: any) => g.context === lc.id);
+    let unitRow: any = null;
+    const cons = consById.get(u.construction)!; const lc = ctxById.get(u.context)!;
+    const group: any = groupByCtx.get(lc.id);
     for (const did of u.links) {
       const d = demandById.get(did)!; const a = assignByDemand.get(did);
       const port = a ? group.usableParents.find((p: any) => p.label === a.label)?.port : group.usableParents[0]?.port;
@@ -289,9 +294,9 @@ export function s5(ctx: StageCtx) {
       const row = rows.get(rowId) ?? { id: rowId, signature, links: [] as string[], units: new Set<string>(), unassigned: [] as string[], heldByLock: [] as string[], reservedChildren: 0, editShortcuts: { sideA: `class/${d.classId}#${d.slot}`, sideB: `context/${lc.id}#${group.id}` } };
       row.links.push(`LINK/${did.slice(4)}`); row.units.add(u.id);
       if (!a) (u.heldByLock ? row.heldByLock : row.unassigned).push(`LINK/${did.slice(4)}`);
-      rows.set(rowId, row);
+      rows.set(rowId, row); unitRow ??= row;
     }
-    const row = [...rows.values()].find(r => r.units.has(u.id)); if (row) row.reservedChildren += u.reservedChildren;
+    if (unitRow) unitRow.reservedChildren += u.reservedChildren;
   }
   const reviewRows = [...rows.values()].map(r => ({ id: r.id, signature: r.signature, memberDigest: digestOf([...r.links].sort(byId)), counts: { links: r.links.length, units: r.units.size, physicalServerEnds: r.links.length, reservedOrParkedChildren: r.reservedChildren }, links: [...r.links].sort(byId), units: [...r.units].sort(byId), exceptions: { unassigned: r.unassigned.sort(byId), heldByLock: r.heldByLock.sort(byId) }, unknownFields: r.signature.construction.unknownFields, editShortcuts: r.editShortcuts, inspection: 'manual review required; inspection does not confer qualification' })).sort((a, b) => byId(a.id, b.id));
   const placedLinks = new Set((S4?.units ?? []).flatMap((u: any) => u.links));

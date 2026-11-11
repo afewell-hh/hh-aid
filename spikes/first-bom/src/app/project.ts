@@ -9,6 +9,7 @@ import { RUN_CONFIGS } from '../engine/stages.ts';
 import { evidenceFromExtraction, evidenceRevision } from '../evidence/load.ts';
 import { MUTATIONS } from '../model/mutations.ts';
 import { seedFromManifest } from '../model/seed.ts';
+import { replicate } from '../model/scale.ts';
 import { AC1_VARIANTS, type Ac1Variant, ac1Evidence, ac1State } from '../model/synthetic.ts';
 import type { ProjectState } from '../model/types.ts';
 import { startRun, type RunHandle } from '../runner/runner.ts';
@@ -23,7 +24,7 @@ export function newProject(dir: string, name: string, actor: string, projectId: 
 }
 
 /** Seed from the FB-01 manifest. Verifies the manifest bytes against the source lock when a commit is given. */
-export async function seed(store: ProjectStore, manifestPath: string, manifestCommit: string, actor: string) {
+export async function seed(store: ProjectStore, manifestPath: string, manifestCommit: string, actor: string, replicas = 0) {
   const bytes = readFileSync(manifestPath); const sha = sha256(bytes);
   const lock = JSON.parse(readFileSync(join(SPIKE_ROOT, 'sources.lock.json'), 'utf8'));
   const entry = lock.entries.find((e: any) => e.role === 'generation-input' && e.commit.startsWith(manifestCommit));
@@ -32,7 +33,8 @@ export async function seed(store: ProjectStore, manifestPath: string, manifestCo
   const ev = evidenceFromExtraction(DEFAULT_EVIDENCE.profile, DEFAULT_EVIDENCE.provenance);
   const evId = store.put(ev);
   if (store.index().inputHead) throw new Error('project already seeded');
-  const state = seedFromManifest(manifest, { commit: entry.commit, path: entry.path, sha256: sha }, store.index().projectId, evId, ev);
+  const base = seedFromManifest(manifest, { commit: entry.commit, path: entry.path, sha256: sha }, store.index().projectId, evId, ev);
+  const state = replicas ? replicate(base, replicas) : base;
   const id = store.put(state);
   await store.commit(actor, 'seed', () => ({ add: { inputs: [id], evidence: [evId] }, inputHead: id }));
   return id;

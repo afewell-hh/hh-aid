@@ -10,7 +10,7 @@ const [cmd, ...rest] = process.argv.slice(2);
 const { values: o, positionals: pos } = parseArgs({ args: rest, allowPositionals: true, options: {
   name: { type: 'string' }, manifest: { type: 'string' }, 'manifest-commit': { type: 'string' }, mutation: { type: 'string' }, patch: { type: 'string' }, note: { type: 'string' },
   config: { type: 'string' }, 'deadline-ms': { type: 'string' }, evidence: { type: 'string' }, output: { type: 'string' }, row: { type: 'string' }, fields: { type: 'string' },
-  from: { type: 'string' }, synthetic: { type: 'string' }, variant: { type: 'string' }, to: { type: 'string' }, o: { type: 'string', short: 'o' }, 'include-audit': { type: 'boolean' }, json: { type: 'boolean' }, actor: { type: 'string' }, 'project-id': { type: 'string' },
+  from: { type: 'string' }, synthetic: { type: 'string' }, scale: { type: 'string' }, variant: { type: 'string' }, to: { type: 'string' }, o: { type: 'string', short: 'o' }, 'include-audit': { type: 'boolean' }, json: { type: 'boolean' }, actor: { type: 'string' }, 'project-id': { type: 'string' },
 } });
 const actor = o.actor ?? process.env.HHAID_ACTOR ?? 'local-user';
 const out = (human: string, data: unknown) => console.log(o.json ? JSON.stringify(data, null, 1) : human);
@@ -20,7 +20,7 @@ const withStore = async <T>(dir: string, f: (s: ProjectStore) => Promise<T> | T)
 try {
   switch (cmd) {
     case 'new': { const s = newProject(need(pos[0], 'projectDir'), o.name ?? 'untitled', actor, o['project-id']); out(`created ${pos[0]}`, { head: s.headId() }); s.close(); break; }
-    case 'seed': await withStore(need(pos[0], 'projectDir'), async s => { const id = o.synthetic === 'FB-AC1' ? await seedSynthetic(s, need(o.manifest, '--manifest'), need(o['manifest-commit'], '--manifest-commit'), need(o.variant, '--variant'), actor) : await seed(s, need(o.manifest, '--manifest'), need(o['manifest-commit'], '--manifest-commit'), actor); out(`seeded input ${id}`, { input: id }); }); break;
+    case 'seed': await withStore(need(pos[0], 'projectDir'), async s => { const id = o.synthetic === 'FB-AC1' ? await seedSynthetic(s, need(o.manifest, '--manifest'), need(o['manifest-commit'], '--manifest-commit'), need(o.variant, '--variant'), actor) : await seed(s, need(o.manifest, '--manifest'), need(o['manifest-commit'], '--manifest-commit'), actor, o.scale ? Number(o.scale) : 0); out(`seeded input ${id}`, { input: id }); }); break;
     case 'edit': await withStore(need(pos[0], 'projectDir'), async s => {
       const patch = o.patch ? parseStrictJson(readFileSync(o.patch, 'utf8')) as any : undefined;
       const r = await edit(s, actor, { mutation: o.mutation, patch, note: o.note });

@@ -41,13 +41,16 @@ export class RunHandle extends EventEmitter {
     const keys: Record<string, string> = {}; const chain: string[] = [];
     for (const st of STAGE_IDS) { keys[st] = stageKey(st, inputId, state.evidence, config, chain); chain.push(keys[st]!); }
     const cached = new Map<string, string>();
-    for (const id of idx.roots.stageResults) { const d = s.get(id); if (d.kind === 'StageResult' && d.complete === true && d.engine === ENGINE_VERSION) cached.set(d.key, id); }
+    // a rooted StageResult is reused only if its bytes still verify (digest, canonical form, schema); anything else is a miss
+    const corrupt: string[] = [];
+    for (const id of idx.roots.stageResults) { try { const d = s.get(id); if (d.kind === 'StageResult' && d.complete === true && d.engine === ENGINE_VERSION) cached.set(d.key, id); } catch { corrupt.push(id); } }
+    if (corrupt.length) s.audit(this.opts.actor, 'stage-cache-miss-corrupt', corrupt);
     const prior: Record<string, any> = {}; const ids: Record<string, string> = {}; const reused: StageId[] = []; const completed: StageId[] = [];
     let k = 0;
     for (; k < STAGE_IDS.length; k++) {
       const st = STAGE_IDS[k]!; const hit = cached.get(keys[st]!);
       if (!hit) break;
-      const d = s.get(hit); if (d.key !== keys[st] || d.stage !== st) break;
+      let d: any; try { d = s.get(hit); } catch { break; } if (d.key !== keys[st] || d.stage !== st) break;
       prior[st] = d.result; ids[st] = hit; reused.push(st); completed.push(st);
     }
     const remaining = STAGE_IDS.slice(k);
