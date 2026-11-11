@@ -53,6 +53,24 @@ def resources(context, required_parents):
                 uplinks=32, unused=children, max_pipeline=max(loads), lower_bound=(required_parents+30)//31)
 
 
+def compare(expected, actual, path='$'):
+    """Validate exact JSON shape/types before values (bool is not an integer)."""
+    if type(actual) is not type(expected):
+        raise ValueError(f'{path}: expected {type(expected).__name__}, got {type(actual).__name__}')
+    if type(expected) is dict:
+        if expected.keys() != actual.keys():
+            raise ValueError(f'{path}: missing or extra keys')
+        for key in expected:
+            compare(expected[key], actual[key], f'{path}.{key}')
+    elif type(expected) is list:
+        if len(expected) != len(actual):
+            raise ValueError(f'{path}: different list length')
+        for index, (left, right) in enumerate(zip(expected, actual)):
+            compare(left, right, f'{path}[{index}]')
+    elif actual != expected:
+        raise ValueError(f'{path}: value differs from frozen expectation')
+
+
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--actual',type=Path,help='future normalized output projection; baseline and count_A3 only')
@@ -75,8 +93,15 @@ def main():
     changed[0]['occurrences'].append('A03')
     actual={'baseline':base,'count_A3':quantities(changed)}
     oracle={k:expected[k] for k in actual}
-    if actual!=oracle:
-        raise ValueError('independent FB01 derivation differs from frozen values')
+    compare(oracle, actual)
+    for field, value in [('be_parked_tails', False), ('servers', 4.0)]:
+        bad = copy.deepcopy(oracle)
+        bad['baseline'][field] = value
+        try:
+            compare(oracle, bad)
+        except ValueError:
+            continue
+        raise AssertionError('corrupted FB01 projection accepted')
     # Independent hand-derived mutation obligations; no author expected fields read.
     assert 31*4+32+2==expected['unknown_mode']['known_configured']
     assert expected['unknown_mode']['configured_total'] is None
@@ -84,11 +109,10 @@ def main():
     assert 2*2-2==expected['dpu_delta']['physical_dpus']
     assert expected['catalog_limit6']['FE_max']>6
     if args.actual:
-        if json.loads(args.actual.read_text())!=oracle:
-            raise ValueError('application projection differs from frozen FB01 expectations')
+        compare(oracle, json.loads(args.actual.read_text()))
         print('FB01 external count projection matched; lifecycle/resource identity still needs separate evidence')
     else:
-        print('FB01 pinned-input independent baseline/count derivation passed; no application tested')
+        print('FB01 pinned-input independent baseline/count derivation and 2 type corruption probes passed; no application tested')
 
 
 if __name__=='__main__':

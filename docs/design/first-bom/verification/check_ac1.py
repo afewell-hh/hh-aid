@@ -27,10 +27,22 @@ def derive(case):
                 assigned=0, status=status, diagnostic=diagnostic)
 
 
-def compare(expected, actual):
-    # Exact projection: missing/extra cases/keys and null-to-zero changes fail.
-    if expected != actual:
-        raise ValueError('AC1 result projection differs from independently frozen expectations')
+def compare(expected, actual, path='$'):
+    """Validate exact JSON shape/types before values (bool is not an integer)."""
+    if type(actual) is not type(expected):
+        raise ValueError(f'{path}: expected {type(expected).__name__}, got {type(actual).__name__}')
+    if type(expected) is dict:
+        if expected.keys() != actual.keys():
+            raise ValueError(f'{path}: missing or extra keys')
+        for key in expected:
+            compare(expected[key], actual[key], f'{path}.{key}')
+    elif type(expected) is list:
+        if len(expected) != len(actual):
+            raise ValueError(f'{path}: different list length')
+        for index, (left, right) in enumerate(zip(expected, actual)):
+            compare(left, right, f'{path}[{index}]')
+    elif actual != expected:
+        raise ValueError(f'{path}: value differs from frozen expectation')
 
 
 def main():
@@ -45,7 +57,9 @@ def main():
     # Deliberate corruption probes: this harness must detect these mistakes.
     for case_id, field, value in [('AC1-over-budget', 'configured_total', 2),
                                  ('AC1-unused-mode-unknown', 'configured_total', 0),
-                                 ('AC1-reserve-selected', 'known_configured', 7)]:
+                                 ('AC1-reserve-selected', 'known_configured', 7),
+                                 ('AC1-over-budget', 'assigned', False),
+                                 ('AC1-over-budget', 'selected', 2.0)]:
         bad = json.loads(json.dumps(expected))
         bad[case_id][field] = value
         try:
@@ -57,7 +71,7 @@ def main():
         compare(expected, json.loads(args.actual.read_text()))
         print('AC1 external projection matched; producer evidence required separately')
     else:
-        print('AC1 fixture derivation and 3 corruption probes passed; no application tested')
+        print('AC1 fixture derivation and 5 corruption probes passed; no application tested')
 
 
 if __name__ == '__main__':
