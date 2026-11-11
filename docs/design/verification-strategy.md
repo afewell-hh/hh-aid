@@ -1,6 +1,6 @@
 # First-BOM verification packet
 
-Author: t8 / parts. Assignment: [D04 #11](https://github.com/afewell-hh/hh-aid/issues/11#issuecomment-6786444311). Independent reviewer: lead. Status: early draft; D03 manifest and sizing review pending. This does not complete #11 or authorize production implementation.
+Author: t8 / parts. Assignment: [D04 #11](https://github.com/afewell-hh/hh-aid/issues/11#issuecomment-6786444311). Independent reviewer: lead. Status: draft with independent FB-01 expectations; full D03 decision-packet review pending. This does not complete #11 or authorize production implementation.
 
 ## Evidence and independence
 
@@ -8,7 +8,7 @@ Start from [delivery brief](../first-bom-experiment.md) and [checkpoint](../desi
 
 Facts: the brief requires two classes, simultaneous attachments, partial BOMs, independent expected results, configured-resource accounting and saved revisions. All interface choices, targets and future checks below are proposals. No maintainer intent is inferred. Previously authored parts examples are design inputs, not independent proof of new application behavior.
 
-D03 owns `docs/design/first-bom/` scenario inputs; this packet owns only its `verification/` subtree. At kickoff #10 had no manifest. Do not substitute SU/SCX numbers or create a competing population manifest. Final expected BOM/allocation files must wait for the exact D03 input commit, then be reviewed by lead. AC1 below is an explicitly separate accepted synthetic counterexample, not the scenario's switch profile.
+D03 owns `docs/design/first-bom/` scenario inputs; this packet owns only its `verification/` subtree. At kickoff #10 had no manifest. The early FB-01 manifest is now pinned below; no SU/SCX populations were silently combined. Final application identity/allocation projections still require D03/arch reconciliation and lead review. AC1 below is an explicitly separate accepted synthetic counterexample, not the scenario's switch profile.
 
 For each frozen expected result record: case ID, exact source manifest path/commit and SHA-256 bytes, explicit input mutations, handwritten derivation, expected quantities/states/diagnostics and coverage exclusions. Enumerate owned occurrences and shared requirement IDs from source inputs; never import the engine, copy generated output or bless a failing actual as a new golden. The verifier may normalize export fields, but must not reconstruct missing actual values from expected data. A changed oracle needs a source change or corrected derivation, a diff and independent disposition.
 
@@ -68,7 +68,7 @@ python3 -I docs/design/first-bom/verification/check_ac1.py --actual /tmp/hh-aid-
 
 Exit nonzero on differences. Matching JSON alone does not prove its producer is an application: capture producer command, app commit, input digests and raw outputs. The helper is a narrow resource oracle, not the final BOM comparator or allocator.
 
-Proposed commands for #14 (NOT implemented or executed): `experiment-check generate --manifest PATH --export DIR`, `experiment-check lifecycle --manifest PATH --workdir DIR`, `experiment-check verify --expected PATH --actual DIR`, and `experiment-check measure --manifest PATH --repeats 5`. Arch owns the runnable app/adapter command and persistence teardown; parts owns frozen expectations and independent comparison. Lead must reconcile these names and export shape before build dispatch. Final manifest cases and comparator will be added here after D03 handoff, without changing app storage requirements.
+Proposed commands for #14 (NOT implemented or executed): `experiment-check generate --manifest PATH --export DIR`, `experiment-check lifecycle --manifest PATH --workdir DIR`, `experiment-check verify --expected PATH --actual DIR`, and `experiment-check measure --manifest PATH --repeats 5`. Arch owns the runnable app/adapter command and persistence teardown; parts owns frozen expectations and independent comparison. Lead must reconcile these names and export shape before build dispatch. The count projection below is now executable; full application identity/lifecycle comparison remains future harness work, without prescribing app storage.
 
 ## Minimal performance evidence
 
@@ -86,8 +86,8 @@ Schema, upstream admission, runtime behavior, hardware qualification and perform
 
 | Original #11 criterion | This packet / remaining scope |
 | --- | --- |
-| Port/coverage/lane/rail/redundancy/compatibility/uplink/BOM checks | V01–V07/V12 obligations defined; scenario-specific expected counts and D03 sizing review pending; physical tuple qualification deferred |
-| Golden/manual, property, metamorphic and invalid cases | AC1 executable; V01–V12 and mutations specified; full manifest goldens and app harness pending |
+| Port/coverage/lane/rail/redundancy/compatibility/uplink/BOM checks | V01–V07/V12 obligations defined; FB-01 count expectations below; complete D03 sizing review pending; physical tuple qualification deferred |
+| Golden/manual, property, metamorphic and invalid cases | AC1 executable; V01–V12 and mutations specified; FB-01 count oracle executable; full app identity/lifecycle harness pending |
 | Evidence layers, topology coverage, upgrades | Layers above; V11 controlled revision; exhaustive supported-topology/NOS coverage and live upgrade regressions deferred |
 | Performance/reproducibility/gates | Measurement protocol and proposed thresholds; actual application measurements pending #14 |
 | Versions, facts and reproducibility | Exact checkpoint pins, independent AC1 source and runnable helper; no fresh release assertion |
@@ -95,6 +95,26 @@ Schema, upstream admission, runtime behavior, hardware qualification and perform
 
 D03 review checklist, to post in #10 by criterion after its exact handoff: coherent manifest and provenance; independent owned/shared quantities; sizing proof versus bound; all configured budgets including unused mode; reservation/parent-child/exhaustion diagnostics; deterministic inputs/outputs; retained missing infrastructure; deferred topology coverage. Record accepted/changes requested/blocked per criterion with source-line evidence. Do not accept the packet merely because its author assertions pass.
 
+## FB-01 independent results (early manifest r1)
+
+Input: [scenario.json at 9aa448a32deb62f57629ac0e5f3480ba95faab7d](https://github.com/afewell-hh/hh-aid/blob/9aa448a32deb62f57629ac0e5f3480ba95faab7d/docs/design/first-bom/scenario.json), SHA-256 `9200061edb0571a58a46fe04c7921898783db6601c615169792963667900d723`. Expected data: `first-bom/verification/fb01-expected.json`. Its helper reads pinned inputs with `git show`, checks the hash, enumerates occurrences/paths, and never reads `author_expected` or mutation expected fields. Ensure this input commit is fetched when reproducing in a new clone. Python 3.9+ standard library; no network during checking.
+
+```sh
+python3 -I docs/design/first-bom/verification/check_fb01.py
+```
+
+Optional `--actual /tmp/hh-aid-fb01-actual.json` compares exactly the baseline/count_A3 projection against the frozen values. This is a count checker, not a substitute for occurrence-level allocation or lifecycle tests. The source hash protects its deliberately fixture-specific mode/pairing assumptions.
+
+Hand derivation: A has two occurrences, each with 1 chassis+8 BE NICs+1 FE DPU+2 cords; B has two occurrences, each with 1 chassis+2 FE NICs+2 cords. The separate component vector is A chassis2, B chassis2, BE NIC16, FE DPU2, B FE NIC4, cords8. Included vector is accelerators16, PSUs8, rail kits4, BMC4, disks8; four accessory requirements have unknown purchasing inclusion. These are per-line quantities, not a homogeneous physical-item KPI.
+
+FE: four servers ×2 links =8 server modules; four independent paths per hypothetical parent module means2 switch modules, hence10 modules, not16. BE: eight rails ×two servers =16 links; one two-tail assembly per rail gives8 assemblies. Four physical servers and6 management interfaces remain single populations across attachments. All six INF-* lines keep unknown quantity, including leaves (conditional bound only), spine, uplink media, control/gateway, OOB and ancillaries.
+
+FE configuration:32 parents×4+32 uplinks×1+2 auxiliaries=162 configured;31×4=124 selected;4 configured children on unused32; maximum paired pipeline usage8. BE:32×2+32+2=98;31×2=62 selected;unused2; maximum pipeline4. Required parent modules/assemblies are2 FE and8 BE;31 selected parents/context yield capacity lower bounds1 FE and1 BE. This is not an exact topology or a feasibility proof: placement, peers, service, host/assembly qualification and infrastructure remain unresolved. Auxiliary modes remain configured despite exclusion from allocation.
+
+A03 mutation: components A chassis3, B chassis2, BE NIC24, FE DPU3, B FE NIC4, cords10;5 accessories unresolved. FE10 links requires10 server+3 switch modules with2 reserved parent children. BE three servers per rail needs two assemblies per rail:16 assemblies for24 active links with8 parked tails, not12 assemblies from unrestricted global pairing. Management8. Installed includes accelerators24, PSUs10, kits5, BMC5, disks8. DPU replacement adds2 adapters and2 management interfaces at base population without changing FE links or server counts.
+
+Unused FE32 unknown:31×4+32+2=158 known configured, total unknown; pipeline15 retains known contribution4 from parent29 and unknown contribution from32. Selected124 remains known but feasibility unresolved. Restrict FE selection to one four-child parent:8 demands exceed one switch's4 candidates by4; conditional switch lower bound2, no borrowing uplinks. Catalog limit10→6 makes FE maximum8 conflict while BE4 is only within-budget, not qualified. Locked-binding and stale-inspection changes need actual state-transition tests; no assertion of implemented behavior.
+
 ## Current handoff state
 
-Completed now: bounded strategy, adapter proposal, independent AC1 inputs/expected projections and corruption detection. Pending: exact #10 manifest, final scenario oracle and D03 review; arch interface reconciliation; lead acceptance. No current application behavior, upstream execution, hardware, user study or application timing/memory run is claimed. See #11 for actual commands/results and exact draft commit. Continue dependent work when #10 posts; no new specialist session requested.
+Completed now: bounded strategy, adapter proposal, independent AC1 and pinned FB-01 count expectations/checkers. Pending: full D03 decision-packet review, application occurrence/identity and lifecycle harness, arch interface reconciliation, lead acceptance. No current application behavior, upstream execution, hardware, user study or application timing/memory run is claimed. See #11 for actual commands/results and exact draft commit. Continue dependent work when #10 posts; no new specialist session requested.
