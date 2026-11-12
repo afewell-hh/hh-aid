@@ -1,0 +1,102 @@
+[
+  {
+    "run": 1,
+    "output": "af72545e2c42ee9d42de17573c6da5499934b3465689b189b168365fb1ec0621",
+    "export_sha256": "2452ecaedcd9a76facc6fc16367395148bf314419ecc8771ff9ed23ef0d049e5",
+    "checks": {
+      "servers": 4000,
+      "demands": 24000,
+      "requirements": 17009,
+      "units": 10000,
+      "reviewRows": 3002,
+      "assigned": 24000
+    },
+    "modules_and_assemblies": {
+      "fe_server_optic_200G": 8,
+      "fe_switch_optic_4x200G": 2,
+      "be_split_dac_2x400G": 8
+    },
+    "accounting_pass": false,
+    "management": 6001
+  },
+  {
+    "run": 2,
+    "output": "af72545e2c42ee9d42de17573c6da5499934b3465689b189b168365fb1ec0621",
+    "export_sha256": "2452ecaedcd9a76facc6fc16367395148bf314419ecc8771ff9ed23ef0d049e5",
+    "checks": {
+      "servers": 4000,
+      "demands": 24000,
+      "requirements": 17009,
+      "units": 10000,
+      "reviewRows": 3002,
+      "assigned": 24000
+    },
+    "modules_and_assemblies": {
+      "fe_server_optic_200G": 8,
+      "fe_switch_optic_4x200G": 2,
+      "be_split_dac_2x400G": 8
+    },
+    "accounting_pass": false,
+    "management": 6001
+  },
+  {
+    "run": 3,
+    "output": "af72545e2c42ee9d42de17573c6da5499934b3465689b189b168365fb1ec0621",
+    "export_sha256": "2452ecaedcd9a76facc6fc16367395148bf314419ecc8771ff9ed23ef0d049e5",
+    "checks": {
+      "servers": 4000,
+      "demands": 24000,
+      "requirements": 17009,
+      "units": 10000,
+      "reviewRows": 3002,
+      "assigned": 24000
+    },
+    "modules_and_assemblies": {
+      "fe_server_optic_200G": 8,
+      "fe_switch_optic_4x200G": 2,
+      "be_split_dac_2x400G": 8
+    },
+    "accounting_pass": false,
+    "management": 6001
+  },
+  {
+    "run": 4,
+    "output": "af72545e2c42ee9d42de17573c6da5499934b3465689b189b168365fb1ec0621",
+    "export_sha256": "2452ecaedcd9a76facc6fc16367395148bf314419ecc8771ff9ed23ef0d049e5",
+    "checks": {
+      "servers": 4000,
+      "demands": 24000,
+      "requirements": 17009,
+      "units": 10000,
+      "reviewRows": 3002,
+      "assigned": 24000
+    },
+    "modules_and_assemblies": {
+      "fe_server_optic_200G": 8,
+      "fe_switch_optic_4x200G": 2,
+      "be_split_dac_2x400G": 8
+    },
+    "accounting_pass": false,
+    "management": 6001
+  },
+  {
+    "run": 5,
+    "output": "af72545e2c42ee9d42de17573c6da5499934b3465689b189b168365fb1ec0621",
+    "export_sha256": "2452ecaedcd9a76facc6fc16367395148bf314419ecc8771ff9ed23ef0d049e5",
+    "checks": {
+      "servers": 4000,
+      "demands": 24000,
+      "requirements": 17009,
+      "units": 10000,
+      "reviewRows": 3002,
+      "assigned": 24000
+    },
+    "modules_and_assemblies": {
+      "fe_server_optic_200G": 8,
+      "fe_switch_optic_4x200G": 2,
+      "be_split_dac_2x400G": 8
+    },
+    "accounting_pass": false,
+    "management": 6001
+  }
+]

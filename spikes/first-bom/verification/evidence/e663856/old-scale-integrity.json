@@ -1,0 +1,57 @@
+[
+  {
+    "run": 1,
+    "export_sha256": "fec3ed886cf8515d16e18a763a4c71a1b282931e5230b17459105340be00cfca",
+    "members": 24000,
+    "supplies": {
+      "fe_server_optic_200G": 8,
+      "fe_switch_optic_4x200G": 2,
+      "be_split_dac_2x400G": 8
+    },
+    "rss_matches_raw": true
+  },
+  {
+    "run": 2,
+    "export_sha256": "fec3ed886cf8515d16e18a763a4c71a1b282931e5230b17459105340be00cfca",
+    "members": 24000,
+    "supplies": {
+      "fe_server_optic_200G": 8,
+      "fe_switch_optic_4x200G": 2,
+      "be_split_dac_2x400G": 8
+    },
+    "rss_matches_raw": true
+  },
+  {
+    "run": 3,
+    "export_sha256": "fec3ed886cf8515d16e18a763a4c71a1b282931e5230b17459105340be00cfca",
+    "members": 24000,
+    "supplies": {
+      "fe_server_optic_200G": 8,
+      "fe_switch_optic_4x200G": 2,
+      "be_split_dac_2x400G": 8
+    },
+    "rss_matches_raw": true
+  },
+  {
+    "run": 4,
+    "export_sha256": "fec3ed886cf8515d16e18a763a4c71a1b282931e5230b17459105340be00cfca",
+    "members": 24000,
+    "supplies": {
+      "fe_server_optic_200G": 8,
+      "fe_switch_optic_4x200G": 2,
+      "be_split_dac_2x400G": 8
+    },
+    "rss_matches_raw": true
+  },
+  {
+    "run": 5,
+    "export_sha256": "fec3ed886cf8515d16e18a763a4c71a1b282931e5230b17459105340be00cfca",
+    "members": 24000,
+    "supplies": {
+      "fe_server_optic_200G": 8,
+      "fe_switch_optic_4x200G": 2,
+      "be_split_dac_2x400G": 8
+    },
+    "rss_matches_raw": true
+  }
+]

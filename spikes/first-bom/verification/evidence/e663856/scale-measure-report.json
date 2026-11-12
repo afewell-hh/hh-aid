@@ -1,0 +1,94 @@
+{
+  "app_commit": "e663856dfde0a0a1247d9812759164d617a000ee",
+  "harness_commit": "10b0cdc84b563257d68c3322c283279c99673799",
+  "platform": "macOS-26.5-arm64-arm-64bit",
+  "processor": "arm",
+  "config_sha256": "4307a7792653fff17ede30fac5fc6e199b16f81a52f0028c5f3a885bd20a6628",
+  "manifest_sha256": "9200061edb0571a58a46fe04c7921898783db6601c615169792963667900d723",
+  "measurement": "/usr/bin/time process-tree peak RSS; not sum of concurrent process peaks",
+  "verification": "pending: run independent member/history checks on each export",
+  "samples": [
+    {
+      "run": 1,
+      "command": [
+        "./experiment-check",
+        "generate",
+        "--scale",
+        "1000",
+        "--config",
+        "scale",
+        "--export",
+        "/private/tmp/hhaid-s02-scale-final/1/export"
+      ],
+      "wall_seconds": 9.857665917,
+      "peak_rss_bytes": 1471102976,
+      "exit_code": 0
+    },
+    {
+      "run": 2,
+      "command": [
+        "./experiment-check",
+        "generate",
+        "--scale",
+        "1000",
+        "--config",
+        "scale",
+        "--export",
+        "/private/tmp/hhaid-s02-scale-final/2/export"
+      ],
+      "wall_seconds": 9.155165125,
+      "peak_rss_bytes": 1480130560,
+      "exit_code": 0
+    },
+    {
+      "run": 3,
+      "command": [
+        "./experiment-check",
+        "generate",
+        "--scale",
+        "1000",
+        "--config",
+        "scale",
+        "--export",
+        "/private/tmp/hhaid-s02-scale-final/3/export"
+      ],
+      "wall_seconds": 9.258454375,
+      "peak_rss_bytes": 1460617216,
+      "exit_code": 0
+    },
+    {
+      "run": 4,
+      "command": [
+        "./experiment-check",
+        "generate",
+        "--scale",
+        "1000",
+        "--config",
+        "scale",
+        "--export",
+        "/private/tmp/hhaid-s02-scale-final/4/export"
+      ],
+      "wall_seconds": 9.360956999999999,
+      "peak_rss_bytes": 1518436352,
+      "exit_code": 0
+    },
+    {
+      "run": 5,
+      "command": [
+        "./experiment-check",
+        "generate",
+        "--scale",
+        "1000",
+        "--config",
+        "scale",
+        "--export",
+        "/private/tmp/hhaid-s02-scale-final/5/export"
+      ],
+      "wall_seconds": 9.260301125000005,
+      "peak_rss_bytes": 1476624384,
+      "exit_code": 0
+    }
+  ],
+  "median_seconds": 9.260301125000005,
+  "max_seconds": 9.857665917
+}

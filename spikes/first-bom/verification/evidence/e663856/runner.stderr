@@ -1,0 +1,9 @@
+file:///Users/arthurfewell/git/afewell-hh/hh-aid-build/spikes/first-bom/src/store/store.ts:82
+    if (sha256(text) !== id) throw new Error(`document ${id} digest mismatch`);
+                                   ^
+
+Error: document bca6ec67e133028ca7977514d628217cbb55bf04820bb8cc4739f6d5cf30e053 digest mismatch
+    at ProjectStore.get (file:///Users/arthurfewell/git/afewell-hh/hh-aid-build/spikes/first-bom/src/store/store.ts:82:36)
+    at run (file:///Users/arthurfewell/git/afewell-hh/hh-aid-build/spikes/first-bom/src/store/store.ts:100:131)
+
+Node.js v26.13.0

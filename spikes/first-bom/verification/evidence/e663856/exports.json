@@ -1,0 +1,132 @@
+{
+  "baseline": {
+    "output": "a40a0ac462eca66086c01add15cf5c47e91ae4ca60536ec7990b97f8ac32f499",
+    "export_sha256": "216fff6a0456e509c2894599acb9600262b75f7d72a1ecd5260ea3c3ed630483",
+    "documents": 11,
+    "checks": {
+      "servers": 4,
+      "demands": 24,
+      "requirements": 17,
+      "units": 10,
+      "reviewRows": 3,
+      "assigned": 24
+    }
+  },
+  "count": {
+    "output": "9666d34a11efef5b06670d319220ab7fdee09acac91d2d8b8347c75a6ccb7a20",
+    "export_sha256": "6eaaa22f3903a9c77da6cb850fefe23d347d929a2e6452ada8d9f7e5973c9280",
+    "documents": 13,
+    "checks": {
+      "servers": 5,
+      "demands": 34,
+      "requirements": 17,
+      "units": 19,
+      "reviewRows": 3,
+      "assigned": 34
+    }
+  },
+  "dpu": {
+    "output": "f724ce0a059155a9e90b5aaec0202c88a4008f51c97bcea6b6a37af458450b7b",
+    "export_sha256": "9680dbabb427e4e53c97517be976abb86cb60ab622440b09557ee305b076f2fa",
+    "documents": 13,
+    "checks": {
+      "servers": 4,
+      "demands": 24,
+      "requirements": 17,
+      "units": 10,
+      "reviewRows": 3,
+      "assigned": 24
+    }
+  },
+  "unknown": {
+    "output": "227e19a04f3898bf1ceda7a4cffd69d99cd101232894e10426813c1156afab2b",
+    "export_sha256": "dcc7b2dd561bb10e4dd9daa2aa7359418cb75f5770424b63a8671f2db279ae5c",
+    "documents": 13,
+    "checks": {
+      "servers": 4,
+      "demands": 24,
+      "requirements": 17,
+      "units": 10,
+      "reviewRows": 3,
+      "assigned": 16
+    }
+  },
+  "exhaust": {
+    "output": "64a9d65f461e02508347c804ebc17f670546518f264cfdcf49e948fa3f4f3725",
+    "export_sha256": "5cfdaac5a4842a59a1f1105ea525ac278c211ca35d0ea82b718f78816569997f",
+    "documents": 13,
+    "checks": {
+      "servers": 4,
+      "demands": 24,
+      "requirements": 17,
+      "units": 10,
+      "reviewRows": 3,
+      "assigned": 20
+    }
+  },
+  "lock": {
+    "output": "da2e7516135b939c0f6bb619bd68179ba4393bd6f87446db16737cdaf88950c1",
+    "export_sha256": "88564d09cfc0d5d19879ba88ece0d89a02b6b78647f31f284d7c809704a85eb5",
+    "documents": 13,
+    "checks": {
+      "servers": 4,
+      "demands": 24,
+      "requirements": 17,
+      "units": 10,
+      "reviewRows": 3,
+      "assigned": 20
+    }
+  },
+  "over-budget": {
+    "output": "4edad747be5ba7b23bbb92d69185a22bc3a6327600a7289278c1751dab73fe17",
+    "export_sha256": "e67cb74b62c6f40097308dab619582879d4a383109a903b5b4b9b09cde3d8e2e",
+    "documents": 11,
+    "checks": {
+      "servers": 0,
+      "demands": 0,
+      "requirements": 0,
+      "units": 0,
+      "reviewRows": 0,
+      "assigned": 0
+    }
+  },
+  "reserve-selected": {
+    "output": "d8f32acdd7d2d243fd33b19a8da2318d3835cef9cd26a0bfec9d11f0be25b61f",
+    "export_sha256": "b332d471fc39aea1d15fe50bde80842c7f4f7501d8fca5e60c6a1814b6e0e543",
+    "documents": 11,
+    "checks": {
+      "servers": 0,
+      "demands": 0,
+      "requirements": 0,
+      "units": 0,
+      "reviewRows": 0,
+      "assigned": 0
+    }
+  },
+  "reserve-unselected": {
+    "output": "4bc9daefcb388d2cd16933ab1555c2dc0c9ff1b55fb874ef272e298b2415fc34",
+    "export_sha256": "2fefd959ff828c0c7896a08e82a791d746fa24b3531cebebd71ed871c3bc0c4b",
+    "documents": 11,
+    "checks": {
+      "servers": 0,
+      "demands": 0,
+      "requirements": 0,
+      "units": 0,
+      "reviewRows": 0,
+      "assigned": 0
+    }
+  },
+  "unused-mode-unknown": {
+    "output": "3bafaba0b45c8d22bb050f4594216836f9aa8042e0977df1978a3f4c2cabc5cb",
+    "export_sha256": "1548bf925cb044090ff79fcb09ee79c2217caca73a8ff8847acec34119ab2e26",
+    "documents": 11,
+    "checks": {
+      "servers": 0,
+      "demands": 0,
+      "requirements": 0,
+      "units": 0,
+      "reviewRows": 0,
+      "assigned": 0
+    }
+  }
+}

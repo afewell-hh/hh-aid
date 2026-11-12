@@ -1,0 +1,72 @@
+{
+  "old": "a40a0ac462eca66086c01add15cf5c47e91ae4ca60536ec7990b97f8ac32f499",
+  "new": "71c315450bf8c634dcb9154567cbd88f45196b58f312c048ddd6bc8ecd867cd7",
+  "records": [
+    {
+      "args": [
+        "import",
+        "/var/folders/xg/hdzs8trs459_0422bq812z480000gn/T/hhaid-s02-7p7o1h6e/baseline/project.hhaid.json",
+        "/tmp/hhaid-s02-physical/project"
+      ],
+      "code": 0,
+      "stdout": "{\n \"head\": \"fafbd89cc97ccff7081889f2c4cb804e8669f65102432b0097caa12bc9c6b02f\"\n}\n",
+      "stderr": ""
+    },
+    {
+      "args": [
+        "review",
+        "/tmp/hhaid-s02-physical/project",
+        "--output",
+        "a40a0ac462eca66086c01add15cf5c47e91ae4ca60536ec7990b97f8ac32f499",
+        "--row",
+        "ROW/6272fba3d1209511",
+        "--fields",
+        "sideA.cage"
+      ],
+      "code": 1,
+      "stdout": "",
+      "stderr": "hhaid review: cannot record inspection of unknown fields: sideA.cage (unknown is not known)\n"
+    },
+    {
+      "args": [
+        "edit",
+        "/tmp/hhaid-s02-physical/project",
+        "--patch",
+        "/tmp/hhaid-s02-physical/patch.json"
+      ],
+      "code": 0,
+      "stdout": "{\n \"id\": \"2899ed06551f4b2058bc690a53855f64bf5b2ba58a13aca86f06fefb19629e36\",\n \"unchanged\": false,\n \"classScope\": [],\n \"impact\": {\n  \"changed\": {\n   \"classes\": [],\n   \"populations\": [],\n   \"contexts\": [],\n   \"networks\": [],\n   \"constructions\": [\n    \"FE-OPT\"\n   ],\n   \"evidence\": false\n  },\n  \"affectedPurchaseLines\": [],\n  \"affectedReviewRows\": [\n   \"ROW/6272fba3d1209511\",\n   \"ROW/634c54907227ebdc\"\n  ],\n  \"affectedLedgers\": []\n }\n}\n",
+      "stderr": ""
+    },
+    {
+      "args": [
+        "assess",
+        "/tmp/hhaid-s02-physical/project"
+      ],
+      "code": 0,
+      "stdout": "{\n \"head\": \"2899ed06551f4b2058bc690a53855f64bf5b2ba58a13aca86f06fefb19629e36\",\n \"currentOutput\": null,\n \"outputs\": [\n  {\n   \"id\": \"a40a0ac462eca66086c01add15cf5c47e91ae4ca60536ec7990b97f8ac32f499\",\n   \"inputRevision\": 1,\n   \"outcome\": \"complete\",\n   \"config\": \"interactive\",\n   \"status\": \"stale\",\n   \"reasons\": [\n    \"input revision 1 is not the current head (revision 2)\"\n   ],\n   \"isCurrent\": false\n  }\n ],\n \"reviews\": []\n}\n",
+      "stderr": ""
+    },
+    {
+      "args": [
+        "generate",
+        "/tmp/hhaid-s02-physical/project"
+      ],
+      "code": 0,
+      "stdout": "{\n \"outcome\": \"complete\",\n \"outputId\": \"71c315450bf8c634dcb9154567cbd88f45196b58f312c048ddd6bc8ecd867cd7\",\n \"message\": \"complete\",\n \"completedStages\": [\n  \"S1\",\n  \"S2\",\n  \"S3\",\n  \"S4\",\n  \"S5\"\n ],\n \"reusedStages\": []\n}\n",
+      "stderr": ""
+    },
+    {
+      "args": [
+        "export",
+        "/tmp/hhaid-s02-physical/project",
+        "-o",
+        "/tmp/hhaid-s02-physical/export.json"
+      ],
+      "code": 0,
+      "stdout": "{\n \"bytes\": 261635\n}\n",
+      "stderr": ""
+    }
+  ],
+  "checks": "unknown inspection rejected; per-end edits/stale/regroup/history/BOM invariance passed"
+}
