@@ -16,6 +16,17 @@ const ROOT_KIND: Record<RootList, Kind> = { inputs: 'InputRevision', outputs: 'O
 export interface ProjectIndex { kind: 'ProjectIndex'; format: 'hhaid/1'; projectId: string; name: string; previous: string | null; inputHead: string | null; roots: Record<RootList, string[]> }
 
 export const EXPORT_FORMAT = 'hhaid-export/1';
+const DIGEST = /^[0-9a-f]{64}$/;
+
+/** A write computed from an input head that is no longer current. Never acknowledged; the caller must reload. */
+export class StaleWriteError extends Error {
+  readonly base: string | null; readonly actual: string | null;
+  constructor(expected: string | null, actual: string | null) {
+    super(`stale write: change was based on input ${expected?.slice(0, 12) ?? '(none)'} but the current input is ${actual?.slice(0, 12) ?? '(none)'}; reload and reapply`);
+    this.name = 'StaleWriteError'; this.base = expected; this.actual = actual;
+  }
+}
+export type CommitDelta = { add?: Partial<Record<RootList, string[]>>; inputHead?: string; expectInputHead?: string | null };
 export const IMPORT_MAX_BYTES = 256 * 1024 * 1024;
 
 function writeAtomic(path: string, data: string) {
@@ -27,6 +38,7 @@ function writeAtomic(path: string, data: string) {
 export class ProjectStore {
   readonly dir: string;
   private queue: Promise<unknown> = Promise.resolve();
+  private inputQueue: Promise<unknown> = Promise.resolve();
   private locked = false;
   private constructor(dir: string) { this.dir = dir; }
 
@@ -76,10 +88,13 @@ export class ProjectStore {
   index(): ProjectIndex { return this.get<ProjectIndex>(this.headId()); }
 
   /** Serialized commit: documents first, then a new index, then HEAD. Concurrent callers queue. */
-  commit(actor: string, action: string, f: (idx: ProjectIndex) => { add?: Partial<Record<RootList, string[]>>; inputHead?: string } | null): Promise<string> {
+  commit(actor: string, action: string, f: (idx: ProjectIndex) => CommitDelta | null): Promise<string> {
     const run = async () => {
       const prevId = this.headId(); const prev = this.get<ProjectIndex>(prevId);
       const delta = f(prev); if (!delta) return prevId;
+      // Compare-and-set on the input head: a write derived from an older input is rejected, never applied.
+      if (delta.expectInputHead !== undefined && delta.expectInputHead !== prev.inputHead) throw new StaleWriteError(delta.expectInputHead, prev.inputHead);
+      if (delta.inputHead !== undefined && delta.expectInputHead === undefined) throw new Error('an input-head change must state the input head it was derived from');
       const roots = structuredClone(prev.roots);
       for (const [k, ids] of Object.entries(delta.add ?? {}) as [RootList, string[]][]) {
         for (const id of ids) { if (!this.has(id)) throw new Error(`commit references missing document ${id}`); const kind = this.get(id).kind; if (kind !== ROOT_KIND[k]) throw new Error(`${id} is ${kind}, not ${ROOT_KIND[k]}`); }
@@ -92,6 +107,12 @@ export class ProjectStore {
       return id;
     };
     const p = this.queue.then(run, run); this.queue = p.catch(() => undefined); return p;
+  }
+  /** Serialize a complete read-modify-write of the input head (read state, derive, put, commit). Every
+   * operation that moves inputHead runs inside this, so concurrent requests in one process apply in turn
+   * against the latest head; the commit's expectInputHead check backs this up. */
+  withInputLock<T>(f: () => Promise<T>): Promise<T> {
+    const p = this.inputQueue.then(f, f); this.inputQueue = p.catch(() => undefined); return p;
   }
   audit(actor: string, action: string, ids: string[], extra: Record<string, unknown> = {}) {
     appendFileSync(join(this.dir, 'audit.log'), JSON.stringify({ at: new Date().toISOString(), actor, action, ids, ...extra }) + '\n');
@@ -125,34 +146,51 @@ export class ProjectStore {
     return canonicalize(doc);
   }
 
-  /** Strict import into a clean directory (architecture-options.md §4 reimport steps 1–8). */
+  /** Strict import into a clean directory (architecture-options.md §4 reimport steps 1–8). Everything is
+   * validated before any file is written; a failure while writing removes what this import created. */
   static importText(text: string, dir: string, actor = 'local-user'): ProjectStore {
     const data = parseStrictJson(text, IMPORT_MAX_BYTES) as any;                                   // 1–2
+    if (data === null || typeof data !== 'object' || Array.isArray(data)) throw new Error('export is not an object');
     const keys = Object.keys(data).sort(byId).join(',');
     if (keys !== 'documents,format,head' && keys !== 'audit,documents,format,head') throw new Error(`unknown export members: ${keys}`);
-    if (data.format !== EXPORT_FORMAT) throw new Error(`unsupported export format ${data.format}`);   // 8
+    if (data.format !== EXPORT_FORMAT) throw new Error(`unsupported export format ${JSON.stringify(data.format)}`);   // 8
+    if (typeof data.head !== 'string' || !DIGEST.test(data.head)) throw new Error(`export head must be a document digest, got ${JSON.stringify(data.head)}`);
+    if (!Array.isArray(data.documents)) throw new Error('export documents must be an array');
+    if ('audit' in data && (!Array.isArray(data.audit) || data.audit.some((l: unknown) => typeof l !== 'string'))) throw new Error('export audit must be an array of strings');
     const docs = new Map<string, any>();
     for (const d of data.documents) {
-      if (Object.keys(d).sort(byId).join(',') !== 'content,id') throw new Error('malformed document entry');
+      if (d === null || typeof d !== 'object' || Array.isArray(d) || Object.keys(d).sort(byId).join(',') !== 'content,id') throw new Error('malformed document entry');
+      if (typeof d.id !== 'string' || !DIGEST.test(d.id)) throw new Error('document id must be a digest');
       validateDocument(d.content);                                                                   // 3 (+8 unknown fields)
       if (sha256(canonicalize(d.content)) !== d.id) throw new Error(`digest mismatch for ${d.id}`);  // 4
       if (docs.has(d.id)) throw new Error(`duplicate document ${d.id}`); docs.set(d.id, d.content);
     }
+    if (!docs.has(data.head)) throw new Error(`export head ${data.head.slice(0, 12)} is not among the exported documents`);
+    if (docs.get(data.head).kind !== 'ProjectIndex') throw new Error(`export head ${data.head.slice(0, 12)} is a ${docs.get(data.head).kind}, not a ProjectIndex`);
     const get = (id: string) => { const c = docs.get(id); if (!c) throw new Error(`unresolved reference ${id}`); return c; };
     // 5: closure from head, acyclic chain; 6: no unreachable extras; 7: consistency
-    const reach = new Set<string>(); const stack: string[] = []; const chain = new Set<string>();
+    const reach = new Set<string>(); const stack: string[] = []; const chain: string[] = [];
     let id: string | null = data.head;
-    while (id) { if (chain.has(id)) throw new Error('index chain cycle'); chain.add(id); const idx = get(id); if (idx.kind !== 'ProjectIndex') throw new Error('head chain contains a non-index'); reach.add(id); for (const r of ROOT_LISTS) for (const x of idx.roots[r]) { if (get(x).kind !== ROOT_KIND[r]) throw new Error(`root ${x} has wrong kind`); stack.push(x); } id = idx.previous; }
+    while (id !== null) { if (chain.includes(id)) throw new Error('index chain cycle'); chain.push(id); const idx = get(id); if (idx.kind !== 'ProjectIndex') throw new Error('head chain contains a non-index'); reach.add(id); for (const r of ROOT_LISTS) for (const x of idx.roots[r]) { if (get(x).kind !== ROOT_KIND[r]) throw new Error(`root ${x} has wrong kind`); stack.push(x); } id = idx.previous; }
     while (stack.length) { const d = stack.pop()!; if (reach.has(d)) continue; reach.add(d); stack.push(...referencesOf(get(d))); }
     const extras = [...docs.keys()].filter(k => !reach.has(k)); if (extras.length) throw new Error(`export carries ${extras.length} unreachable document(s)`);
+    checkIndexChain(chain.map(c => [c, get(c)]), get);
     for (const [k, c] of docs) checkConsistency(k, c, get);
-    if (existsSync(join(dir, 'HEAD'))) throw new Error(`${dir} is not empty`);
+    if (existsSync(dir) && readdirSync(dir).length) throw new Error(`${dir} is not empty`);
+    const created = !existsSync(dir);
     mkdirSync(join(dir, 'docs'), { recursive: true });
-    const s = new ProjectStore(dir); s.acquire();
-    for (const c of docs.values()) s.put(c);
-    writeAtomic(join(dir, 'HEAD'), data.head + '\n');
-    s.audit(actor, 'import', [data.head], { documents: docs.size });
-    return s;
+    let s: ProjectStore | null = null;
+    try {
+      s = new ProjectStore(dir); s.acquire();
+      for (const c of docs.values()) s.put(c);
+      writeAtomic(join(dir, 'HEAD'), data.head + '\n');
+      s.audit(actor, 'import', [data.head], { documents: docs.size });
+      return s;
+    } catch (e) {
+      s?.close();
+      if (created) rmSync(dir, { recursive: true, force: true }); else for (const f of readdirSync(dir)) rmSync(join(dir, f), { recursive: true, force: true });
+      throw e;
+    }
   }
 }
 
@@ -169,6 +207,22 @@ export function referencesOf(c: any): string[] {
     case 'ProjectIndex': return [...(c.previous ? [c.previous] : [])];
     default: throw new Error(`unknown kind ${c.kind}`);
   }
+}
+/** Index chain consistency (newest first): one project, append-only roots, and an input head that resolves to
+ * a listed InputRevision of the same project (or null only before seeding). */
+function checkIndexChain(chain: [string, ProjectIndex][], get: (id: string) => any) {
+  const [, head] = chain[0]!;
+  chain.forEach(([id, idx], i) => {
+    if (idx.projectId !== head.projectId || idx.format !== head.format) throw new Error(`index ${id.slice(0, 12)} belongs to a different project`);
+    if (idx.inputHead !== null) {
+      const inp = get(idx.inputHead);
+      if (inp.kind !== 'InputRevision') throw new Error(`index ${id.slice(0, 12)} inputHead is a ${inp.kind}, not an InputRevision`);
+      if (!idx.roots.inputs.includes(idx.inputHead)) throw new Error(`index ${id.slice(0, 12)} inputHead is not listed in its input roots`);
+      if (inp.projectId !== idx.projectId) throw new Error(`index ${id.slice(0, 12)} inputHead belongs to project ${inp.projectId}`);
+    } else if (idx.roots.inputs.length) throw new Error(`index ${id.slice(0, 12)} lists inputs but has no inputHead`);
+    const older = chain[i + 1]?.[1];
+    if (older) for (const r of ROOT_LISTS) for (const x of older.roots[r]) if (!idx.roots[r].includes(x)) throw new Error(`index ${id.slice(0, 12)} drops root ${x.slice(0, 12)} (roots are append-only)`);
+  });
 }
 function checkConsistency(id: string, c: any, get: (id: string) => any) {
   const want = (ref: string, kind: string) => { if (get(ref).kind !== kind) throw new Error(`${id} references ${ref} as ${kind}`); };

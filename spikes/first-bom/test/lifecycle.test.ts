@@ -18,7 +18,8 @@ test('scoped staleness: after FB-COUNT a B-frontend inspection is retained, an A
   const a = cliJson('assess', dir); const byNote = (n: string) => a.reviews.find((r: any) => { const s = ProjectStore.open(dir); try { return s.get(r.id).note === n; } finally { s.close(); } });
   assert.equal(byNote('B frontend checked').status, 'retained within unchanged scope');
   assert.equal(byNote('A frontend checked').status, 'needs review');
-  assert.throws(() => cli('review', dir, '--output', o1, '--row', rowOf(out1, 'NET-FE', 'A').id, '--fields', 'pmd'), /unknown is not known/);
+  assert.throws(() => cli('review', dir, '--output', o1, '--row', rowOf(out1, 'NET-FE', 'A').id, '--fields', 'sideA.pmd'), /unknown is not known/);
+  assert.throws(() => cli('review', dir, '--output', o1, '--row', rowOf(out1, 'NET-FE', 'A').id, '--fields', 'pmd'), /not inspectable/);
 });
 test('diff after FB-COUNT reports regrouped FE modules and added assemblies, not only totals', () => {
   const dir = seededProject(); const o1 = cliJson('generate', dir).outputId; cli('edit', dir, '--mutation', 'FB-COUNT'); const o2 = cliJson('generate', dir).outputId;

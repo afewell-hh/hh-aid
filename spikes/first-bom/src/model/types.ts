@@ -57,6 +57,18 @@ export interface LeafContext {
   excludedPorts: string[];                  // e.g. auxiliary ports excluded from allocation
 }
 
+/** A physical attribute value at one end of a connection: a stated value, or a typed unknown. Values are
+ * engineering descriptors entered or sourced for manual inspection; none implies qualification. */
+export type Attr = string | Unknown;
+/** Independent attributes of one physical end (server end = side A, switch end = side B). Separate optics
+ * describe the module at that end; an integrated assembly describes that end of the assembly. */
+export interface PhysicalEnd { cage: Attr; connector: Attr; pmd?: Attr; reach?: Attr; fiber?: Attr; media?: Attr; length?: Attr; hostFit?: Attr }
+export type EndField = keyof PhysicalEnd;
+export const END_FIELDS: Record<'parent-module' | 'split-assembly', EndField[]> = {
+  'parent-module': ['cage', 'connector', 'pmd', 'reach', 'fiber'],
+  'split-assembly': ['cage', 'connector', 'media', 'length', 'hostFit'],
+};
+
 export interface Construction {
   id: string; network: string;
   kind: 'parent-module' | 'split-assembly';
@@ -65,7 +77,7 @@ export interface Construction {
   switchModulePerUnit: number;             // detachable modules at the switch end
   pairing: 'ordered' | 'same-rail';
   item: { serverModule?: string; switchModule?: string; assembly?: string };
-  unknownFields: string[];                  // e.g. pmd, connector, fiber_type, reach, length
+  ends: { server: PhysicalEnd; switch: PhysicalEnd };  // side A / side B physical attributes (END_FIELDS[kind])
   qualification: 'unknown';
   externalFiber?: string;
 }

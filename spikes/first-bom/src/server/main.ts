@@ -8,7 +8,7 @@ import { parseStrictJson } from '../contracts/json.ts';
 import { SPIKE_ROOT, assessProject, diff, edit, generate, refresh, review } from '../app/project.ts';
 import { RUN_CONFIGS } from '../engine/stages.ts';
 import type { RunHandle, RunResult } from '../runner/runner.ts';
-import { ProjectStore } from '../store/store.ts';
+import { ProjectStore, StaleWriteError } from '../store/store.ts';
 
 const args = process.argv.slice(2);
 const dir = args.find(a => !a.startsWith('--')) ?? (console.error('usage: main.ts <projectDir> [--port N]'), process.exit(2));
@@ -65,7 +65,7 @@ const server = createServer(async (req, res) => {
       if (req.method === 'POST' && r[0] === 'runs' && r[1] && r[2] === 'cancel') { const x = runs.get(r[1]); x?.handle.cancel('user-cancel'); return send(res, 200, { cancelled: !!x }); }
       if (req.method === 'POST' && r[0] === 'review') { const b = await body(req); return send(res, 200, { review: await review(store, actor, b.output, b.row, b.fields, b.note ?? '', b.excluded ?? []) }); }
       if (req.method === 'POST' && r[0] === 'diff') { const b = await body(req); return send(res, 200, await diff(store, actor, b.from, b.to)); }
-      if (req.method === 'POST' && r[0] === 'refresh') { const b = await body(req); const f = resolve(FIXTURE_REVISIONS, String(b.file)); if (!f.startsWith(FIXTURE_REVISIONS + sep)) return send(res, 400, { error: 'bad file' }); return send(res, 200, await refresh(store, actor, f)); }
+      if (req.method === 'POST' && r[0] === 'refresh') { const b = await body(req); const f = resolve(FIXTURE_REVISIONS, String(b.file)); if (!f.startsWith(FIXTURE_REVISIONS + sep)) return send(res, 400, { error: 'bad file' }); return send(res, 200, await refresh(store, actor, f, b.baseInput)); }
       if (req.method === 'GET' && r[0] === 'export') { res.writeHead(200, { 'content-type': 'application/json', 'content-disposition': `attachment; filename="${store.index().name.replace(/[^\w.-]/g, '_')}.hhaid.json"` }); return res.end(store.exportText()); }
       return send(res, 404, { error: 'unknown endpoint' });
     }
@@ -75,7 +75,7 @@ const server = createServer(async (req, res) => {
     if (!existsSync(file) || statSync(file).isDirectory()) file = join(UI, 'index.html');
     if (!existsSync(file)) return send(res, 503, 'UI not built: run npm run ui:build', 'text/plain');
     return send(res, 200, readFileSync(file, 'utf8'), TYPES[extname(file)] ?? 'application/octet-stream');
-  } catch (e) { return send(res, 400, { error: (e as Error).message }); }
+  } catch (e) { return send(res, e instanceof StaleWriteError ? 409 : 400, { error: (e as Error).message, ...(e instanceof StaleWriteError ? { stale: true, currentInput: e.actual } : {}) }); }
 });
 server.listen(port, '127.0.0.1', () => {
   const a = server.address(); const p = typeof a === 'object' && a ? a.port : port;

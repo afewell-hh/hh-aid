@@ -3,9 +3,9 @@
 // a function of (input state, evidence, run configuration, engine version, earlier stage results).
 import { byId, digestOf } from '../contracts/canonical.ts';
 import { type Q, ceilDiv, checkedAdd, checkedMul, isKnown, sumQ, unknown } from '../contracts/quantity.ts';
-import type { Construction, EvidenceSnapshot, LeafContext, ProjectState } from '../model/types.ts';
+import { END_FIELDS, type Construction, type EvidenceSnapshot, type LeafContext, type ProjectState } from '../model/types.ts';
 
-export const ENGINE_VERSION = 'hhaid-engine/0.1.0';
+export const ENGINE_VERSION = 'hhaid-engine/0.2.0';
 export const RULE_REVISION = 'FB-constructive-v1-proposed';
 
 export interface RunConfig {
@@ -247,6 +247,19 @@ export function s4(ctx: StageCtx) {
 }
 
 // ---------------------------------------------------------------- S5: acquisition, missing infrastructure, review rows
+/** One end's physical attributes in END_FIELDS order (only the fields defined for the construction kind). */
+function endOf(c: Construction, side: 'server' | 'switch') {
+  return Object.fromEntries(END_FIELDS[c.kind].map(f => [f, c.ends[side][f] ?? unknown('not-in-source', `construction ${c.id} ${side} end has no ${f}`)]));
+}
+/** Inspectable fields of a row and which of them are unknown (unknown fields cannot be recorded as inspected). */
+const ROW_SCALAR_FIELDS = ['sideA.classRevision', 'sideA.item', 'sideA.rate', 'sideB.mode', 'sideB.group', 'construction.kind', 'construction.linksPerUnit'];
+function rowFields(sig: any) {
+  const phys = (side: 'sideA' | 'sideB') => Object.entries(sig[side].physical as Record<string, unknown>).map(([f, v]) => ({ field: `${side}.${f}`, unknown: isUnknownValue(v) }));
+  const all = [...phys('sideA'), ...phys('sideB')];
+  const unknownFields = [...all.filter(x => x.unknown).map(x => x.field), ...(sig.sideB.mode === 'unknown' ? ['sideB.mode'] : [])];
+  return { inspectableFields: [...ROW_SCALAR_FIELDS, ...all.map(x => x.field)], unknownFields };
+}
+const isUnknownValue = (v: unknown) => typeof v === 'object' && v !== null && (v as any).state === 'unknown';
 export function s5(ctx: StageCtx) {
   const { state } = ctx; const S1 = ctx.prior.S1, S3 = ctx.prior.S3, S4 = ctx.prior.S4;
   const diagnostics: Diagnostic[] = [];
@@ -289,16 +302,18 @@ export function s5(ctx: StageCtx) {
       const d = demandById.get(did)!; const a = assignByDemand.get(did);
       const port = a ? group.usableParents.find((p: any) => p.label === a.label)?.port : group.usableParents[0]?.port;
       const mode = port ? lc.modes[port] : undefined;
-      const signature = { network: u.network, construction: { id: cons.id, kind: cons.kind, linksPerUnit: cons.linksPerUnit, qualification: cons.qualification, unknownFields: cons.unknownFields }, sideA: { classId: d.classId, classRevision: d.classRevision, slot: d.slot, item: d.item, rate: d.rate }, sideB: { context: lc.id, group: group.id, selector: group.sourceSelector, mode: typeof mode === 'string' ? mode : 'unknown', evidence: lc.profile.evidenceId } };
+      // Material row signature: both ends' physical attributes are part of it, so a change at either end
+      // separates rows and invalidates inspections of the old signature.
+      const signature = { network: u.network, construction: { id: cons.id, kind: cons.kind, linksPerUnit: cons.linksPerUnit, qualification: cons.qualification, item: cons.item }, sideA: { classId: d.classId, classRevision: d.classRevision, slot: d.slot, item: d.item, rate: d.rate, physical: endOf(cons, 'server') }, sideB: { context: lc.id, group: group.id, selector: group.sourceSelector, mode: typeof mode === 'string' ? mode : 'unknown', evidence: lc.profile.evidenceId, physical: endOf(cons, 'switch') } };
       const rowId = `ROW/${digestOf(signature).slice(0, 16)}`;
-      const row = rows.get(rowId) ?? { id: rowId, signature, links: [] as string[], units: new Set<string>(), unassigned: [] as string[], heldByLock: [] as string[], reservedChildren: 0, editShortcuts: { sideA: `class/${d.classId}#${d.slot}`, sideB: `context/${lc.id}#${group.id}` } };
+      const row = rows.get(rowId) ?? { id: rowId, signature, links: [] as string[], units: new Set<string>(), unassigned: [] as string[], heldByLock: [] as string[], reservedChildren: 0, editShortcuts: { sideA: `class/${d.classId}#${d.slot}`, sideB: `context/${lc.id}#${group.id}`, physicalA: `construction/${cons.id}#server`, physicalB: `construction/${cons.id}#switch` } };
       row.links.push(`LINK/${did.slice(4)}`); row.units.add(u.id);
       if (!a) (u.heldByLock ? row.heldByLock : row.unassigned).push(`LINK/${did.slice(4)}`);
       rows.set(rowId, row); unitRow ??= row;
     }
     if (unitRow) unitRow.reservedChildren += u.reservedChildren;
   }
-  const reviewRows = [...rows.values()].map(r => ({ id: r.id, signature: r.signature, memberDigest: digestOf([...r.links].sort(byId)), counts: { links: r.links.length, units: r.units.size, physicalServerEnds: r.links.length, reservedOrParkedChildren: r.reservedChildren }, links: [...r.links].sort(byId), units: [...r.units].sort(byId), exceptions: { unassigned: r.unassigned.sort(byId), heldByLock: r.heldByLock.sort(byId) }, unknownFields: r.signature.construction.unknownFields, editShortcuts: r.editShortcuts, inspection: 'manual review required; inspection does not confer qualification' })).sort((a, b) => byId(a.id, b.id));
+  const reviewRows = [...rows.values()].map(r => ({ id: r.id, signature: r.signature, memberDigest: digestOf([...r.links].sort(byId)), counts: { links: r.links.length, units: r.units.size, physicalServerEnds: r.links.length, reservedOrParkedChildren: r.reservedChildren }, links: [...r.links].sort(byId), units: [...r.units].sort(byId), exceptions: { unassigned: r.unassigned.sort(byId), heldByLock: r.heldByLock.sort(byId) }, ...rowFields(r.signature), editShortcuts: r.editShortcuts, inspection: 'manual review required; inspection does not confer qualification' })).sort((a, b) => byId(a.id, b.id));
   const placedLinks = new Set((S4?.units ?? []).flatMap((u: any) => u.links));
   const unplacedDemands = (S1.demands ?? []).filter((d: Demand) => !placedLinks.has(d.id)).map((d: Demand) => ({ demand: d.id, network: d.network, context: d.context, reason: S4?.skipped ? 'S4 skipped' : 'not eligible for any construction unit (see diagnostics)' }));
   return { purchaseLines, knownGenericPurchaseUnits, unresolvedPurchase, missingInfrastructure, reviewRows, unplacedDemands, diagnostics };

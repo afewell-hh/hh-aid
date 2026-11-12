@@ -13,7 +13,7 @@ import { replicate } from '../model/scale.ts';
 import { AC1_VARIANTS, type Ac1Variant, ac1Evidence, ac1State } from '../model/synthetic.ts';
 import type { ProjectState } from '../model/types.ts';
 import { startRun, type RunHandle } from '../runner/runner.ts';
-import { ProjectStore } from '../store/store.ts';
+import { ProjectStore, StaleWriteError } from '../store/store.ts';
 
 export const SPIKE_ROOT = join(import.meta.dirname, '..', '..');
 export const DEFAULT_EVIDENCE = { profile: join(SPIKE_ROOT, 'evidence', 'celestica-ds5000.fabric-v0.144.1.json'), provenance: join(SPIKE_ROOT, 'evidence', 'celestica-ds5000.fabric-v0.144.1.provenance.json') };
@@ -24,7 +24,8 @@ export function newProject(dir: string, name: string, actor: string, projectId: 
 }
 
 /** Seed from the FB-01 manifest. Verifies the manifest bytes against the source lock when a commit is given. */
-export async function seed(store: ProjectStore, manifestPath: string, manifestCommit: string, actor: string, replicas = 0) {
+export function seed(store: ProjectStore, manifestPath: string, manifestCommit: string, actor: string, replicas = 0) {
+  return store.withInputLock(async () => {
   const bytes = readFileSync(manifestPath); const sha = sha256(bytes);
   const lock = JSON.parse(readFileSync(join(SPIKE_ROOT, 'sources.lock.json'), 'utf8'));
   const entry = lock.entries.find((e: any) => e.role === 'generation-input' && e.commit.startsWith(manifestCommit));
@@ -36,12 +37,14 @@ export async function seed(store: ProjectStore, manifestPath: string, manifestCo
   const base = seedFromManifest(manifest, { commit: entry.commit, path: entry.path, sha256: sha }, store.index().projectId, evId, ev);
   const state = replicas ? replicate(base, replicas) : base;
   const id = store.put(state);
-  await store.commit(actor, 'seed', () => ({ add: { inputs: [id], evidence: [evId] }, inputHead: id }));
+  await store.commit(actor, 'seed', () => ({ add: { inputs: [id], evidence: [evId] }, inputHead: id, expectInputHead: null }));
   return id;
+  });
 }
 
 /** Synthetic AC1 project from the locked manifest's FB-AC1 entry plus a contract variant. */
-export async function seedSynthetic(store: ProjectStore, manifestPath: string, manifestCommit: string, variant: string, actor: string) {
+export function seedSynthetic(store: ProjectStore, manifestPath: string, manifestCommit: string, variant: string, actor: string) {
+  return store.withInputLock(async () => {
   if (!(AC1_VARIANTS as readonly string[]).includes(variant)) throw new Error(`unknown AC1 variant ${variant}; one of ${AC1_VARIANTS.join(', ')}`);
   const bytes = readFileSync(manifestPath); const sha = sha256(bytes);
   const lock = JSON.parse(readFileSync(join(SPIKE_ROOT, 'sources.lock.json'), 'utf8'));
@@ -50,8 +53,9 @@ export async function seedSynthetic(store: ProjectStore, manifestPath: string, m
   const m = parseStrictJson(bytes.toString('utf8')) as any;
   const ev = ac1Evidence(m); const evId = store.put(ev);
   const id = store.put(ac1State(m, variant as Ac1Variant, store.index().projectId, evId));
-  await store.commit(actor, 'seed-synthetic', () => ({ add: { inputs: [id], evidence: [evId] }, inputHead: id }));
+  await store.commit(actor, 'seed-synthetic', () => ({ add: { inputs: [id], evidence: [evId] }, inputHead: id, expectInputHead: null }));
   return id;
+  });
 }
 
 export type PatchOp = { op: 'replace' | 'add' | 'remove'; path: string; value?: unknown };
@@ -85,8 +89,16 @@ function bumpChangedClasses(oldS: ProjectState, newS: ProjectState) {
   return affected;
 }
 
-export async function edit(store: ProjectStore, actor: string, change: { mutation?: string; patch?: PatchOp[]; note?: string }) {
+/** One input mutation: the whole read-modify-write runs under the store's input lock, so concurrent edits in
+ * this process apply in turn (each sees the previous one's result). A caller that derived its change from a
+ * specific input (a UI tab's patch with array indexes) passes baseInput; if the head has moved since, the
+ * edit is rejected with StaleWriteError and nothing is written. */
+export function edit(store: ProjectStore, actor: string, change: { mutation?: string; patch?: PatchOp[]; note?: string; baseInput?: string }) {
+  return store.withInputLock(() => editLocked(store, actor, change));
+}
+async function editLocked(store: ProjectStore, actor: string, change: { mutation?: string; patch?: PatchOp[]; note?: string; baseInput?: string }) {
   const idx = store.index(); if (!idx.inputHead) throw new Error('project has no input revision');
+  if (change.baseInput !== undefined && change.baseInput !== idx.inputHead) throw new StaleWriteError(change.baseInput, idx.inputHead);
   const oldS: ProjectState = store.get(idx.inputHead);
   let next: any;
   if (change.mutation) { const f = MUTATIONS[change.mutation]; if (!f) throw new Error(`unknown mutation ${change.mutation}`); next = f(oldS); }
@@ -97,7 +109,7 @@ export async function edit(store: ProjectStore, actor: string, change: { mutatio
   const id = store.put(next);
   if (id === idx.inputHead) return { id, unchanged: true, classScope, impact: null };
   const last = [...idx.roots.outputs].map(o => store.get(o)).filter(o => o.input === idx.inputHead).at(-1);
-  await store.commit(actor, `edit:${change.mutation ?? 'patch'}`, () => ({ add: { inputs: [id] }, inputHead: id }));
+  await store.commit(actor, `edit:${change.mutation ?? 'patch'}`, () => ({ add: { inputs: [id] }, inputHead: id, expectInputHead: idx.inputHead }));
   return { id, unchanged: false, classScope, impact: last ? editImpact(oldS, next, last) : null };
 }
 
@@ -107,8 +119,11 @@ export function generate(store: ProjectStore, actor: string, opts: { config?: st
 }
 
 /** Controlled evidence refresh: new evidence document + new input revision referencing it. Old outputs untouched. */
-export async function refresh(store: ProjectStore, actor: string, revisionFile: string) {
-  const idx = store.index(); const s: ProjectState = store.get(idx.inputHead!);
+export function refresh(store: ProjectStore, actor: string, revisionFile: string, baseInput?: string) {
+  return store.withInputLock(async () => {
+  const idx = store.index(); if (!idx.inputHead) throw new Error('project has no input revision');
+  if (baseInput !== undefined && baseInput !== idx.inputHead) throw new StaleWriteError(baseInput, idx.inputHead);
+  const s: ProjectState = store.get(idx.inputHead);
   const file = parseStrictJson(readFileSync(revisionFile, 'utf8')) as any;
   const baseId = s.leafContexts.find(c => c.profile.name === file.profile)?.profile.evidenceId; if (!baseId) throw new Error(`no context uses profile ${file.profile}`);
   const ev = evidenceRevision(store.get(baseId), baseId, file); const evId = store.put(ev);
@@ -118,13 +133,16 @@ export async function refresh(store: ProjectStore, actor: string, revisionFile: 
   next.revision = s.revision + 1; next.parent = idx.inputHead; next.change = `evidence refresh: ${file.id} (${file.origin}; not a Hedgehog release)`;
   const id = store.put(next);
   const last = [...idx.roots.outputs].map(o => store.get(o)).filter(o => o.input === idx.inputHead).at(-1);
-  await store.commit(actor, 'refresh', () => ({ add: { inputs: [id], evidence: [evId] }, inputHead: id }));
+  await store.commit(actor, 'refresh', () => ({ add: { inputs: [id], evidence: [evId] }, inputHead: id, expectInputHead: idx.inputHead }));
   return { id, evidence: evId, impact: last ? editImpact(s, next, last) : null };
+  });
 }
 
 export async function review(store: ProjectStore, actor: string, outputId: string, rowId: string, fields: string[], note: string, excluded: string[] = []) {
   const o = store.get(outputId); if (o.kind !== 'OutputRevision') throw new Error('not an output');
   const row = o.reviewRows.find((r: any) => r.id === rowId); if (!row) throw new Error(`row ${rowId} not in output`);
+  const notInRow = fields.filter(f => !row.inspectableFields.includes(f));
+  if (notInRow.length) throw new Error(`not inspectable fields of row ${rowId}: ${notInRow.join(', ')}`);
   const unknownInspected = fields.filter(f => row.unknownFields.includes(f));
   if (unknownInspected.length) throw new Error(`cannot record inspection of unknown fields: ${unknownInspected.join(', ')} (unknown is not known)`);
   const rec = { kind: 'ReviewRecord', output: outputId, row: rowId, rowSignature: digestOf(row.signature), memberDigest: row.memberDigest, members: row.links, fields: [...fields].sort(byId), excluded: [...new Set([...excluded, ...row.unknownFields])].sort(byId), note, actor, revision: o.inputRevision };

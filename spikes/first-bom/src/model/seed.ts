@@ -3,7 +3,7 @@
 //  * author_expected and every expected/expected_delta field are never read;
 //  * only fields listed here are consumed; anything unrecognised is ignored, not inferred.
 import { unknown } from '../contracts/quantity.ts';
-import type { Component, EvidenceSnapshot, LeafContext, ProjectState, ServerClass } from './types.ts';
+import { END_FIELDS, type Component, type EndField, type EvidenceSnapshot, type LeafContext, type PhysicalEnd, type ProjectState, type ServerClass } from './types.ts';
 
 type Manifest = Record<string, any>;
 const range = (a: number, b: number) => Array.from({ length: b - a + 1 }, (_, k) => a + k);
@@ -69,18 +69,29 @@ export function seedFromManifest(manifest: Manifest, source: { commit: string; p
       excludedPorts: lc.auxiliary_allocation === 'excluded' ? Object.keys(lc.auxiliary_modes) : [],
     };
   });
+  // Per-end physical attributes. The manifest states construction-level fields (null = not supplied); a stated
+  // value applies to both ends, and fields it does not carry at all stay typed unknown. Nothing is derived from
+  // the assembly name or the item key.
+  const endsFor = (c: Manifest, fields: EndField[]) => {
+    const MANIFEST_KEY: Partial<Record<EndField, string>> = { pmd: 'pmd', connector: 'connector', fiber: 'fiber_type', reach: 'reach', length: 'length' };
+    const end = (side: 'server' | 'switch'): PhysicalEnd => Object.fromEntries(fields.map(f => {
+      const k = MANIFEST_KEY[f];
+      if (k && typeof c[k] === 'string') return [f, c[k]];
+      return [f, k && k in c ? unknown('not-supplied', prov(`constructions.${c.id}.${k}`)) : unknown('not-in-source', prov(`constructions.${c.id} has no ${side}-end ${f} field`))];
+    })) as unknown as PhysicalEnd;
+    return { server: end('server'), switch: end('switch') };
+  };
   const constructions = manifest.constructions.map((c: Manifest) => {
-    const unknownFields = ['pmd', 'connector', 'fiber_type', 'reach', 'length'].filter(f => f in c && c[f] === null);
     if (c.assembly_type === 'separate-optics') return {
       id: c.id, network: c.network, kind: 'parent-module', linksPerUnit: c.logical_links_per_switch_parent,
       serverModulePerLink: c.server_module_per_link, switchModulePerUnit: c.switch_module_per_parent, pairing: 'ordered',
-      item: { serverModule: 'fe_server_optic_200G', switchModule: 'fe_switch_optic_4x200G' }, unknownFields, qualification: 'unknown',
+      item: { serverModule: 'fe_server_optic_200G', switchModule: 'fe_switch_optic_4x200G' }, ends: endsFor(c, END_FIELDS['parent-module']), qualification: 'unknown',
       externalFiber: c.external_fiber_bom,
     };
     return {
       id: c.id, network: c.network, kind: 'split-assembly', linksPerUnit: c.logical_links_per_assembly,
       serverModulePerLink: 0, switchModulePerUnit: c.separate_modules, pairing: c.cross_rail_pairing === false ? 'same-rail' : 'ordered',
-      item: { assembly: 'be_split_dac_2x400G' }, unknownFields: [...unknownFields, 'host-fit'], qualification: 'unknown',
+      item: { assembly: 'be_split_dac_2x400G' }, ends: endsFor(c, END_FIELDS['split-assembly']), qualification: 'unknown',
     };
   });
   const roleNet = (role: string) => manifest.network_intents.find((n: Manifest) => (role === 'frontend' ? n.purpose !== 'backend' : n.purpose === 'backend')).id;

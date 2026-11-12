@@ -11,6 +11,21 @@ function mapDiff(a: Map<string, any>, b: Map<string, any>, pick: (x: any) => unk
   return { added, removed, changed };
 }
 
+/** Rows that kept members but changed a material attribute (a new signature, so a new row id): reported
+ * field by field, e.g. sideA.connector unknown → stated value, so an inspector sees what moved. */
+function materialRowChanges(a: any[], b: any[]) {
+  const flat = (sig: any) => { const o: Record<string, unknown> = {}; const walk = (x: any, p: string) => { if (x && typeof x === 'object' && !Array.isArray(x) && x.state !== 'unknown') for (const [k, v] of Object.entries(x)) walk(v, p ? `${p}.${k}` : k); else o[p] = x; }; walk(sig, ''); return o; };
+  const out: any[] = [];
+  for (const rb of b) {
+    if (a.some(ra => ra.id === rb.id)) continue;
+    const ra = a.find(x => x.links.some((l: string) => rb.links.includes(l))); if (!ra) continue;
+    const fa = flat(ra.signature), fb = flat(rb.signature);
+    const fields = [...new Set([...Object.keys(fa), ...Object.keys(fb)])].filter(k => !same(fa[k], fb[k])).sort(byId).map(k => ({ field: k.replace(/\.physical\./, '.'), from: fa[k] ?? null, to: fb[k] ?? null }));
+    out.push({ from: ra.id, to: rb.id, sameMembers: ra.memberDigest === rb.memberDigest, fields });
+  }
+  return out.sort((x, y) => byId(x.to, y.to));
+}
+
 /** Semantic diff between two OutputRevision contents. Reordering is not a change; identical totals can
  * still hide regrouped constructions or moved assignments, which are reported separately. */
 export function diffOutputs(from: any, to: any) {
@@ -27,7 +42,7 @@ export function diffOutputs(from: any, to: any) {
     assignments: mapDiff(keyed(from.assignments, 'demand'), keyed(to.assignments, 'demand'), a => ({ occurrence: a.occurrence, label: a.label, child: a.child, unit: a.unit })),
     ledgers: mapDiff(keyed(from.ledgers), keyed(to.ledgers), l => ({ known: l.knownConfigured, total: l.configuredTotal, limit: l.limit, status: l.status })),
     sizing: mapDiff(keyed(from.sizing, 'context'), keyed(to.sizing, 'context'), s => ({ status: s.status, lowerBound: s.lowerBound, unmet: s.unmetDemands, witnessIds: s.witnessIds })),
-    reviewRows: { ...mapDiff(rowsA, rowsB, r => r.memberDigest) },
+    reviewRows: { ...mapDiff(rowsA, rowsB, r => r.memberDigest), materialChanges: materialRowChanges(from.reviewRows ?? [], to.reviewRows ?? []) },
     missingInfrastructure: mapDiff(keyed(from.missingInfrastructure), keyed(to.missingInfrastructure), m => m),
     diagnostics: { added: [...new Set<string>((to.diagnostics ?? []).map((d: any) => d.code))].filter(c => !(from.diagnostics ?? []).some((d: any) => d.code === c)).sort(), removed: [...new Set<string>((from.diagnostics ?? []).map((d: any) => d.code))].filter(c => !(to.diagnostics ?? []).some((d: any) => d.code === c)).sort() },
   };

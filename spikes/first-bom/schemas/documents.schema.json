@@ -663,7 +663,7 @@
        "switchModulePerUnit",
        "pairing",
        "item",
-       "unknownFields",
+       "ends",
        "qualification"
       ],
       "properties": {
@@ -702,19 +702,79 @@
          "type": "string"
         }
        },
-       "unknownFields": {
-        "type": "array",
-        "items": {
-         "type": "string"
-        }
-       },
        "qualification": {
         "const": "unknown"
        },
        "externalFiber": {
         "type": "string"
+       },
+       "ends": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+         "server",
+         "switch"
+        ],
+        "properties": {
+         "server": {
+          "type": "object"
+         },
+         "switch": {
+          "type": "object"
+         }
+        }
        }
-      }
+      },
+      "allOf": [
+       {
+        "if": {
+         "properties": {
+          "kind": {
+           "const": "parent-module"
+          }
+         }
+        },
+        "then": {
+         "properties": {
+          "ends": {
+           "type": "object",
+           "properties": {
+            "server": {
+             "$ref": "#/$defs/physicalEndOptics"
+            },
+            "switch": {
+             "$ref": "#/$defs/physicalEndOptics"
+            }
+           }
+          }
+         }
+        }
+       },
+       {
+        "if": {
+         "properties": {
+          "kind": {
+           "const": "split-assembly"
+          }
+         }
+        },
+        "then": {
+         "properties": {
+          "ends": {
+           "type": "object",
+           "properties": {
+            "server": {
+             "$ref": "#/$defs/physicalEndAssembly"
+            },
+            "switch": {
+             "$ref": "#/$defs/physicalEndAssembly"
+            }
+           }
+          }
+         }
+        }
+       }
+      ]
      }
     },
     "demandOrder": {
@@ -1219,6 +1279,75 @@
     },
     "revision": {
      "$ref": "#/$defs/nonneg"
+    }
+   }
+  },
+  "attr": {
+   "oneOf": [
+    {
+     "type": "string",
+     "minLength": 1
+    },
+    {
+     "$ref": "#/$defs/unknown"
+    }
+   ]
+  },
+  "physicalEndOptics": {
+   "type": "object",
+   "description": "one end of a separate-optics construction (the module at that end)",
+   "additionalProperties": false,
+   "required": [
+    "cage",
+    "connector",
+    "pmd",
+    "reach",
+    "fiber"
+   ],
+   "properties": {
+    "cage": {
+     "$ref": "#/$defs/attr"
+    },
+    "connector": {
+     "$ref": "#/$defs/attr"
+    },
+    "pmd": {
+     "$ref": "#/$defs/attr"
+    },
+    "reach": {
+     "$ref": "#/$defs/attr"
+    },
+    "fiber": {
+     "$ref": "#/$defs/attr"
+    }
+   }
+  },
+  "physicalEndAssembly": {
+   "type": "object",
+   "description": "one end of an integrated assembly",
+   "additionalProperties": false,
+   "required": [
+    "cage",
+    "connector",
+    "media",
+    "length",
+    "hostFit"
+   ],
+   "properties": {
+    "cage": {
+     "$ref": "#/$defs/attr"
+    },
+    "connector": {
+     "$ref": "#/$defs/attr"
+    },
+    "media": {
+     "$ref": "#/$defs/attr"
+    },
+    "length": {
+     "$ref": "#/$defs/attr"
+    },
+    "hostFit": {
+     "$ref": "#/$defs/attr"
     }
    }
   }

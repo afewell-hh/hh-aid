@@ -1,6 +1,6 @@
 // Thin experiment UI over the local API. It displays engine output; it never computes quantities.
 import { Fragment, useCallback, useEffect, useMemo, useState } from 'react';
-import { api, fmtQ, isUnknown } from './api.ts';
+import { api, fmtQ, isUnknown, setBaseInput } from './api.ts';
 
 type Tab = 'servers' | 'destinations' | 'bom' | 'review' | 'history';
 const TABS: [Tab, string][] = [['servers', 'Server classes'], ['destinations', 'Destinations'], ['bom', 'BOM'], ['review', 'Connection review'], ['history', 'History & evidence']];
@@ -13,12 +13,12 @@ export function App() {
   const [err, setErr] = useState<string>('');
   const [focus, setFocus] = useState<string>('');
   const load = useCallback(async () => {
-    const proj = await api.project(); setP(proj);
+    const proj = await api.project(); setBaseInput(proj.head); setP(proj);
     const cur = proj.assessment.currentOutput ?? proj.assessment.outputs.at(-1)?.id;
     setOut(cur ? { ...(await api.doc(cur)), id: cur } : null);
   }, []);
   useEffect(() => { load().catch(e => setErr(String(e.message))); }, [load]);
-  const act = async (f: () => Promise<any>, ok: (r: any) => string) => { setErr(''); try { const r = await f(); setMsg(ok(r)); await load(); } catch (e: any) { setErr(e.message); } };
+  const act = async (f: () => Promise<any>, ok: (r: any) => string) => { setErr(''); try { const r = await f(); setMsg(ok(r)); await load(); } catch (e: any) { setErr(e.message); if (/stale write/.test(e.message)) { setMsg(''); await load(); } } };
   if (err && !p) return <main className="wrap"><p className="error" role="alert">{err}</p></main>;
   if (!p) return <main className="wrap"><p>Loading…</p></main>;
   const outAssess = out ? p.assessment.outputs.find((o: any) => o.id === out.id) : null;
