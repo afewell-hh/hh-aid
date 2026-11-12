@@ -1,0 +1,233 @@
+{
+  "01-baseline.hhaid.json": {
+    "output": "c081b1841cd9b7a6e08f99c0c97bba32e4a33b3a4cb431586e71ebbc0abb901c",
+    "documents": 11,
+    "checks": {
+      "servers": 4,
+      "demands": 24,
+      "requirements": 17,
+      "units": 10,
+      "reviewRows": 3,
+      "assigned": 24
+    }
+  },
+  "02-FB-DPU.hhaid.json": {
+    "output": "0780edcdf17737786b34a9f5f24dd344342c0dda1460eaf33226ecc16f093f80",
+    "documents": 22,
+    "checks": {
+      "servers": 4,
+      "demands": 24,
+      "requirements": 17,
+      "units": 10,
+      "reviewRows": 3,
+      "assigned": 24
+    }
+  },
+  "03-FB-COUNT.hhaid.json": {
+    "output": "eca29480c871d273a29c9127b22ac1e66102c9fbc691dd00b101df3bbc668fa0",
+    "documents": 31,
+    "checks": {
+      "servers": 5,
+      "demands": 34,
+      "requirements": 17,
+      "units": 19,
+      "reviewRows": 3,
+      "assigned": 34
+    }
+  },
+  "04-evidence-refresh.hhaid.json": {
+    "output": "47de8e06850824cffed49a21613b3b038f8d22c1cf3950a002e946863ac4a83c",
+    "documents": 41,
+    "checks": {
+      "servers": 5,
+      "demands": 34,
+      "requirements": 17,
+      "units": 19,
+      "reviewRows": 3,
+      "assigned": 24
+    }
+  },
+  "05-final.hhaid.json": {
+    "output": "47de8e06850824cffed49a21613b3b038f8d22c1cf3950a002e946863ac4a83c",
+    "documents": 43,
+    "checks": {
+      "servers": 5,
+      "demands": 34,
+      "requirements": 17,
+      "units": 19,
+      "reviewRows": 3,
+      "assigned": 24
+    }
+  },
+  "06-reexport.hhaid.json": {
+    "output": "47de8e06850824cffed49a21613b3b038f8d22c1cf3950a002e946863ac4a83c",
+    "documents": 43,
+    "checks": {
+      "servers": 5,
+      "demands": 34,
+      "requirements": 17,
+      "units": 19,
+      "reviewRows": 3,
+      "assigned": 24
+    }
+  },
+  "runner": {
+    "concurrent": [
+      {
+        "id": "3a72b873ff00959f23e4d75e5133a9cbf9d118728f1d9538fdddb212c364006d",
+        "unchanged": false,
+        "classScope": [],
+        "impact": null
+      },
+      {
+        "id": "32e5d06d72dc7c5826a738efae204df44b388434bdf67d9cfe642c2f596b3f08",
+        "unchanged": false,
+        "classScope": [],
+        "impact": null
+      }
+    ],
+    "before": {
+      "prior": {
+        "outcome": "complete",
+        "outputId": "e9d786e0e069d1d8358f91504df7c2238eea7e1b85e4940aea408e15fd16ce19",
+        "message": "complete",
+        "completedStages": [
+          "S1",
+          "S2",
+          "S3",
+          "S4",
+          "S5"
+        ],
+        "reusedStages": []
+      },
+      "interrupted": {
+        "outcome": "interrupted",
+        "partialId": "ee41f01772a31ef3326dd538a003b1d610b8688d67bc37fb0abbaa9c1a2500c5",
+        "reason": "user-cancel",
+        "message": "terminated: user-cancel",
+        "completedStages": [],
+        "reusedStages": []
+      },
+      "resume": {
+        "outcome": "complete",
+        "outputId": "c4c72b0c6e33c167e2ba18b2f0f5d51bd654f5df7a19dd3aaac1cd23b935b5ac",
+        "message": "complete",
+        "completedStages": [
+          "S1",
+          "S2",
+          "S3",
+          "S4",
+          "S5"
+        ],
+        "reusedStages": []
+      }
+    },
+    "after": {
+      "prior": {
+        "outcome": "complete",
+        "outputId": "e9d786e0e069d1d8358f91504df7c2238eea7e1b85e4940aea408e15fd16ce19",
+        "message": "complete",
+        "completedStages": [
+          "S1",
+          "S2",
+          "S3",
+          "S4",
+          "S5"
+        ],
+        "reusedStages": []
+      },
+      "interrupted": {
+        "outcome": "interrupted",
+        "partialId": "b2acd6879beeb7467515cd41f4458a0427e841588c44610008374dbc3c50f3a7",
+        "reason": "user-cancel",
+        "message": "terminated: user-cancel",
+        "completedStages": [
+          "S1"
+        ],
+        "reusedStages": []
+      },
+      "resume": {
+        "outcome": "complete",
+        "outputId": "c4c72b0c6e33c167e2ba18b2f0f5d51bd654f5df7a19dd3aaac1cd23b935b5ac",
+        "message": "complete",
+        "completedStages": [
+          "S1",
+          "S2",
+          "S3",
+          "S4",
+          "S5"
+        ],
+        "reusedStages": [
+          "S1"
+        ]
+      }
+    },
+    "deadline": {
+      "prior": {
+        "outcome": "complete",
+        "outputId": "e9d786e0e069d1d8358f91504df7c2238eea7e1b85e4940aea408e15fd16ce19",
+        "message": "complete",
+        "completedStages": [
+          "S1",
+          "S2",
+          "S3",
+          "S4",
+          "S5"
+        ],
+        "reusedStages": []
+      },
+      "interrupted": {
+        "outcome": "interrupted",
+        "partialId": "826f35e82188ae293afdbec878919bce0a9d8209bb3622b4b3a9eb642d95ffef",
+        "reason": "deadline",
+        "message": "terminated: deadline",
+        "completedStages": [
+          "S1"
+        ],
+        "reusedStages": []
+      },
+      "resume": {
+        "outcome": "complete",
+        "outputId": "c4c72b0c6e33c167e2ba18b2f0f5d51bd654f5df7a19dd3aaac1cd23b935b5ac",
+        "message": "complete",
+        "completedStages": [
+          "S1",
+          "S2",
+          "S3",
+          "S4",
+          "S5"
+        ],
+        "reusedStages": [
+          "S1"
+        ]
+      }
+    },
+    "uninterrupted": {
+      "outcome": "complete",
+      "outputId": "c4c72b0c6e33c167e2ba18b2f0f5d51bd654f5df7a19dd3aaac1cd23b935b5ac",
+      "message": "complete",
+      "completedStages": [
+        "S1",
+        "S2",
+        "S3",
+        "S4",
+        "S5"
+      ],
+      "reusedStages": []
+    },
+    "operation": {
+      "outcome": "limit-reached",
+      "outputId": "7415df0fb1d33a7f3e9ea53065b1b5777f0bfa0ce0f85dad96ac05a996649f76",
+      "message": "limit-reached",
+      "completedStages": [
+        "S1",
+        "S2",
+        "S3",
+        "S4",
+        "S5"
+      ],
+      "reusedStages": []
+    }
+  },
+  "mutations": "DPU/unknown/exhaust/lock/evidence checks passed"
+}

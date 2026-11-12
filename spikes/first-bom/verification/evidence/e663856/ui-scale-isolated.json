@@ -1,0 +1,49 @@
+{
+  "url": "http://127.0.0.1:55016/",
+  "firstRender": {
+    "afterDataMs": 542.2999999523163,
+    "rows": 3002
+  },
+  "samples": [
+    {
+      "clickToPaintMs": 518.9000000953674,
+      "rows": 3002,
+      "latestData": {
+        "url": "/api/doc/af72545e2c42ee9d42de17573c6da5499934b3465689b189b168365fb1ec0621",
+        "at": 5080.200000047684
+      }
+    },
+    {
+      "clickToPaintMs": 601.5999999046326,
+      "rows": 3002,
+      "latestData": {
+        "url": "/api/doc/af72545e2c42ee9d42de17573c6da5499934b3465689b189b168365fb1ec0621",
+        "at": 5080.200000047684
+      }
+    },
+    {
+      "clickToPaintMs": 483.2000000476837,
+      "rows": 3002,
+      "latestData": {
+        "url": "/api/doc/af72545e2c42ee9d42de17573c6da5499934b3465689b189b168365fb1ec0621",
+        "at": 5080.200000047684
+      }
+    },
+    {
+      "clickToPaintMs": 465.5,
+      "rows": 3002,
+      "latestData": {
+        "url": "/api/doc/af72545e2c42ee9d42de17573c6da5499934b3465689b189b168365fb1ec0621",
+        "at": 5080.200000047684
+      }
+    },
+    {
+      "clickToPaintMs": 595.6000001430511,
+      "rows": 3002,
+      "latestData": {
+        "url": "/api/doc/af72545e2c42ee9d42de17573c6da5499934b3465689b189b168365fb1ec0621",
+        "at": 5080.200000047684
+      }
+    }
+  ]
+}

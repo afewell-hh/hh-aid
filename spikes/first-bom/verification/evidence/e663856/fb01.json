@@ -1,0 +1,86 @@
+{
+  "baseline": {
+    "servers": 4,
+    "fe_links": 8,
+    "be_links": 16,
+    "fe_server_modules": 8,
+    "fe_switch_modules": 2,
+    "be_assemblies": 8,
+    "be_parked_tails": 0,
+    "fe_reserved_children": 0,
+    "management": 6,
+    "separate": {
+      "backend_nic_400": 16,
+      "chassis_bundle_A": 2,
+      "chassis_bundle_B": 2,
+      "frontend_dual_dpu_200": 2,
+      "frontend_nic_200": 4,
+      "power_cord": 8
+    },
+    "included": {
+      "accelerator": 16,
+      "bmc": 4,
+      "disk": 8,
+      "psu": 8,
+      "rail_kit": 4
+    },
+    "unknown_purchase": {
+      "accessory": 4
+    },
+    "resources": {
+      "LC-BE": {
+        "configured": 98,
+        "selected": 62,
+        "uplinks": 32,
+        "unused": 2,
+        "max_pipeline": 4,
+        "lower_bound": 1
+      },
+      "LC-FE": {
+        "configured": 162,
+        "selected": 124,
+        "uplinks": 32,
+        "unused": 4,
+        "max_pipeline": 8,
+        "lower_bound": 1
+      }
+    },
+    "missing": {
+      "INF-LEAF": null,
+      "INF-SPINE": null,
+      "INF-UPLINK-MEDIA": null,
+      "INF-CONTROL-GATEWAY": null,
+      "INF-OOB": null,
+      "INF-ANCILLARY": null
+    }
+  },
+  "count_A3": {
+    "servers": 5,
+    "fe_links": 10,
+    "be_links": 24,
+    "fe_server_modules": 10,
+    "fe_switch_modules": 3,
+    "be_assemblies": 16,
+    "be_parked_tails": 8,
+    "fe_reserved_children": 2,
+    "management": 8,
+    "separate": {
+      "backend_nic_400": 24,
+      "chassis_bundle_A": 3,
+      "chassis_bundle_B": 2,
+      "frontend_dual_dpu_200": 3,
+      "frontend_nic_200": 4,
+      "power_cord": 10
+    },
+    "included": {
+      "accelerator": 24,
+      "bmc": 5,
+      "disk": 8,
+      "psu": 10,
+      "rail_kit": 5
+    },
+    "unknown_purchase": {
+      "accessory": 5
+    }
+  }
+}

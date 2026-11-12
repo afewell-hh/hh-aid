@@ -1,0 +1,71 @@
+{
+  "missing-reference": {
+    "code": 1,
+    "seconds": 0.35620975,
+    "stdout": "",
+    "stderr": "hhaid import: unresolved reference 06bd713ee84cd99c79627d5c9c026bdf82130c45617676892e96daa2941f16f8\n"
+  },
+  "duplicate-document": {
+    "code": 1,
+    "seconds": 0.13708666599999997,
+    "stdout": "",
+    "stderr": "hhaid import: duplicate document 06bd713ee84cd99c79627d5c9c026bdf82130c45617676892e96daa2941f16f8\n"
+  },
+  "bad-digest": {
+    "code": 1,
+    "seconds": 0.131767666,
+    "stdout": "",
+    "stderr": "hhaid import: digest mismatch for 06bd713ee84cd99c79627d5c9c026bdf82130c45617676892e96daa2941f16f8\n"
+  },
+  "unsafe": {
+    "code": 1,
+    "seconds": 0.1250325,
+    "stdout": "",
+    "stderr": "hhaid import: $.head: unsafe integer 9007199254740993 at offset 50\n"
+  },
+  "fraction": {
+    "code": 1,
+    "seconds": 0.13211850000000003,
+    "stdout": "",
+    "stderr": "hhaid import: $.head: non-integer number 1.0 at offset 37\n"
+  },
+  "exponent": {
+    "code": 1,
+    "seconds": 0.132151958,
+    "stdout": "",
+    "stderr": "hhaid import: $.head: non-integer number 1e3 at offset 37\n"
+  },
+  "negative-zero": {
+    "code": 1,
+    "seconds": 0.14253737500000008,
+    "stdout": "",
+    "stderr": "hhaid import: $.head: negative zero at offset 36\n"
+  },
+  "huge": {
+    "code": 0,
+    "seconds": 0.24814558399999997,
+    "stdout": "{\n \"outcome\": \"limit-reached\",\n \"outputId\": \"672d36f93b188bba6680490742a05fc821cf0728cb2c9ba77810b6482f34552a\",\n \"message\": \"limit-reached\",\n \"completedStages\": [\n  \"S1\",\n  \"S2\",\n  \"S3\",\n  \"S4\",\n  \"S5\"\n ],\n \"reusedStages\": []\n}\n",
+    "stderr": "",
+    "quantity": 8000000000000,
+    "limits": [
+      {
+        "allowed": 100000,
+        "limit": "maxMaterializedOccurrences",
+        "observed": 1000000000002,
+        "stage": "S1"
+      }
+    ]
+  },
+  "overflow": {
+    "code": 0,
+    "seconds": 0.23172195799999962,
+    "stdout": "{\n \"outcome\": \"complete\",\n \"outputId\": \"c34d09505f5846451c4387c637fef4124a63be888be042c3e8b342b27664cf82\",\n \"message\": \"complete\",\n \"completedStages\": [\n  \"S1\",\n  \"S2\",\n  \"S3\",\n  \"S4\",\n  \"S5\"\n ],\n \"reusedStages\": []\n}\n",
+    "stderr": "",
+    "quantity": {
+      "provenance": "REQ/POP-A/A/separate/backend_nic_400",
+      "reason": "quantity-overflow",
+      "state": "unknown"
+    },
+    "limits": []
+  }
+}

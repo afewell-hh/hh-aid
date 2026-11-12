@@ -1,0 +1,89 @@
+{
+  "old": {
+    "imports": {
+      "empty": {
+        "code": 0,
+        "stdout": "{\n \"head\": \"\"\n}\n",
+        "stderr": ""
+      },
+      "null": {
+        "code": 0,
+        "stdout": "{\n \"head\": \"null\"\n}\n",
+        "stderr": ""
+      },
+      "unsafe": {
+        "code": 1,
+        "stdout": "",
+        "stderr": "hhaid import: $.head: unsafe integer 9007199254740993 at offset 50\n"
+      },
+      "duplicate": {
+        "code": 1,
+        "stdout": "",
+        "stderr": "hhaid import: $: duplicate key \"head\" at offset 45\n"
+      }
+    },
+    "http_edits": [
+      200,
+      200
+    ],
+    "http_revision": 3,
+    "stale_response": [
+      200,
+      {
+        "id": "c2228545d4580f4f26f6ed256857cb35a33af05fc5e0d1cfdebe7c188e9b8a04",
+        "unchanged": false,
+        "classScope": [],
+        "impact": null
+      }
+    ],
+    "same_process_concurrency": {
+      "head_revision": 2,
+      "class_revisions": [
+        "r1",
+        "r1"
+      ],
+      "retained_input_revisions": [
+        2,
+        1,
+        2
+      ]
+    }
+  },
+  "final": {
+    "imports": {
+      "empty": {
+        "code": 1,
+        "stdout": "",
+        "stderr": "hhaid import: export head must be a document digest, got \"\"\n"
+      },
+      "null": {
+        "code": 1,
+        "stdout": "",
+        "stderr": "hhaid import: export head must be a document digest, got null\n"
+      },
+      "unsafe": {
+        "code": 1,
+        "stdout": "",
+        "stderr": "hhaid import: $.head: unsafe integer 9007199254740993 at offset 50\n"
+      },
+      "duplicate": {
+        "code": 1,
+        "stdout": "",
+        "stderr": "hhaid import: $: duplicate key \"head\" at offset 45\n"
+      }
+    },
+    "http_edits": [
+      200,
+      200
+    ],
+    "http_revision": 3,
+    "stale_response": [
+      409,
+      {
+        "error": "stale write: change was based on input 3a0580424628 but the current input is 548164a9e82a; reload and reapply",
+        "stale": true,
+        "currentInput": "548164a9e82af698e9b4fc5e8a601e67e5f990f0ac6df80f6f65dd1d53db146c"
+      }
+    ]
+  }
+}
