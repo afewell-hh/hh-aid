@@ -22,7 +22,7 @@ export function App() {
   if (err && !p) return <main className="wrap"><p className="error" role="alert">{err}</p></main>;
   if (!p) return <main className="wrap"><p>Loading…</p></main>;
   const outAssess = out ? p.assessment.outputs.find((o: any) => o.id === out.id) : null;
-  const goTo = (shortcut: string) => { const [kind, rest] = shortcut.split('/'); setFocus(rest ?? ''); setTab(kind === 'class' ? 'servers' : 'destinations'); };
+  const goTo = (shortcut: string) => { const [kind, rest] = shortcut.split('/'); setFocus(rest ?? ''); setTab(kind === 'class' ? 'servers' : 'destinations'); setTimeout(() => document.querySelector('.focus')?.scrollIntoView({ block: 'center' }), 50); };
   return (
     <main className="wrap">
       <header className="top">
@@ -105,6 +105,7 @@ function Destinations({ p, out, focus, act }: { p: any; out: any; focus: string;
         </tbody></table>
         <p className="muted">Picking a destination binds intent only; no switch instance is chosen.</p>
       </article>
+      {s.constructions.map((c: any, ci: number) => <ConstructionEnds key={c.id} c={c} ci={ci} focus={focus} act={act} />)}
       {s.leafContexts.map((lc: any, li: number) => {
         const g = out?.groups.find((x: any) => x.context === lc.id); const sz = out?.sizing.find((x: any) => x.context === lc.id); const led = out?.contextLedgers.find((x: any) => x.context === lc.id);
         return (
@@ -124,6 +125,32 @@ function Destinations({ p, out, focus, act }: { p: any; out: any; focus: string;
       })}
     </section>
   );
+}
+
+const END_FIELDS: Record<string, string[]> = { 'parent-module': ['cage', 'connector', 'pmd', 'reach', 'fiber'], 'split-assembly': ['cage', 'connector', 'media', 'length', 'hostFit'] };
+const FIELD_LABEL: Record<string, string> = { cage: 'Cage', connector: 'Connector', pmd: 'Optical PMD', reach: 'Reach', fiber: 'Fiber', media: 'Media', length: 'Length', hostFit: 'Host fit' };
+const fmtAttr = (v: any) => isUnknown(v) ? 'unknown' : String(v);
+
+/** Source editor for one connection construction's two physical ends (side A = server end, side B = switch
+ * end). Blank means typed unknown; values are descriptors for manual inspection, never qualification. */
+function ConstructionEnds({ c, ci, focus, act }: { c: any; ci: number; focus: string; act: Act }) {
+  const fields = END_FIELDS[c.kind] ?? [];
+  const save = (side: string, f: string, raw: string) => {
+    const v = raw.trim(); const cur = c.ends[side][f];
+    if (v === '' && isUnknown(cur)) return; if (v !== '' && v === cur) return;
+    const value = v === '' ? { state: 'unknown', reason: 'cleared-by-user', provenance: `ui:constructions.${c.id}.ends.${side}.${f}` } : v;
+    void act(() => api.edit({ patch: [{ op: 'replace', path: `/constructions/${ci}/ends/${side}/${f}`, value }], note: `${c.id} ${side} end ${f}: ${fmtAttr(cur)} → ${v || 'unknown'}` }), scopeText);
+  };
+  const cell = (side: string, f: string) => { const v = c.ends[side][f]; return (
+    <td className={focus === `${c.id}#${side}` ? 'focus' : ''}><input aria-label={`${c.id} ${side} ${f}`} key={`${side}-${f}-${JSON.stringify(v)}`} defaultValue={isUnknown(v) ? '' : v} placeholder={isUnknown(v) ? `unknown (${v.reason})` : ''} onBlur={e => save(side, f, e.target.value)} onKeyDown={e => { if (e.key === 'Enter') (e.target as HTMLInputElement).blur(); }} /></td>); };
+  return (
+    <article className={`card ${focus.startsWith(`${c.id}#`) ? 'focus' : ''}`} data-testid={`cons-${c.id}`}>
+      <h2>Connection construction {c.id} <span className="muted">{c.kind} · network {c.network} · items {Object.values(c.item).join(', ')} · qualification {c.qualification}</span></h2>
+      <p className="muted">Physical attributes of each end, entered for manual inspection. Leave blank for unknown. Changing an end changes the connection-review row and puts its inspections back into review; it does not change BOM counts.</p>
+      <table className="ends"><thead><tr><th>Attribute</th><th>Side A: server end</th><th>Side B: switch end</th></tr></thead><tbody>
+        {fields.map(f => <tr key={f}><th scope="row">{FIELD_LABEL[f] ?? f}</th>{cell('server', f)}{cell('switch', f)}</tr>)}
+      </tbody></table>
+    </article>);
 }
 
 function SelectorEditor({ lc, li, act }: { lc: any; li: number; act: Act }) {
@@ -170,30 +197,38 @@ function Bom({ p, out, outAssess, act }: { p: any; out: any; outAssess: any; act
   );
 }
 
+function Phys({ p, side }: { p: Record<string, any>; side: string }) {
+  return <span className="phys" data-testid={`phys-${side}`}>{Object.keys(p).sort((a, b) => ORDER.indexOf(a) - ORDER.indexOf(b)).map(f => <span key={f} className={isUnknown(p[f]) ? 'unk' : ''}>{FIELD_LABEL[f] ?? f}: {fmtAttr(p[f])}</span>)}</span>;
+}
+const ORDER = ['cage', 'connector', 'pmd', 'reach', 'fiber', 'media', 'length', 'hostFit'];
+
 function Review({ p, out, outAssess, act, goTo }: { p: any; out: any; outAssess: any; act: Act; goTo: (s: string) => void }) {
   const [sel, setSel] = useState<string>(''); const [note, setNote] = useState(''); const [fields, setFields] = useState<string[]>([]);
   if (!out) return <p>Generate first.</p>;
   const reviewsByRow = (id: string) => p.assessment.reviews.filter((r: any) => r.row === id);
   const row = out.reviewRows.find((r: any) => r.id === sel);
-  const FIELDS = ['sideA.classRevision', 'sideA.item', 'sideA.rate', 'sideB.mode', 'sideB.group', 'construction.kind', 'construction.linksPerUnit'];
+  const edit = (sc: string, label: string) => <button className="link" aria-label={label} onClick={e => { e.stopPropagation(); goTo(sc); }}>edit</button>;
   return (
     <section aria-label="Connection review">
       {outAssess?.status === 'stale' && <p className="badge stale">This output is stale; inspection rows reflect input revision {out.inputRevision}.</p>}
-      <table data-testid="review-rows"><thead><tr><th>Side A (server)</th><th>Side B (leaf)</th><th>Construction</th><th>Links</th><th>Units</th><th>Reserved/parked</th><th>Exceptions</th><th>Unknown</th><th>Inspection</th></tr></thead><tbody>
-        {out.reviewRows.map((r: any) => { const rv = reviewsByRow(r.id); return (
-          <tr key={r.id} className={sel === r.id ? 'focus' : ''} onClick={() => setSel(r.id)}>
-            <td>{r.signature.sideA.classId}@{r.signature.sideA.classRevision} · {r.signature.sideA.item} · {r.signature.sideA.rate}G <button className="link" onClick={e => { e.stopPropagation(); goTo(r.editShortcuts.sideA); }}>edit</button></td>
-            <td>{r.signature.sideB.context}/{r.signature.sideB.group} · {r.signature.sideB.mode} <button className="link" onClick={e => { e.stopPropagation(); goTo(r.editShortcuts.sideB); }}>edit</button></td>
+      <p className="muted">One row per material combination of both ends. Unknown attributes are shown as unknown and cannot be recorded as inspected; inspection is manual and does not confer qualification.</p>
+      <table data-testid="review-rows" className="review"><thead><tr><th>Side A: server</th><th>Side A physical end</th><th>Side B: leaf</th><th>Side B physical end</th><th>Construction</th><th>Links</th><th>Units</th><th>Reserved/parked</th><th>Exceptions</th><th>Inspection</th></tr></thead><tbody>
+        {out.reviewRows.map((r: any) => { const rv = reviewsByRow(r.id); const A = r.signature.sideA, B = r.signature.sideB; return (
+          <tr key={r.id} className={sel === r.id ? 'focus' : ''} onClick={() => { setSel(r.id); setFields([]); }}>
+            <td>{A.classId}@{A.classRevision} · {A.item} · {A.rate}G {edit(r.editShortcuts.sideA, `edit side A source ${r.id}`)}</td>
+            <td>{A.physical ? <Phys p={A.physical} side="A" /> : '—'} {r.editShortcuts.physicalA && edit(r.editShortcuts.physicalA, `edit side A physical ${r.id}`)}</td>
+            <td>{B.context}/{B.group} · {B.mode} {edit(r.editShortcuts.sideB, `edit side B source ${r.id}`)}</td>
+            <td>{B.physical ? <Phys p={B.physical} side="B" /> : '—'} {r.editShortcuts.physicalB && edit(r.editShortcuts.physicalB, `edit side B physical ${r.id}`)}</td>
             <td>{r.signature.construction.id} ({r.signature.construction.kind})</td><td>{r.counts.links}</td><td>{r.counts.units}</td><td>{r.counts.reservedOrParkedChildren}</td>
             <td>{[r.exceptions.unassigned.length && `${r.exceptions.unassigned.length} unassigned`, r.exceptions.heldByLock.length && `${r.exceptions.heldByLock.length} held by lock`].filter(Boolean).join(', ') || '—'}</td>
-            <td>{r.unknownFields.join(', ')}</td><td>{rv.length ? rv.map((x: any) => x.status).join('; ') : 'not inspected'}</td>
+            <td>{rv.length ? rv.map((x: any) => x.status).join('; ') : 'not inspected'}</td>
           </tr>); })}
       </tbody></table>
       {row && <form className="card" onSubmit={e => { e.preventDefault(); if (!fields.length) return; void act(() => api.review({ output: out.id, row: row.id, fields, note }), () => 'Inspection recorded for this row, member set and revision.'); }}>
         <h3>Record manual inspection — {row.id}</h3>
-        <p className="muted">Scope: {row.counts.links} member link(s) in input revision {out.inputRevision}. Unknown fields ({row.unknownFields.join(', ')}) are excluded automatically; inspection does not confer qualification.</p>
+        <p className="muted">Scope: {row.counts.links} member link(s) in input revision {out.inputRevision}. {row.unknownFields.length} unknown field(s) are excluded automatically; inspection does not confer qualification.</p>
         <details><summary>Members</summary><p>{row.links.join(', ')}</p></details>
-        <fieldset><legend>Inspected fields</legend>{FIELDS.map(f => <label key={f} className="chk"><input type="checkbox" checked={fields.includes(f)} onChange={e => setFields(e.target.checked ? [...fields, f] : fields.filter(x => x !== f))} />{f}</label>)}</fieldset>
+        <fieldset><legend>Inspected fields</legend>{(row.inspectableFields ?? []).map((f: string) => { const unk = row.unknownFields.includes(f); return <label key={f} className={`chk ${unk ? 'unk' : ''}`}><input type="checkbox" disabled={unk} checked={fields.includes(f)} onChange={e => setFields(e.target.checked ? [...fields, f] : fields.filter(x => x !== f))} />{f}{unk ? ' (unknown)' : ''}</label>; })}</fieldset>
         <label>Note <input aria-label="review note" value={note} onChange={e => setNote(e.target.value)} /></label>
         <button type="submit" disabled={!fields.length}>Save inspection</button>
       </form>}
@@ -232,5 +267,5 @@ function DiffView({ d }: { d: any }) {
   if (d.error) return <p className="error">{d.error}</p>;
   const sec = (name: string, x: any) => (x.added?.length || x.removed?.length || x.changed?.length || x.regrouped?.length) ? <li key={name}><strong>{name}</strong>: +{x.added?.length ?? 0} −{x.removed?.length ?? 0} ~{x.changed?.length ?? 0}{x.regrouped?.length ? ` · regrouped ${x.regrouped.length}` : ''}
     {x.changed?.length ? <ul>{x.changed.slice(0, 20).map((c: any) => <li key={c.id}><code>{c.id}</code>: {JSON.stringify(c.from)} → {JSON.stringify(c.to)}</li>)}</ul> : null}</li> : null;
-  return <ul data-testid="diff">{['purchaseLines', 'requirements', 'constructions', 'assignments', 'ledgers', 'sizing', 'reviewRows', 'missingInfrastructure'].map(k => sec(k, d[k]))}<li>diagnostics: +{d.diagnostics.added.join(', ') || '∅'} −{d.diagnostics.removed.join(', ') || '∅'}</li></ul>;
+  return <ul data-testid="diff">{['purchaseLines', 'requirements', 'constructions', 'assignments', 'ledgers', 'sizing', 'reviewRows', 'missingInfrastructure'].map(k => sec(k, d[k]))}{d.reviewRows?.materialChanges?.length ? <li><strong>review rows, material changes</strong><ul>{d.reviewRows.materialChanges.map((m: any) => <li key={m.to}><code>{m.from}</code> → <code>{m.to}</code>{m.sameMembers ? ' (same members)' : ''}: {m.fields.map((f: any) => `${f.field} ${fmtAttr(f.from)} → ${fmtAttr(f.to)}`).join('; ')}</li>)}</ul></li> : null}<li>diagnostics: +{d.diagnostics.added.join(', ') || '∅'} −{d.diagnostics.removed.join(', ') || '∅'}</li></ul>;
 }

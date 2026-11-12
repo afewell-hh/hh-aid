@@ -5,7 +5,26 @@ These are author evidence (t7 / arch). They are not acceptance. Independent veri
 - **Experiment scope:** the FB-01 conditional estimate.
 - **Not covered:** no wiring is emitted, no upstream validation was run, and nothing about hardware or qualification is claimed.
 
-## Commands actually run (at the commit in the issue handoff)
+## Correction pass: lead's B1–B3 (#14 comment 6802266475)
+
+This section supersedes the earlier figures where they differ. The final correction commit is named in the #14 comment.
+
+| Item | Change | Evidence |
+| --- | --- | --- |
+| **B1: lost concurrent edit** | `seed`, `edit` and `refresh` each run their full read-modify-write under `ProjectStore.withInputLock`. A commit that moves `inputHead` must name its base (`expectInputHead`), and a mismatch throws `StaleWriteError`. The UI sends its loaded head as `baseInput` (the CLI takes `--base-input`). A stale write gets HTTP 409, nothing is written, and the tab reloads. | `test/corrections.test.ts`: lead's `Promise.all` repro (edit/edit), edit/refresh, a stale patch and refresh (HEAD and the document count unchanged), and the store guard. `e2e/corrections.spec.ts` B1 runs two tabs: the second gets a visible "stale write" message, then a retry succeeds on top of the first tab's edit ([screens/b1-stale-tab.png](screens/b1-stale-tab.png)). |
+| **B2: invalid export head** | Import validates the envelope types and a 64-hex head that is a listed `ProjectIndex`. It checks the index chain: one project, append-only roots, and an `inputHead` that resolves to a listed `InputRevision` of the project (or is null with no inputs). All of this happens before any file is written; if writing fails partway, the import removes what it created. | `test/corrections.test.ts` covers `''`, `null`, `0`, non-digest and absent heads, a malformed envelope, a missing head, a wrong-kind head, wrong-kind, missing, unlisted and foreign `inputHead`s, inputs without a head, dropped roots and a mixed chain. Each leaves the target uninitialized. A valid empty unseeded project round-trips byte-identically with a clean `fsck`, and a non-empty target is refused. |
+| **B3: per-end physical fields** | `Construction.ends.server` (side A) and `.switch` (side B) are independent. Separate optics carry `cage, connector, pmd, reach, fiber`; an integrated assembly carries `cage, connector, media, length, hostFit`. Each value is a string or a typed unknown, and the schema enforces the fields for each kind. They are seeded from the manifest's construction fields (`null` becomes `not-supplied`; an absent field becomes `not-in-source`), with nothing derived from item names. Row signatures include both ends. Rows expose `inspectableFields`, a derived `unknownFields`, and the shortcuts `physicalA` / `physicalB`. The diff reports `reviewRows.materialChanges` field by field. An ends-only edit previews 0 BOM lines and only the affected rows. The Destinations tab has a construction end editor that the review shortcuts open. | `test/corrections.test.ts`: the baseline keeps all fields unknown on every row. A synthetic `SYNTH-*` case shows the ends differing under identical item descriptions, with purchase lines byte-identical, the same members, a new row, the diff, inspection rules, the BE inspection retained, and the FE inspection needing review after a switch-end change. Kind validation and export/import persistence are also tested. `e2e/corrections.spec.ts` B3: [screens/b3-connection-review.png](screens/b3-connection-review.png), [screens/b3-construction-ends.png](screens/b3-construction-ends.png), [screens/b3-diff.png](screens/b3-diff.png). [screens/cp3-connection-review.png](screens/cp3-connection-review.png) is regenerated with the per-end columns. |
+
+**Format change.** `InputRevision.constructions[].unknownFields` is replaced by `ends`, and the engine is now `hhaid-engine/0.2.0`, so exports from `0b21b90` do not import into this build. BOM, ledger, group, sizing and assignment fields are unchanged: FB-01 numbers and AC1 results are identical (`bom`, `allocation` tests). Output digests differ from `0b21b90` (for example, the scale output is no longer `bede7f8a…`) because review rows changed.
+
+**Performance (lead decision).** About 1.35 GiB peak RSS at scale is kept as a visible experiment limitation. It **exceeds** the 1 GiB investigation threshold and is not a pass. No export redesign was made in this cycle; lead tracks optimization in #16, and parts measures independently.
+- **Not re-run:** the five-sample measurement below is from `0b21b90` and was not repeated for this pass.
+- **One unbenchmarked observation on this build:** a `generate --config scale` on the 1,000-replica fixture completed in 3.76 s with a 1.11 GB maximum RSS (generation only, no export).
+- **Not measured:** UI rendering time, which remains for the independent run.
+
+**Regression commands for this pass:** `npm run typecheck`, `npm test` (51/51), `PLAYWRIGHT_BROWSERS_PATH=$PWD/.toolchain/playwright npm run e2e` (5/5), `npm run determinism` (7/7), `./experiment-check lifecycle --workdir W`, and `python3 -I verification/verify.py self-test`.
+
+## Commands actually run at `0b21b90` (original handoff)
 
 Run from `spikes/first-bom`, with the pinned Node on `PATH`.
 
@@ -68,6 +87,6 @@ The interactive small run (FB-01) generates in about 0.2 s from the CLI. That fi
 
 - **Independent projections from actual exports.** Running parts' `fb01` and `ac1` checkers on application exports needs parts' export-to-projection adapter (owned by #15, not yet published). The fields it needs are in the export (see `schemas/documents.schema.json`). I did not write that adapter, to keep it independent.
 - **UI rendering time** was not measured.
-- **Screenshots** from the e2e run are in [screens/](screens/). The demonstration route is `npm run app -- <projectDir>`.
+- **Screenshots** from the e2e run are in [screens/](screens/); the `b1-*` and `b3-*` screenshots come from the correction pass. The demonstration route is `npm run app -- <projectDir>`.
 - **Not run:** wiring emission, the upstream `hhfab` validation gate, VLAB and hardware. Optics and assembly qualification remain unknown by design.
 - **Scope ledger.** Spine, uplink media, control/gateway, OOB and ancillary sizing stay unresolved. So do arbitrary redundancy and two-plane coverage, broad catalogs, shared hosting and procurement.

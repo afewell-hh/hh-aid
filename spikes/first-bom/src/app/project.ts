@@ -89,6 +89,13 @@ function bumpChangedClasses(oldS: ProjectState, newS: ProjectState) {
   return affected;
 }
 
+/** The most recently committed output (what the user last generated), whatever input it was built from;
+ * edit impact is previewed against it, so consecutive edits keep reporting what that output no longer covers. */
+function latestOutput(store: ProjectStore): any | null {
+  const outs = new Set(store.index().roots.outputs); const id = chainOrder(store).filter(x => outs.has(x)).at(-1);
+  return id ? store.get(id) : null;
+}
+
 /** One input mutation: the whole read-modify-write runs under the store's input lock, so concurrent edits in
  * this process apply in turn (each sees the previous one's result). A caller that derived its change from a
  * specific input (a UI tab's patch with array indexes) passes baseInput; if the head has moved since, the
@@ -108,9 +115,9 @@ async function editLocked(store: ProjectStore, actor: string, change: { mutation
   const classScope = bumpChangedClasses(oldS, next);
   const id = store.put(next);
   if (id === idx.inputHead) return { id, unchanged: true, classScope, impact: null };
-  const last = [...idx.roots.outputs].map(o => store.get(o)).filter(o => o.input === idx.inputHead).at(-1);
+  const last = latestOutput(store);
   await store.commit(actor, `edit:${change.mutation ?? 'patch'}`, () => ({ add: { inputs: [id] }, inputHead: id, expectInputHead: idx.inputHead }));
-  return { id, unchanged: false, classScope, impact: last ? editImpact(oldS, next, last) : null };
+  return { id, unchanged: false, classScope, impact: last ? editImpact(store.get(last.input), next, last) : null };
 }
 
 export function generate(store: ProjectStore, actor: string, opts: { config?: string; deadlineMs?: number; stepMode?: boolean } = {}): RunHandle {
@@ -132,9 +139,9 @@ export function refresh(store: ProjectStore, actor: string, revisionFile: string
   for (const c of next.leafContexts) if (c.profile.evidenceId === baseId) c.profile.evidenceId = evId;
   next.revision = s.revision + 1; next.parent = idx.inputHead; next.change = `evidence refresh: ${file.id} (${file.origin}; not a Hedgehog release)`;
   const id = store.put(next);
-  const last = [...idx.roots.outputs].map(o => store.get(o)).filter(o => o.input === idx.inputHead).at(-1);
+  const last = latestOutput(store);
   await store.commit(actor, 'refresh', () => ({ add: { inputs: [id], evidence: [evId] }, inputHead: id, expectInputHead: idx.inputHead }));
-  return { id, evidence: evId, impact: last ? editImpact(s, next, last) : null };
+  return { id, evidence: evId, impact: last ? editImpact(store.get(last.input), next, last) : null };
   });
 }
 

@@ -158,10 +158,13 @@ test('B3 synthetic values: two ends differ despite identical item descriptions; 
     await review(store, 'lead', o1, beRow.id, ['sideB.mode'], 'BE checked');
     const fi = consIndex(store, 'FE-OPT');
     // clearly synthetic values; not vendor data and not qualification
-    await edit(store, 'lead', { patch: [
+    const pe = await edit(store, 'lead', { patch: [
       ...setEnd(fi, 'server', { cage: 'SYNTH-CAGE-X', connector: 'SYNTH-CONN-1', pmd: 'SYNTH-PMD-P', reach: 'SYNTH-REACH-50', fiber: 'SYNTH-FIBER-MM' }),
       ...setEnd(fi, 'switch', { cage: 'SYNTH-CAGE-Y', connector: 'SYNTH-CONN-2', pmd: 'SYNTH-PMD-P' }),
     ], note: 'B3 synthetic end attributes (test only)' });
+    assert.deepEqual(pe.impact!.affectedPurchaseLines, [], 'physical-only edit previews no BOM line change');
+    assert.deepEqual(pe.impact!.affectedLedgers, []);
+    assert.deepEqual(pe.impact!.affectedReviewRows, out1.reviewRows.filter((r: any) => r.signature.construction.id === 'FE-OPT').map((r: any) => r.id).sort());
     const { id: o2, o: out2 } = await out(store);
     const row = out2.reviewRows.find((r: any) => r.signature.network === 'NET-FE' && r.signature.sideA.classId === 'A');
     assert.equal(row.signature.sideA.item, feA.signature.sideA.item, 'same item description');

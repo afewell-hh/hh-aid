@@ -16,14 +16,14 @@ test('review, edit shortcut, stale, regenerate, diff', async ({ page, project })
   const rows = page.getByTestId('review-rows').locator('tbody tr');
   await expect(rows).toHaveCount(3);
   const bRow = rows.filter({ hasText: 'B@r1 · frontend_nic_200' });
-  await expect(bRow).toContainText('LC-FE/FE-SERVER · 4x200G'); await expect(bRow).toContainText('pmd, connector, fiber_type, reach');
+  await expect(bRow).toContainText('LC-FE/FE-SERVER · 4x200G'); await expect(bRow.getByTestId('phys-A')).toContainText('Optical PMD: unknown'); await expect(bRow.getByTestId('phys-B')).toContainText('Connector: unknown');
   await bRow.click();
   await page.getByLabel('sideB.mode').check(); await page.getByLabel('review note').fill('B frontend both ends checked');
   await page.getByRole('button', { name: 'Save inspection' }).click();
   await expect(bRow).toContainText('retained within unchanged scope');
   await page.screenshot({ path: join(shots, 'cp3-connection-review.png'), fullPage: true });
   // edit shortcut lands on the source class slot
-  await rows.filter({ hasText: 'A@r1 · frontend_dual_dpu_200' }).getByRole('button', { name: 'edit' }).first().click();
+  await rows.filter({ hasText: 'A@r1 · frontend_dual_dpu_200' }).getByRole('button', { name: /edit side A source/ }).first().click();
   await expect(page.getByTestId('class-A')).toHaveClass(/focus/);
   // identity-preserving count edit -> output stale until regenerated
   await page.getByTestId('pop-POP-A').getByRole('button', { name: 'Add server' }).click();

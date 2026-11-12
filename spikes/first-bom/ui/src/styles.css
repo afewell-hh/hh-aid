@@ -28,3 +28,6 @@ button.link { border: 0; color: var(--accent); padding: 0 4px; text-decoration: 
 .grid { display: grid; grid-template-columns: max-content 1fr; gap: 4px 16px; } .grid dt { color: var(--muted); } .grid dd { margin: 0; }
 .chk { display: inline-flex; gap: 4px; margin-right: 12px; } fieldset { border: 1px solid var(--line); border-radius: 6px; margin: 8px 0; }
 code { font-size: .82rem; word-break: break-all; }
+.phys { display: flex; flex-direction: column; gap: 1px; font-size: .8rem; } .phys .unk, .chk.unk { color: var(--muted); font-style: italic; }
+td.focus { background: var(--focus); outline: 2px solid var(--accent); }
+table.ends input { width: 100%; min-width: 9rem; } table.review { font-size: .9rem; }

@@ -57,7 +57,11 @@ export function editImpact(oldIn: any, newIn: any, output: any) {
   const lockCtx = new Set<string>([...oldIn.locks, ...newIn.locks].filter((l: any) => !same(oldIn.locks.find((x: any) => x.id === l.id), newIn.locks.find((x: any) => x.id === l.id))).map((l: any) => l.context));
   const evidenceChanged = !same(oldIn.evidence, newIn.evidence);
   for (const c of lockCtx) contexts.add(c);
-  for (const n of [...oldIn.networks, ...newIn.networks]) { if (nets.has(n.id) || cons.has(n.construction)) contexts.add(n.leafContext); }
+  // A construction whose only change is its physical end attributes affects review rows (signatures), not
+  // counts, ledgers or BOM lines.
+  const withoutEnds = (c: any) => { if (!c) return c; const { ends: _e, ...rest } = c; return rest; };
+  const physOnly = new Set([...cons].filter(id => { const a = oldIn.constructions.find((c: any) => c.id === id), b = newIn.constructions.find((c: any) => c.id === id); return a && b && same(withoutEnds(a), withoutEnds(b)); }));
+  for (const n of [...oldIn.networks, ...newIn.networks]) { if (nets.has(n.id) || (cons.has(n.construction) && !physOnly.has(n.construction))) contexts.add(n.leafContext); }
   if (evidenceChanged) for (const c of newIn.leafContexts) contexts.add(c.id);
   const popsOfClass = (cid: string) => newIn.populations.concat(oldIn.populations).filter((p: any) => p.classId === cid).map((p: any) => p.id);
   for (const c of classes) for (const p of popsOfClass(c)) pops.add(p);
@@ -66,7 +70,7 @@ export function editImpact(oldIn: any, newIn: any, output: any) {
   const affectedCtx = new Set(contexts); if (pops.size) for (const n of newIn.networks) affectedCtx.add(n.leafContext); // population changes alter demands
   const lines = (output.purchaseLines ?? []).filter((l: any) => l.requirementIds.some((r: string) => reqs.has(r) || affectedCtx.has(ctxOfCons.get(r) as string))).map((l: any) => l.id).sort(byId);
   const classesOfPops = new Set(newIn.populations.concat(oldIn.populations).filter((p: any) => pops.has(p.id)).map((p: any) => p.classId));
-  const rows = (output.reviewRows ?? []).filter((r: any) => classes.has(r.signature.sideA.classId) || classesOfPops.has(r.signature.sideA.classId) || affectedCtx.has(r.signature.sideB.context)).map((r: any) => r.id).sort(byId);
+  const rows = (output.reviewRows ?? []).filter((r: any) => physOnly.has(r.signature.construction.id) || classes.has(r.signature.sideA.classId) || classesOfPops.has(r.signature.sideA.classId) || affectedCtx.has(r.signature.sideB.context)).map((r: any) => r.id).sort(byId);
   return { changed: { classes: [...classes].sort(byId), populations: [...pops].sort(byId), contexts: [...contexts].sort(byId), networks: [...nets].sort(byId), constructions: [...cons].sort(byId), evidence: evidenceChanged }, affectedPurchaseLines: lines, affectedReviewRows: rows, affectedLedgers: (output.ledgers ?? []).filter((l: any) => affectedCtx.has(l.context)).map((l: any) => l.id).sort(byId) };
 }
 
