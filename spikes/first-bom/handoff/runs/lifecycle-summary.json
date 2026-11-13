@@ -1,0 +1,116 @@
+{
+ "appCommit": "0e95dc641b523bed527ac5e3618d510ec22f781d",
+ "reexportIdentical": true,
+ "regeneratedHeadOutput": "5adcbb1efa49d745e8b4decd9e1f35475e86b50e16cb79d4145dd874e2f9b70d",
+ "headOutput": "5adcbb1efa49d745e8b4decd9e1f35475e86b50e16cb79d4145dd874e2f9b70d",
+ "regenerationMatches": true,
+ "fsck": {
+  "reachable": 44,
+  "orphans": [],
+  "problems": []
+ },
+ "steps": [
+  {
+   "command": "hhaid new",
+   "ms": 143,
+   "outcome": null
+  },
+  {
+   "command": "hhaid seed",
+   "ms": 146,
+   "outcome": null
+  },
+  {
+   "command": "hhaid generate",
+   "ms": 194,
+   "outcome": "complete"
+  },
+  {
+   "command": "hhaid export",
+   "ms": 126,
+   "outcome": null
+  },
+  {
+   "command": "hhaid review",
+   "ms": 139,
+   "outcome": null
+  },
+  {
+   "command": "hhaid edit --mutation FB-DPU",
+   "ms": 138,
+   "outcome": null
+  },
+  {
+   "command": "hhaid generate",
+   "ms": 178,
+   "outcome": "complete"
+  },
+  {
+   "command": "hhaid export",
+   "ms": 136,
+   "outcome": null
+  },
+  {
+   "command": "hhaid edit --mutation FB-COUNT",
+   "ms": 142,
+   "outcome": null
+  },
+  {
+   "command": "hhaid generate",
+   "ms": 201,
+   "outcome": "complete"
+  },
+  {
+   "command": "hhaid export",
+   "ms": 143,
+   "outcome": null
+  },
+  {
+   "command": "hhaid refresh",
+   "ms": 152,
+   "outcome": null
+  },
+  {
+   "command": "hhaid generate",
+   "ms": 200,
+   "outcome": "complete"
+  },
+  {
+   "command": "hhaid export",
+   "ms": 147,
+   "outcome": null
+  },
+  {
+   "command": "hhaid diff",
+   "ms": 140,
+   "outcome": null
+  },
+  {
+   "command": "hhaid assess",
+   "ms": 129,
+   "outcome": null
+  },
+  {
+   "command": "hhaid export",
+   "ms": 150,
+   "outcome": null
+  },
+  {
+   "command": "hhaid import",
+   "ms": 352,
+   "outcome": null
+  },
+  {
+   "command": "hhaid fsck",
+   "ms": 140,
+   "outcome": null
+  }
+ ],
+ "exports": {
+  "01-baseline": "01-baseline.hhaid.json",
+  "02-FB-DPU": "02-FB-DPU.hhaid.json",
+  "03-FB-COUNT": "03-FB-COUNT.hhaid.json",
+  "04-evidence-refresh": "04-evidence-refresh.hhaid.json",
+  "05-final": "05-final.hhaid.json"
+ }
+}

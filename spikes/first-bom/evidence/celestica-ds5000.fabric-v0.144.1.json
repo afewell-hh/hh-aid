@@ -1,0 +1,678 @@
+{
+  "name": "celestica-ds5000",
+  "spec": {
+    "displayName": "Celestica DS5000",
+    "otherNames": [
+      "Celestica Moonstone"
+    ],
+    "switchSilicon": "Broadcom TH5",
+    "features": {
+      "subinterfaces": true,
+      "acls": true,
+      "l3vni": true,
+      "roce": true,
+      "ecmpRoCEQPN": true,
+      "portLocator": true
+    },
+    "notes": "Doesn't support non-L3 VPC modes due to the lack of L2VNI support.",
+    "config": {},
+    "ports": {
+      "E1/1": {
+        "nos": "1/1",
+        "baseNOSName": "Ethernet0",
+        "label": "1",
+        "profile": "OSFP-800G",
+        "pipeline": "1"
+      },
+      "E1/10": {
+        "nos": "1/10",
+        "baseNOSName": "Ethernet72",
+        "label": "10",
+        "profile": "OSFP-800G",
+        "pipeline": "6"
+      },
+      "E1/11": {
+        "nos": "1/11",
+        "baseNOSName": "Ethernet80",
+        "label": "11",
+        "profile": "OSFP-800G",
+        "pipeline": "6"
+      },
+      "E1/12": {
+        "nos": "1/12",
+        "baseNOSName": "Ethernet88",
+        "label": "12",
+        "profile": "OSFP-800G",
+        "pipeline": "5"
+      },
+      "E1/13": {
+        "nos": "1/13",
+        "baseNOSName": "Ethernet96",
+        "label": "13",
+        "profile": "OSFP-800G",
+        "pipeline": "7"
+      },
+      "E1/14": {
+        "nos": "1/14",
+        "baseNOSName": "Ethernet104",
+        "label": "14",
+        "profile": "OSFP-800G",
+        "pipeline": "8"
+      },
+      "E1/15": {
+        "nos": "1/15",
+        "baseNOSName": "Ethernet112",
+        "label": "15",
+        "profile": "OSFP-800G",
+        "pipeline": "8"
+      },
+      "E1/16": {
+        "nos": "1/16",
+        "baseNOSName": "Ethernet120",
+        "label": "16",
+        "profile": "OSFP-800G",
+        "pipeline": "7"
+      },
+      "E1/17": {
+        "nos": "1/17",
+        "baseNOSName": "Ethernet128",
+        "label": "17",
+        "profile": "OSFP-800G",
+        "pipeline": "9"
+      },
+      "E1/18": {
+        "nos": "1/18",
+        "baseNOSName": "Ethernet136",
+        "label": "18",
+        "profile": "OSFP-800G",
+        "pipeline": "10"
+      },
+      "E1/19": {
+        "nos": "1/19",
+        "baseNOSName": "Ethernet144",
+        "label": "19",
+        "profile": "OSFP-800G",
+        "pipeline": "10"
+      },
+      "E1/2": {
+        "nos": "1/2",
+        "baseNOSName": "Ethernet8",
+        "label": "2",
+        "profile": "OSFP-800G",
+        "pipeline": "2"
+      },
+      "E1/20": {
+        "nos": "1/20",
+        "baseNOSName": "Ethernet152",
+        "label": "20",
+        "profile": "OSFP-800G",
+        "pipeline": "9"
+      },
+      "E1/21": {
+        "nos": "1/21",
+        "baseNOSName": "Ethernet160",
+        "label": "21",
+        "profile": "OSFP-800G",
+        "pipeline": "11"
+      },
+      "E1/22": {
+        "nos": "1/22",
+        "baseNOSName": "Ethernet168",
+        "label": "22",
+        "profile": "OSFP-800G",
+        "pipeline": "12"
+      },
+      "E1/23": {
+        "nos": "1/23",
+        "baseNOSName": "Ethernet176",
+        "label": "23",
+        "profile": "OSFP-800G",
+        "pipeline": "12"
+      },
+      "E1/24": {
+        "nos": "1/24",
+        "baseNOSName": "Ethernet184",
+        "label": "24",
+        "profile": "OSFP-800G",
+        "pipeline": "11"
+      },
+      "E1/25": {
+        "nos": "1/25",
+        "baseNOSName": "Ethernet192",
+        "label": "25",
+        "profile": "OSFP-800G",
+        "pipeline": "13"
+      },
+      "E1/26": {
+        "nos": "1/26",
+        "baseNOSName": "Ethernet200",
+        "label": "26",
+        "profile": "OSFP-800G",
+        "pipeline": "14"
+      },
+      "E1/27": {
+        "nos": "1/27",
+        "baseNOSName": "Ethernet208",
+        "label": "27",
+        "profile": "OSFP-800G",
+        "pipeline": "14"
+      },
+      "E1/28": {
+        "nos": "1/28",
+        "baseNOSName": "Ethernet216",
+        "label": "28",
+        "profile": "OSFP-800G",
+        "pipeline": "13"
+      },
+      "E1/29": {
+        "nos": "1/29",
+        "baseNOSName": "Ethernet224",
+        "label": "29",
+        "profile": "OSFP-800G",
+        "pipeline": "15"
+      },
+      "E1/3": {
+        "nos": "1/3",
+        "baseNOSName": "Ethernet16",
+        "label": "3",
+        "profile": "OSFP-800G",
+        "pipeline": "2"
+      },
+      "E1/30": {
+        "nos": "1/30",
+        "baseNOSName": "Ethernet232",
+        "label": "30",
+        "profile": "OSFP-800G",
+        "pipeline": "16"
+      },
+      "E1/31": {
+        "nos": "1/31",
+        "baseNOSName": "Ethernet240",
+        "label": "31",
+        "profile": "OSFP-800G",
+        "pipeline": "16"
+      },
+      "E1/32": {
+        "nos": "1/32",
+        "baseNOSName": "Ethernet248",
+        "label": "32",
+        "profile": "OSFP-800G",
+        "pipeline": "15"
+      },
+      "E1/33": {
+        "nos": "1/33",
+        "baseNOSName": "Ethernet256",
+        "label": "33",
+        "profile": "OSFP-800G",
+        "pipeline": "17"
+      },
+      "E1/34": {
+        "nos": "1/34",
+        "baseNOSName": "Ethernet264",
+        "label": "34",
+        "profile": "OSFP-800G",
+        "pipeline": "18"
+      },
+      "E1/35": {
+        "nos": "1/35",
+        "baseNOSName": "Ethernet272",
+        "label": "35",
+        "profile": "OSFP-800G",
+        "pipeline": "18"
+      },
+      "E1/36": {
+        "nos": "1/36",
+        "baseNOSName": "Ethernet280",
+        "label": "36",
+        "profile": "OSFP-800G",
+        "pipeline": "17"
+      },
+      "E1/37": {
+        "nos": "1/37",
+        "baseNOSName": "Ethernet288",
+        "label": "37",
+        "profile": "OSFP-800G",
+        "pipeline": "19"
+      },
+      "E1/38": {
+        "nos": "1/38",
+        "baseNOSName": "Ethernet296",
+        "label": "38",
+        "profile": "OSFP-800G",
+        "pipeline": "20"
+      },
+      "E1/39": {
+        "nos": "1/39",
+        "baseNOSName": "Ethernet304",
+        "label": "39",
+        "profile": "OSFP-800G",
+        "pipeline": "20"
+      },
+      "E1/4": {
+        "nos": "1/4",
+        "baseNOSName": "Ethernet24",
+        "label": "4",
+        "profile": "OSFP-800G",
+        "pipeline": "1"
+      },
+      "E1/40": {
+        "nos": "1/40",
+        "baseNOSName": "Ethernet312",
+        "label": "40",
+        "profile": "OSFP-800G",
+        "pipeline": "19"
+      },
+      "E1/41": {
+        "nos": "1/41",
+        "baseNOSName": "Ethernet320",
+        "label": "41",
+        "profile": "OSFP-800G",
+        "pipeline": "21"
+      },
+      "E1/42": {
+        "nos": "1/42",
+        "baseNOSName": "Ethernet328",
+        "label": "42",
+        "profile": "OSFP-800G",
+        "pipeline": "22"
+      },
+      "E1/43": {
+        "nos": "1/43",
+        "baseNOSName": "Ethernet336",
+        "label": "43",
+        "profile": "OSFP-800G",
+        "pipeline": "22"
+      },
+      "E1/44": {
+        "nos": "1/44",
+        "baseNOSName": "Ethernet344",
+        "label": "44",
+        "profile": "OSFP-800G",
+        "pipeline": "21"
+      },
+      "E1/45": {
+        "nos": "1/45",
+        "baseNOSName": "Ethernet352",
+        "label": "45",
+        "profile": "OSFP-800G",
+        "pipeline": "23"
+      },
+      "E1/46": {
+        "nos": "1/46",
+        "baseNOSName": "Ethernet360",
+        "label": "46",
+        "profile": "OSFP-800G",
+        "pipeline": "24"
+      },
+      "E1/47": {
+        "nos": "1/47",
+        "baseNOSName": "Ethernet368",
+        "label": "47",
+        "profile": "OSFP-800G",
+        "pipeline": "24"
+      },
+      "E1/48": {
+        "nos": "1/48",
+        "baseNOSName": "Ethernet376",
+        "label": "48",
+        "profile": "OSFP-800G",
+        "pipeline": "23"
+      },
+      "E1/49": {
+        "nos": "1/49",
+        "baseNOSName": "Ethernet384",
+        "label": "49",
+        "profile": "OSFP-800G",
+        "pipeline": "25"
+      },
+      "E1/5": {
+        "nos": "1/5",
+        "baseNOSName": "Ethernet32",
+        "label": "5",
+        "profile": "OSFP-800G",
+        "pipeline": "3"
+      },
+      "E1/50": {
+        "nos": "1/50",
+        "baseNOSName": "Ethernet392",
+        "label": "50",
+        "profile": "OSFP-800G",
+        "pipeline": "26"
+      },
+      "E1/51": {
+        "nos": "1/51",
+        "baseNOSName": "Ethernet400",
+        "label": "51",
+        "profile": "OSFP-800G",
+        "pipeline": "26"
+      },
+      "E1/52": {
+        "nos": "1/52",
+        "baseNOSName": "Ethernet408",
+        "label": "52",
+        "profile": "OSFP-800G",
+        "pipeline": "25"
+      },
+      "E1/53": {
+        "nos": "1/53",
+        "baseNOSName": "Ethernet416",
+        "label": "53",
+        "profile": "OSFP-800G",
+        "pipeline": "27"
+      },
+      "E1/54": {
+        "nos": "1/54",
+        "baseNOSName": "Ethernet424",
+        "label": "54",
+        "profile": "OSFP-800G",
+        "pipeline": "28"
+      },
+      "E1/55": {
+        "nos": "1/55",
+        "baseNOSName": "Ethernet432",
+        "label": "55",
+        "profile": "OSFP-800G",
+        "pipeline": "28"
+      },
+      "E1/56": {
+        "nos": "1/56",
+        "baseNOSName": "Ethernet440",
+        "label": "56",
+        "profile": "OSFP-800G",
+        "pipeline": "27"
+      },
+      "E1/57": {
+        "nos": "1/57",
+        "baseNOSName": "Ethernet448",
+        "label": "57",
+        "profile": "OSFP-800G",
+        "pipeline": "29"
+      },
+      "E1/58": {
+        "nos": "1/58",
+        "baseNOSName": "Ethernet456",
+        "label": "58",
+        "profile": "OSFP-800G",
+        "pipeline": "30"
+      },
+      "E1/59": {
+        "nos": "1/59",
+        "baseNOSName": "Ethernet464",
+        "label": "59",
+        "profile": "OSFP-800G",
+        "pipeline": "30"
+      },
+      "E1/6": {
+        "nos": "1/6",
+        "baseNOSName": "Ethernet40",
+        "label": "6",
+        "profile": "OSFP-800G",
+        "pipeline": "4"
+      },
+      "E1/60": {
+        "nos": "1/60",
+        "baseNOSName": "Ethernet472",
+        "label": "60",
+        "profile": "OSFP-800G",
+        "pipeline": "29"
+      },
+      "E1/61": {
+        "nos": "1/61",
+        "baseNOSName": "Ethernet480",
+        "label": "61",
+        "profile": "OSFP-800G",
+        "pipeline": "31"
+      },
+      "E1/62": {
+        "nos": "1/62",
+        "baseNOSName": "Ethernet488",
+        "label": "62",
+        "profile": "OSFP-800G",
+        "pipeline": "32"
+      },
+      "E1/63": {
+        "nos": "1/63",
+        "baseNOSName": "Ethernet496",
+        "label": "63",
+        "profile": "OSFP-800G",
+        "pipeline": "32"
+      },
+      "E1/64": {
+        "nos": "1/64",
+        "baseNOSName": "Ethernet504",
+        "label": "64",
+        "profile": "OSFP-800G",
+        "pipeline": "31"
+      },
+      "E1/65": {
+        "nos": "Ethernet512",
+        "label": "65",
+        "profile": "SFP28-25G"
+      },
+      "E1/66": {
+        "nos": "Ethernet513",
+        "label": "66",
+        "profile": "SFP28-25G"
+      },
+      "E1/7": {
+        "nos": "1/7",
+        "baseNOSName": "Ethernet48",
+        "label": "7",
+        "profile": "OSFP-800G",
+        "pipeline": "4"
+      },
+      "E1/8": {
+        "nos": "1/8",
+        "baseNOSName": "Ethernet56",
+        "label": "8",
+        "profile": "OSFP-800G",
+        "pipeline": "3"
+      },
+      "E1/9": {
+        "nos": "1/9",
+        "baseNOSName": "Ethernet64",
+        "label": "9",
+        "profile": "OSFP-800G",
+        "pipeline": "5"
+      },
+      "M1": {
+        "nos": "Management0",
+        "management": true,
+        "oniePortName": "eth0"
+      }
+    },
+    "portProfiles": {
+      "OSFP-800G": {
+        "breakout": {
+          "default": "1x800G",
+          "supported": {
+            "1x100G": {
+              "offsets": [
+                "0"
+              ]
+            },
+            "1x400G": {
+              "offsets": [
+                "0"
+              ]
+            },
+            "1x50G": {
+              "offsets": [
+                "0"
+              ]
+            },
+            "1x800G": {
+              "offsets": [
+                "0"
+              ]
+            },
+            "2x100G": {
+              "offsets": [
+                "0",
+                "4"
+              ]
+            },
+            "2x200G": {
+              "offsets": [
+                "0",
+                "4"
+              ]
+            },
+            "2x400G": {
+              "offsets": [
+                "0",
+                "4"
+              ]
+            },
+            "2x50G": {
+              "offsets": [
+                "0",
+                "2"
+              ]
+            },
+            "4x100G": {
+              "offsets": [
+                "0",
+                "2",
+                "4",
+                "6"
+              ]
+            },
+            "4x200G": {
+              "offsets": [
+                "0",
+                "2",
+                "4",
+                "6"
+              ]
+            },
+            "8x100G": {
+              "offsets": [
+                "0",
+                "1",
+                "2",
+                "3",
+                "4",
+                "5",
+                "6",
+                "7"
+              ]
+            }
+          }
+        },
+        "autoNegAllowed": true
+      },
+      "SFP28-25G": {
+        "speed": {
+          "default": "25G",
+          "supported": [
+            "1G",
+            "10G",
+            "25G"
+          ]
+        }
+      }
+    },
+    "nosType": "sonic-bcm-base",
+    "platform": "x86-64-cls-ds5000-r0",
+    "pipelines": {
+      "1": {
+        "maxPorts": 10
+      },
+      "10": {
+        "maxPorts": 10
+      },
+      "11": {
+        "maxPorts": 10
+      },
+      "12": {
+        "maxPorts": 10
+      },
+      "13": {
+        "maxPorts": 10
+      },
+      "14": {
+        "maxPorts": 10
+      },
+      "15": {
+        "maxPorts": 10
+      },
+      "16": {
+        "maxPorts": 10
+      },
+      "17": {
+        "maxPorts": 10
+      },
+      "18": {
+        "maxPorts": 10
+      },
+      "19": {
+        "maxPorts": 10
+      },
+      "2": {
+        "maxPorts": 10
+      },
+      "20": {
+        "maxPorts": 10
+      },
+      "21": {
+        "maxPorts": 10
+      },
+      "22": {
+        "maxPorts": 10
+      },
+      "23": {
+        "maxPorts": 10
+      },
+      "24": {
+        "maxPorts": 10
+      },
+      "25": {
+        "maxPorts": 10
+      },
+      "26": {
+        "maxPorts": 10
+      },
+      "27": {
+        "maxPorts": 10
+      },
+      "28": {
+        "maxPorts": 10
+      },
+      "29": {
+        "maxPorts": 10
+      },
+      "3": {
+        "maxPorts": 10
+      },
+      "30": {
+        "maxPorts": 10
+      },
+      "31": {
+        "maxPorts": 10
+      },
+      "32": {
+        "maxPorts": 10
+      },
+      "4": {
+        "maxPorts": 10
+      },
+      "5": {
+        "maxPorts": 10
+      },
+      "6": {
+        "maxPorts": 10
+      },
+      "7": {
+        "maxPorts": 10
+      },
+      "8": {
+        "maxPorts": 10
+      },
+      "9": {
+        "maxPorts": 10
+      }
+    },
+    "maxPorts": 320
+  }
+}

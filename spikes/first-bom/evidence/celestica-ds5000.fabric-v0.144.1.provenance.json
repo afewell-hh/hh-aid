@@ -1,0 +1,16 @@
+{
+  "command": "GOTOOLCHAIN=go1.27.3 go run . celestica-ds5000.fabric-v0.144.1.json celestica-ds5000.fabric-v0.144.1.provenance.json",
+  "expected_commit": "4bde50829fd7cfebac69332982abd1dee504a8a3",
+  "go_toolchain": "go1.27.3",
+  "module": "go.githedgehog.com/fabric",
+  "module_sum": "h1:fphd4WgmdXUSF6mabU9BQrWiSp8M7dNJS08i26T/ecc=",
+  "module_version": "v0.144.1",
+  "origin": "extracted",
+  "output_file": "celestica-ds5000.fabric-v0.144.1.json",
+  "output_sha256": "865ca7f4e430abfb91764751e92352c6d5bea5d7daefa950cd98e612533ec8bf",
+  "profile": "celestica-ds5000",
+  "schema": "hhaid-extraction-provenance/1",
+  "source_file": "pkg/ctrl/switchprofile/p_bcm_celestica_ds5000.go",
+  "source_git_blob": "99eea5fe0d160bd6ab21451c1b10dc195f82cb68",
+  "source_sha256": "23429fc477dbd7e46dfb249958401c26c317456fd14c7177622d9b98fe8ef22c"
+}
